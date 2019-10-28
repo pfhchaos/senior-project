@@ -51,7 +51,7 @@ public class ARFragment extends Fragment {
 
                     camView.setSurfaceTexture(previewOutput.getSurfaceTexture());
 
-                    //updateTransform();
+                    updateTransform();
                 });
 
 
