@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         checkPermissions();
+        drawer.openDrawer(GravityCompat.START);
     }
 
     private void checkPermissions() {

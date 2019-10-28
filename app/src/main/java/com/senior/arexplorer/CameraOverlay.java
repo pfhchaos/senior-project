@@ -15,8 +15,9 @@ public class CameraOverlay extends View{
     private Runnable clockTimer;
     private boolean isRunning = true;
     Paint p = new Paint();
-    Rect rect = new Rect();
+    Rect rect = new Rect(), curCompass = new Rect();
     Bitmap compass;
+    int bearing = 0;
 
     private final long TIMER_MSEC = 100;
 
@@ -31,11 +32,13 @@ public class CameraOverlay extends View{
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
 
+
         clockHandler = new Handler();
         clockTimer = new Runnable() {
             @Override
             public void run(){
                 if(isRunning) {
+                    bearing += 20;
                     invalidate();
                     clockHandler.postDelayed(this, TIMER_MSEC);
                 }
@@ -44,6 +47,8 @@ public class CameraOverlay extends View{
         clockTimer.run();
 
         compass = BitmapFactory.decodeResource(getResources(),R.drawable.compass);
+        toggleTimer();
+
     }
 
     public void toggleTimer(){
@@ -70,7 +75,18 @@ public class CameraOverlay extends View{
         canvas.scale(sx,sy);
 
         rect.set(500,500,9500,1000);
-        canvas.drawBitmap(compass, new Rect(0,0,compass.getWidth()/2, compass.getHeight()), rect, null);
+        calcCompass();
+        canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
+    private void calcCompass(){
+        int width = compass.getWidth();
+        int offset = width / 4;
+        int mid =  width / 2 + bearing;
+        if(mid >= width / 2 + offset) {
+            mid = width / 2 - offset;
+            bearing = - offset;
+        }
+        curCompass.set(mid - offset,0,mid + offset, compass.getHeight());
+    }
 }
