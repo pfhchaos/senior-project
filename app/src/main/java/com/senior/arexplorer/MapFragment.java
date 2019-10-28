@@ -34,7 +34,7 @@ import java.util.ArrayList;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private static final int PERMISSION_REQUEST = -1;
+    private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final String ZOOM_KEY = "zoom_key";
     private static final String MAP_OPTIONS_LIST_KEY = "map_options_list_key";
     private float zoom = 10;
@@ -44,12 +44,51 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        mapFragment.getMapAsync(this);
+        getChildFragmentManager().beginTransaction().replace(R.id.mapView, mapFragment).commit();
+
+        final Button mark = getActivity().findViewById(R.id.button_mark);
+
+        if (savedInstanceState != null) {
+            markerOptionsList = (ArrayList<MarkerOptions>) savedInstanceState.getSerializable(MAP_OPTIONS_LIST_KEY);
+            zoom = savedInstanceState.getFloat(ZOOM_KEY);
+        }
+        else markerOptionsList = new ArrayList<MarkerOptions>();
+
+        markerList = new ArrayList<Marker>();
+/*
+        mark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Location location = getLocation();
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.title("Mark" + markerOptionsList.size() + 1);
+                markerOptions.position(new LatLng(location.getLatitude(),location.getLongitude()));
+                markerOptionsList.add(markerOptions);
+                markerList.add(mMap.addMarker(markerOptions));
+            }
+        });
+
+        mark.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (markerList.size() != 0) {
+                    Marker lastAdded = markerList.remove(markerList.size() - 1);
+                    markerOptionsList.remove(markerOptionsList.size() - 1);
+                    lastAdded.remove();
+                }
+                return true;
+            }
+        });
+*/
         return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
     private void initMap() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_LOCATION);
             return;
         }
         this.mMap.setMyLocationEnabled(true);
@@ -122,7 +161,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onRequestPermissionsResult(int rqst, String perms[], int[] res) {
-        if (rqst == PERMISSION_REQUEST) {
+        if (rqst == PERMISSION_REQUEST_LOCATION) {
             // if the request is cancelled, the result arrays are empty.
             if (res.length>0 && res[0] == PackageManager.PERMISSION_GRANTED) {
                 // permission was granted! We can now init the map
@@ -138,53 +177,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getActivity().setContentView(R.layout.fragment_map);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.mapView);
-        mapFragment.getMapAsync(this);
 
-        Button mapType = getActivity().findViewById(R.id.button_changeType);
-        final Button mark = getActivity().findViewById(R.id.button_mark);
-
-        if (savedInstanceState != null) {
-            markerOptionsList = (ArrayList<MarkerOptions>) savedInstanceState.getSerializable(MAP_OPTIONS_LIST_KEY);
-            zoom = savedInstanceState.getFloat(ZOOM_KEY);
-        }
-        else markerOptionsList = new ArrayList<MarkerOptions>();
-
-        markerList = new ArrayList<Marker>();
-
-        mapType.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mMap.getMapType() == mMap.MAP_TYPE_NORMAL) mMap.setMapType(mMap.MAP_TYPE_SATELLITE);
-                else if (mMap.getMapType() == mMap.MAP_TYPE_SATELLITE) mMap.setMapType(mMap.MAP_TYPE_TERRAIN);
-                else if (mMap.getMapType() == mMap.MAP_TYPE_TERRAIN) mMap.setMapType(mMap.MAP_TYPE_NORMAL);
-            }
-        });
-
-        mark.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Location location = getLocation();
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.title("Mark" + markerOptionsList.size() + 1);
-                markerOptions.position(new LatLng(location.getLatitude(),location.getLongitude()));
-                markerOptionsList.add(markerOptions);
-                markerList.add(mMap.addMarker(markerOptions));
-            }
-        });
-
-        mark.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (markerList.size() != 0) {
-                    Marker lastAdded = markerList.remove(markerList.size() - 1);
-                    markerOptionsList.remove(markerOptionsList.size() - 1);
-                    lastAdded.remove();
-                }
-                return true;
-            }
-        });
     }
 
 
