@@ -2,15 +2,22 @@ package com.senior.arexplorer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final int PERMISSION_REQUEST_LOCATION = 1;
+    private static final int PERMISSION_REQUEST_CAMERA = 10;
     DrawerLayout drawer;
 
     @Override
@@ -26,6 +33,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
             navView.setCheckedItem(R.id.nav_home);
         }
+
+        checkPermissions();
+    }
+
+    private void checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSION_REQUEST_CAMERA);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_LOCATION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int rqst, String perms[], int[] res) {
+        switch(rqst){
+            case PERMISSION_REQUEST_CAMERA :
+            case PERMISSION_REQUEST_LOCATION :
+                // if the request is cancelled, the result arrays are empty.
+                if (res.length>0 && res[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted! We can now init the map
+                } else {
+                    Toast.makeText(this, "This app is useless without loc permissions",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    System.exit(0);
+                }
+                break;
+        }
+
     }
 
     @Override
@@ -59,4 +102,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 }
