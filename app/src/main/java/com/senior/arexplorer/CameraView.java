@@ -37,8 +37,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    public void surfaceDestroyed(SurfaceHolder holder) {
-    }
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         if (mHolder.getSurface() == null){
@@ -59,71 +58,5 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        Paint p = new Paint();
-        p.setColor(Color.BLUE);
-        canvas.translate(50, 50);
-        canvas.drawPoint(150,150, p);
-    }
 
-    public CameraOverlay getOverlay(Context context){
-        return new CameraOverlay(context);
-    }
-
-    protected class CameraOverlay extends View
-    {
-        private Handler clockHandler;
-        private Runnable clockTimer;
-        private boolean isRunning = true;
-
-        private final long TIMER_MSEC = 100;
-
-        public CameraOverlay(Context context){
-            super(context);
-            init();
-        }
-
-        public void init(){
-
-            setWillNotDraw(false);
-            setBackgroundColor(Color.TRANSPARENT);
-            setAlpha(1f);
-            clockHandler = new Handler();
-            clockTimer = new Runnable() {
-                @Override
-                public void run(){
-                    if(isRunning) {
-                        invalidate();
-                        clockHandler.postDelayed(this, TIMER_MSEC);
-                    }
-                }
-            };
-            clockTimer.run();
-        }
-
-        public void toggleTimer(){
-            isRunning = !isRunning;
-            if(isRunning)
-                clockHandler.postDelayed(clockTimer, TIMER_MSEC);
-            else
-                clockHandler.removeCallbacks(clockTimer);
-        }
-
-        public void stopTimer(){
-            isRunning = false;
-            clockHandler.removeCallbacks(clockTimer);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-            Paint p = new Paint();
-            p.setColor(Color.BLUE);
-            canvas.translate(100,100);
-            canvas.drawRect(100,100,100,100, p);
-        }
-
-    }
 }
