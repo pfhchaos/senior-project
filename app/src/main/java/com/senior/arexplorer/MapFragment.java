@@ -20,9 +20,12 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -33,7 +36,8 @@ import java.util.ArrayList;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    private GoogleMap googleMap;
+    private MapView mapView;
     private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final String ZOOM_KEY = "zoom_key";
     private static final String MAP_OPTIONS_LIST_KEY = "map_options_list_key";
@@ -41,51 +45,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     ArrayList<MarkerOptions> markerOptionsList;
     ArrayList<Marker> markerList;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-        mapFragment.getMapAsync(this);
-        getChildFragmentManager().beginTransaction().replace(R.id.mapView, mapFragment).commit();
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
 
-        final Button mark = getActivity().findViewById(R.id.button_mark);
+        // Gets the MapView from the XML layout and creates it
+        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
 
-        if (savedInstanceState != null) {
-            markerOptionsList = (ArrayList<MarkerOptions>) savedInstanceState.getSerializable(MAP_OPTIONS_LIST_KEY);
-            zoom = savedInstanceState.getFloat(ZOOM_KEY);
-        }
-        else markerOptionsList = new ArrayList<MarkerOptions>();
-
-        markerList = new ArrayList<Marker>();
-/*
-        mark.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Location location = getLocation();
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.title("Mark" + markerOptionsList.size() + 1);
-                markerOptions.position(new LatLng(location.getLatitude(),location.getLongitude()));
-                markerOptionsList.add(markerOptions);
-                markerList.add(mMap.addMarker(markerOptions));
-            }
-        });
-
-        mark.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (markerList.size() != 0) {
-                    Marker lastAdded = markerList.remove(markerList.size() - 1);
-                    markerOptionsList.remove(markerOptionsList.size() - 1);
-                    lastAdded.remove();
-                }
-                return true;
-            }
-        });
-*/
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        return v;
     }
 
+    @Override
+    public void onResume() {
+        mapView.onResume();
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap gMap) {
+        googleMap = gMap;
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+        //googleMap.addMarker(new MarkerOptions().position(/*some location*/));
+        //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(/*some location*/, 10));
+        moveToLocation(getLocation());
+
+    }
+/*
     private void initMap() {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_LOCATION);
@@ -109,11 +110,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         handler.postDelayed(runnable, 200);
         for (MarkerOptions markerOptions : markerOptionsList) markerList.add(mMap.addMarker(markerOptions));
     }
+    */
     private void moveToLocation(Location location) {
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
                 new LatLng(location.getLatitude(), location.getLongitude()), zoom);
-        this.mMap.moveCamera(cameraUpdate);
+        this.googleMap.moveCamera(cameraUpdate);
     }
+
     private String getProvider(LocationManager locMgr, int accuracy, String
             defProvider) {
         Criteria criteria = new Criteria();
@@ -132,6 +135,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         return providerName;
     }
+
     private Location getLocation() {
         LocationManager locMgr = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
@@ -158,6 +162,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         return location;
     }
+    /*
 
     @Override
     public void onRequestPermissionsResult(int rqst, String perms[], int[] res) {
@@ -172,15 +177,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getActivity().setContentView(R.layout.fragment_map);
-
-    }
-
-
+    */
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -191,17 +188,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    /*
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         initMap();
     }
-
+    */
+/*
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putFloat(ZOOM_KEY, mMap.getCameraPosition().zoom);
         savedInstanceState.putSerializable(MAP_OPTIONS_LIST_KEY, markerOptionsList);
         super.onSaveInstanceState(savedInstanceState);
     }
-
+    */
 }
