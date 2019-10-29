@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
 public class ARFragment extends Fragment {
+
     private CameraOverlay mOverlay;
     private TextureView camView;
     private FrameLayout overlay;
