@@ -36,6 +36,8 @@ public class ARFragment extends Fragment {
         overlay.addView(mOverlay);
         mOverlay.toggleTimer();
 
+        overlay.setOnClickListener( (i) -> {mOverlay.toggleTimer(); System.out.println(mOverlay.bearing);});
+
         return view;
     }
 
@@ -52,7 +54,7 @@ public class ARFragment extends Fragment {
 
                     camView.setSurfaceTexture(previewOutput.getSurfaceTexture());
 
-                    //updateTransform();
+                    updateTransform();
                 });
 
 
@@ -69,7 +71,6 @@ public class ARFragment extends Fragment {
 
         int rotationDgr;
         int rotation = (int)camView.getRotation();
-        System.out.println(rotation);
 
         switch(rotation){
             case Surface.ROTATION_0:
@@ -88,7 +89,7 @@ public class ARFragment extends Fragment {
                 return;
         }
 
-        mx.postRotate((float)rotationDgr + 180, cX, cY);
+        mx.postRotate((float)rotationDgr, cX, cY);
         camView.setTransform(mx);
     }
 }
