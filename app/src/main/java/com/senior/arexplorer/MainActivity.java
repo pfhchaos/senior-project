@@ -35,21 +35,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         checkPermissions();
-        drawer.openDrawer(GravityCompat.START);
+        if (savedInstanceState == null) {
+            drawer.openDrawer(GravityCompat.START);
+        }
     }
 
+    public void onResume() {
+       super.onResume();
+
+    }
     private void checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
+                    new String[]{
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },
                     PERMISSION_REQUEST_CAMERA);
         }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSION_REQUEST_LOCATION);
+        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions( this,
+                    new String[] {Manifest.permission.CAMERA},
+                    PERMISSION_REQUEST_CAMERA);
+        }
+        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions( this,
+                    new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_CAMERA);
         }
     }
 
