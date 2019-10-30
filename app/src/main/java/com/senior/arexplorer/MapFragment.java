@@ -54,15 +54,39 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+        try {
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mapView.getMapAsync(this);
 
         return v;
     }
 
     @Override
+    public void onStart() {
+        mapView.onStart();
+        super.onStart();
+    }
+
+    @Override
     public void onResume() {
         mapView.onResume();
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mapView.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        mapView.onStop();
+        super.onStop();
     }
 
     @Override
@@ -83,6 +107,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         //googleMap.addMarker(new MarkerOptions().position(/*some location*/));
         //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(/*some location*/, 10));
+        Toast.makeText(getActivity().getApplicationContext(),
+                getLocation().toString(), Toast.LENGTH_LONG).show();
         moveToLocation(getLocation());
 
     }

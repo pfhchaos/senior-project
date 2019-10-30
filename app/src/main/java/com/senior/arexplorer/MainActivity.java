@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (res.length>0 && res[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted! We can now init the map
                 } else {
-                    Toast.makeText(this, "This app is useless without loc permissions",
+                    Toast.makeText(this, "This app is useless without loc and camera permissions",
                             Toast.LENGTH_SHORT).show();
                     finish();
                     System.exit(0);
