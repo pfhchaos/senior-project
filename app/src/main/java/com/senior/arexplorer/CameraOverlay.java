@@ -7,16 +7,22 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.view.View;
+
+import static android.content.Context.SENSOR_SERVICE;
 
 public class CameraOverlay extends View{
     private Handler clockHandler;
     private Runnable clockTimer;
     private boolean isRunning = true;
     Paint p = new Paint();
-    Rect rect = new Rect();
+    Rect rect = new Rect(), curCompass = new Rect();
     Bitmap compass;
+    float bearing = 0;
+    float scale;
 
     private final long TIMER_MSEC = 100;
 
@@ -36,6 +42,7 @@ public class CameraOverlay extends View{
             @Override
             public void run(){
                 if(isRunning) {
+                    bearing += 1;
                     invalidate();
                     clockHandler.postDelayed(this, TIMER_MSEC);
                 }
@@ -44,6 +51,10 @@ public class CameraOverlay extends View{
         clockTimer.run();
 
         compass = BitmapFactory.decodeResource(getResources(),R.drawable.compass);
+        scale = (float) compass.getWidth() / 720;
+        System.out.println(scale * 360 + " " + compass.getWidth());
+        toggleTimer();
+
     }
 
     public void toggleTimer(){
@@ -70,7 +81,21 @@ public class CameraOverlay extends View{
         canvas.scale(sx,sy);
 
         rect.set(500,500,9500,1000);
-        canvas.drawBitmap(compass, new Rect(0,0,compass.getWidth()/2, compass.getHeight()), rect, null);
+        calcCompass();
+        canvas.drawBitmap(compass, curCompass, rect, null);
+    }
+
+    private void calcCompass(){
+        int width = compass.getWidth();
+        int offset = (int) (180 * scale);
+        int mid =  width / 2 + (int) (bearing * scale);
+
+        if(bearing >= 180) {
+            mid = width / 2 - offset;
+            bearing = -180;
+            System.out.println(mid + " " + bearing);
+        }
+        curCompass.set(mid - offset,0,mid + offset, compass.getHeight());
     }
 
 }

@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">ARExplorer</string>
+    <string name="title_activity_nearest">NearestActivity</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
