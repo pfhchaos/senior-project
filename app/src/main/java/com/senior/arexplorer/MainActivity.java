@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final int PERMISSION_REQUEST_CAMERA = 10;
     DrawerLayout drawer;
+    SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
 
 
     @Override
@@ -41,30 +42,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         checkPermissions();
         drawer.openDrawer(GravityCompat.START);
+        LoadData(); //create database and load
 
-        // for database
-        SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
-        try{
-            SQLiteDatabase db =databaseHelper.getReadableDatabase();
-            Cursor cursor = db.query("USER",
-                    new String[]{"fName", "lName","email", "Password"},
-                    "_id = ?",null,null,null,null);
 
-            // move to the first record in the cursor
-            if(cursor.moveToFirst()){
-                String fNameText = cursor.getString(0);
-                String lNameText = cursor.getString(1);
-                String emailText = cursor.getString(2);
-                String passwordText = cursor.getString(3);
-
-            }
-        }catch(SQLiteException e){
-            Toast toast = Toast.makeText(this, "Database unavailable",Toast.LENGTH_SHORT);
-            toast.show();
-
-        }
-
-        //database end
     }
 
     private void checkPermissions() {
@@ -140,5 +120,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    private void LoadData(){
+        // for database
+
+        try{
+            SQLiteDatabase db =databaseHelper.getReadableDatabase();
+            Cursor cursor = db.query("USER",
+                    new String[]{"fName", "lName","email", "Password"},
+                    "_id = ?",null,null,null,null);
+
+            // move to the first record in the cursor
+            if(cursor.moveToFirst()){
+                String fNameText = cursor.getString(0);
+                String lNameText = cursor.getString(1);
+                String emailText = cursor.getString(2);
+                String passwordText = cursor.getString(3);
+
+            }
+        }catch(SQLiteException e){
+            Toast toast = Toast.makeText(this, "Database unavailable",Toast.LENGTH_SHORT);
+            toast.show();
+
+        }
+
+        //database end
+
+    }
 
 }

@@ -15,11 +15,21 @@ public class CreateDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db){
-        db.execSQL("CREATE TABLE USER("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+       db.execSQL("CREATE TABLE USER("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      + "fName TEXT,"
                      + "lName TEXT,"
                      + "email TEXT,"
                       + "Password TEXT);");
+        insertUsers( db, "Md", "kashem", "kasem@yahoo.com", "secret");
+
+        db.execSQL("CREATE TABLE LOCAL_DATA("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name TEXT,"
+                + "description TEXT,"
+                + "latitude TEXT,"
+                + "longitude TEXT,"
+                + "elevation TEXT,"
+                + "image_resource_id INTEGER);");
+
         insertUsers( db, "Md", "kashem", "kasem@yahoo.com", "secret");
 
 
