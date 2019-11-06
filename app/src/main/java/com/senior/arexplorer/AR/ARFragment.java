@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.AR;
 
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+
+import com.senior.arexplorer.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,10 +38,23 @@ public class ARFragment extends Fragment {
         overlay.addView(mOverlay);
         mOverlay.toggleTimer();
 
-        overlay.setOnClickListener( (i) -> {mOverlay.toggleTimer(); System.out.println(mOverlay.bearing);});
+        overlay.setOnClickListener( (i) -> {mOverlay.toggleTimer(); System.out.println(mOverlay.heading);});
 
         return view;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mOverlay.kill();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        mOverlay.toggleTimer();
+    }
+
 
     void startCamera(){
         PreviewConfig config = new PreviewConfig.Builder().build();
