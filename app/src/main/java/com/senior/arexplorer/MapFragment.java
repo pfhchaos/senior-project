@@ -1,6 +1,5 @@
 package com.senior.arexplorer;
 
-import android.Manifest;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
@@ -16,12 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -32,17 +25,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, Response.ErrorListener, Response.Listener<String> {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap googleMap;
     private MapView mapView;
+    private CurrentLocation currentLocation;
     private float zoom = 10;
-    private RequestQueue requestQueue;
-    private final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-
 
     @Nullable
     @Override
@@ -54,14 +43,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Respons
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
 
-        requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-
-        Location here = getLocation();
-        String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), 1000);
-        System.err.println(request);
-        StringRequest stringRequest = new StringRequest(request, this, this);
-
-        requestQueue.add(stringRequest);
+        currentLocation = new CurrentLocation(getActivity());
+        PlaceFetcher backend = new GooglePlaceFetcher(getActivity(), currentLocation);
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -76,6 +59,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Respons
     @Override
     public void onStart() {
         mapView.onStart();
+        currentLocation.onStart(getActivity());
         super.onStart();
     }
 
@@ -94,6 +78,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Respons
     @Override
     public void onStop() {
         mapView.onStop();
+        currentLocation.onStop();
         super.onStop();
     }
 
@@ -115,7 +100,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Respons
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         //googleMap.addMarker(new MarkerOptions().position(/*some location*/));
         //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(/*some location*/, 10));
-        moveToLocation(getLocation());
+        moveToLocation(currentLocation.getLocation());
 
     }
 
@@ -125,68 +110,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Respons
         this.googleMap.moveCamera(cameraUpdate);
     }
 
-    private String getProvider(LocationManager locMgr, int accuracy, String
-            defProvider) {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(accuracy);
-        // get best provider regardless of whether it is enabled
-        String providerName = locMgr.getBestProvider(criteria, false);
-        if (providerName == null)
-            providerName = defProvider;
-        // if neither that nor the default are enabled, prompt user to change settings
-        if (!locMgr.isProviderEnabled(providerName)) {
-            View parent = getActivity().findViewById(R.id.mapLayout);
-            Toast.makeText(getActivity(),
-                    "Location Provider Not Enabled: Goto Settings?", Toast.LENGTH_SHORT)
-                    .show();
-        }
 
-        return providerName;
-    }
 
-    private Location getLocation() {
-        LocationManager locMgr = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Location location = null;
-        // location = this.getLocation();
-
-        String provider;
-        if (location == null) {
-            provider = getProvider(locMgr, Criteria.ACCURACY_FINE, locMgr.GPS_PROVIDER);
-            try {
-                location = locMgr.getLastKnownLocation(provider);
-            } catch(SecurityException e) {
-                Log.e("Error", "Security Exception: " + e.getMessage());
-            }
-        }
-        if (location == null) {
-            provider = getProvider(locMgr, Criteria.ACCURACY_COARSE, locMgr.NETWORK_PROVIDER);
-            try {
-                location = locMgr.getLastKnownLocation(provider);
-            } catch(SecurityException e) {
-                Log.e("Error", "Security Exception: " + e.getMessage());
-            }
-        }
-        if (location == null) Toast.makeText(getActivity(), "Cannot get current location.", Toast.LENGTH_SHORT).show();
-
-        return location;
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-
-        Toast.makeText(getActivity(),
-                "No response from google. Fuck you Google!", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResponse(String response) {
-        JSONObject googleResp = null;
-        try {
-            googleResp = new JSONObject(response);
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        System.out.println(googleResp);
-    }
 }
