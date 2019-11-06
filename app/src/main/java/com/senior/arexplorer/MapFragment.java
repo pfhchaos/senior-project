@@ -1,5 +1,6 @@
 package com.senior.arexplorer;
 
+import android.Manifest;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
@@ -15,6 +16,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,18 +32,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, Response.ErrorListener, Response.Listener<String> {
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private static final int PERMISSION_REQUEST_LOCATION = 1;
-    private static final String ZOOM_KEY = "zoom_key";
-    private static final String MAP_OPTIONS_LIST_KEY = "map_options_list_key";
     private float zoom = 10;
-    ArrayList<MarkerOptions> markerOptionsList;
-    ArrayList<Marker> markerList;
+    private RequestQueue requestQueue;
+    private final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
 
     @Nullable
@@ -48,6 +53,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView = (MapView) v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
+
+        requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+
+        Location here = getLocation();
+        String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), 1000);
+        System.err.println(request);
+        StringRequest stringRequest = new StringRequest(request, this, this);
+
+        requestQueue.add(stringRequest);
+
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -156,4 +171,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return location;
     }
 
+    @Override
+    public void onErrorResponse(VolleyError error) {
+
+        Toast.makeText(getActivity(),
+                "No response from google. Fuck you Google!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onResponse(String response) {
+        JSONObject googleResp = null;
+        try {
+            googleResp = new JSONObject(response);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        System.out.println(googleResp);
+    }
 }
