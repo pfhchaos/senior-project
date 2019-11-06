@@ -25,13 +25,13 @@ public class CompassAssistant implements SensorEventListener {
     // a hint to the system and the events might actually be received faster or slower then this
     // specified rate. Since the minimum Android API levels about 9, we are able to set this value
     // ourselves rather than using one of the provided constants which deliver updates too quickly for
-    // our use case. The default is set to 100ms
-    private static final int SENSOR_DELAY_MICROS = 100 * 1000;
+    // our use case. The default is set to 100ms. Overriding to 17 for 60 FPS refresh.
+    private static final int SENSOR_DELAY_MICROS = 17 * 1000;
     // Filtering coefficient 0 < ALPHA < 1
     private static final float ALPHA = 0.45f;
 
     // Controls the compass update rate in milliseconds
-    private static final int COMPASS_UPDATE_RATE_MS = 500;
+    private static final int COMPASS_UPDATE_RATE_MS = 17;
 
     private final WindowManager windowManager;
     private final SensorManager sensorManager;

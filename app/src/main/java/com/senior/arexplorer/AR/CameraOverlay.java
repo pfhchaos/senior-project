@@ -17,8 +17,6 @@ import com.senior.arexplorer.AR.Assistant.CompassAssistant;
 import com.senior.arexplorer.R;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener {
-    private Handler clockHandler;
-    private Runnable clockTimer;
     private boolean isRunning = true;
     Paint p = new Paint();
     Rect rect = new Rect(), curCompass = new Rect();
@@ -27,7 +25,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     float scale;
     CompassAssistant assistant;
 
-    private final long TIMER_MSEC = 10;
 
     public CameraOverlay(Context context){
         super(context);
@@ -47,32 +44,17 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
 
-        clockHandler = new Handler();
-        clockTimer = new Runnable() {
-            @Override
-            public void run(){
-                if(isRunning) {
-                    invalidate();
-                    clockHandler.postDelayed(this, TIMER_MSEC);
-                }
-            }
-        };
-        clockTimer.run();
-
         compass = BitmapFactory.decodeResource(getResources(), R.drawable.compass);
         scale = (float) compass.getWidth() / 720;
         System.out.println(scale * 360 + " " + compass.getWidth());
-        toggleTimer();
 
     }
 
     public void toggleTimer(){
         if(!isRunning){
-            clockHandler.postDelayed(clockTimer, TIMER_MSEC);
             assistant.onStart();
         }
         else {
-            clockHandler.removeCallbacks(clockTimer);
             assistant.onStop();
         }
         isRunning = !isRunning;
@@ -80,7 +62,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     public void kill(){
         isRunning = false;
-        clockHandler.removeCallbacks(clockTimer);
 
         assistant.onStop();
     }
@@ -102,14 +83,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     private void calcCompass(){
         int width = compass.getWidth();
-        int offset = (int) (180 * scale);
+        int offset = (int) (90 * scale);
         int mid = width / 2 +  (int) ((heading) * scale);
 
-//        if(heading >= 180) {
-//            mid = width / 2 - offset;
-//            heading = -180;
-//            System.out.println(mid + " " + heading);
-//        }
         curCompass.set(mid - offset,0,mid + offset, compass.getHeight());
     }
 
@@ -121,8 +97,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         if (previousCompassBearing < 0) {
             previousCompassBearing = userHeading;
         }
-        float normalizedBearing =
-                CompassAssistant.shortestRotation(userHeading, previousCompassBearing);
+        float normalizedBearing = CompassAssistant.shortestRotation(userHeading, previousCompassBearing);
         previousCompassBearing = userHeading;
         heading = normalizedBearing;
 
@@ -146,6 +121,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
 
         System.out.printf("CompassBearing: %f\nAccuracySensorStatus: %s\n", normalizedBearing, status);
+        invalidate();
     }
 
     @Override

@@ -38,20 +38,24 @@ public class ARFragment extends Fragment {
         overlay.addView(mOverlay);
         mOverlay.toggleTimer();
 
-        overlay.setOnClickListener( (i) -> {mOverlay.toggleTimer(); System.out.println(mOverlay.heading);});
-
         return view;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mOverlay.kill();
+        //mOverlay.kill();
     }
 
     @Override
     public void onPause(){
         super.onPause();
+        mOverlay.toggleTimer();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
         mOverlay.toggleTimer();
     }
 
