@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -31,6 +32,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     private MapView mapView;
     private CurrentLocation currentLocation;
+    private PlaceFetcher backend;
     private float zoom = 10;
 
     @Nullable
@@ -60,6 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onStart() {
         mapView.onStart();
         currentLocation.onStart(getActivity());
+        backend.onStart(getActivity(), currentLocation);
         super.onStart();
     }
 

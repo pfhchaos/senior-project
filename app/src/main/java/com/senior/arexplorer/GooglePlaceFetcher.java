@@ -1,8 +1,8 @@
 package com.senior.arexplorer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -16,26 +16,26 @@ import java.util.Collection;
 
 public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener, Response.Listener<String> {
 
-    Context mContext;
+    Activity mActivity;
     CurrentLocation currentLocation;
     private final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     private RequestQueue requestQueue;
 
-    public void onStart(Context mContext, CurrentLocation currentLocation) {
-        this.mContext = mContext;
+    public void onStart(Activity mActivity, CurrentLocation currentLocation) {
+        this.mActivity = mActivity;
         this.currentLocation = currentLocation;
     }
 
     public void onStop() {
-        this.mContext = null;
+        this.mActivity = null;
         this.currentLocation = null;
     }
 
     public GooglePlaceFetcher(Context mContext, CurrentLocation currentLocation) {
 
-        this.onStart(mContext, currentLocation);
+        this.onStart(mActivity, currentLocation);
 
-        requestQueue = Volley.newRequestQueue(this.mContext);
+        requestQueue = Volley.newRequestQueue(this.mActivity);
 
         Location here = this.currentLocation.getLocation();
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), 1000);
