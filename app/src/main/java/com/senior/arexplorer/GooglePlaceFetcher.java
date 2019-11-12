@@ -16,26 +16,14 @@ import java.util.Collection;
 
 public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener, Response.Listener<String> {
 
-    Activity mActivity;
     CurrentLocation currentLocation;
     private final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     private RequestQueue requestQueue;
 
-    public void onStart(Activity mActivity, CurrentLocation currentLocation) {
-        this.mActivity = mActivity;
+    public GooglePlaceFetcher(Activity mActivity, CurrentLocation currentLocation) {
         this.currentLocation = currentLocation;
-    }
 
-    public void onStop() {
-        this.mActivity = null;
-        this.currentLocation = null;
-    }
-
-    public GooglePlaceFetcher(Context mContext, CurrentLocation currentLocation) {
-
-        this.onStart(mActivity, currentLocation);
-
-        requestQueue = Volley.newRequestQueue(this.mActivity);
+        requestQueue = Volley.newRequestQueue(mActivity);
 
         Location here = this.currentLocation.getLocation();
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), 1000);

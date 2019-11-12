@@ -45,9 +45,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
 
-        currentLocation = new CurrentLocation(getActivity());
-        PlaceFetcher backend = new GooglePlaceFetcher(getActivity(), currentLocation);
-
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -60,9 +57,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onStart() {
+        currentLocation = new CurrentLocation(getActivity());
+        PlaceFetcher backend = new GooglePlaceFetcher(getActivity(), currentLocation);
+
         mapView.onStart();
         currentLocation.onStart(getActivity());
-        backend.onStart(getActivity(), currentLocation);
         super.onStart();
     }
 
