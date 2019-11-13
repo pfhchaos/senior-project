@@ -2,6 +2,7 @@ package com.senior.arexplorer;
 
 import android.app.Activity;
 import android.location.Location;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -30,6 +31,9 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
         places = new ArrayList<>();
 
         Location here = this.currentLocation.getLocation();
+        if (currentLocation == null) {
+            Toast.makeText(mActivity, "here is null. this should not happen", Toast.LENGTH_SHORT).show();
+        }
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radious);
         System.err.println(request);
         StringRequest stringRequest = new StringRequest(request, this, this);
