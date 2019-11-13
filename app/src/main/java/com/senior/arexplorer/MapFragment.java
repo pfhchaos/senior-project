@@ -1,5 +1,6 @@
 package com.senior.arexplorer;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
@@ -118,6 +119,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void loadSettings(Menu menu, DrawerLayout drawer) {
+        menu.removeGroup(R.id.settings);
 
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Save Location")
+                .setOnMenuItemClickListener((i) ->{
+                    AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
+
+                    View view = ((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                            .inflate(R.layout.fragment_save, null);
+
+                    //From here we can grab the views with view.getViewByID and assign on clicks to the popup
+
+                    popDialog.setView(view);
+
+                    popDialog.setPositiveButton("OK", (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+
+                    popDialog.create();
+                    popDialog.show();
+                    return false;
+                });
     }
 }

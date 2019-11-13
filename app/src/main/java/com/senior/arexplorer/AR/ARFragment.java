@@ -130,91 +130,89 @@ public class ARFragment extends Fragment implements IFragSettings {
     public void loadSettings(Menu menu, DrawerLayout drawer){
         menu.removeGroup(R.id.settings);
 
-        MenuItem fovItem = menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees");
-        fovItem.setOnMenuItemClickListener((i) -> {
-            AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
-            TextView title = new TextView(drawer.getContext());
-            title.setText("");
-            title.setPadding(10, 10, 10, 10);
-            title.setGravity(Gravity.CENTER);
-            title.setTextSize(20);
-            title.setText("Please Select a Field of View");
-            popDialog.setCustomTitle(title);
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
+            .setOnMenuItemClickListener((i) -> {
+                AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
+                TextView title = new TextView(drawer.getContext());
+                title.setText("");
+                title.setPadding(10, 10, 10, 10);
+                title.setGravity(Gravity.CENTER);
+                title.setTextSize(20);
+                title.setText("Please Select a Field of View");
+                popDialog.setCustomTitle(title);
 
-            SeekBarWithText popView = new SeekBarWithText(getContext());
-            popView.setMinMax(FOV_MIN, FOV_MAX)
-                    .setProgress(fov - FOV_MIN)
-                    .setText("Current Field of View : " + fov)
-                    .setListener(new SeekBar.OnSeekBarChangeListener(){
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                            fov = progress + FOV_MIN;
-                            popView.setText("Current Field of View : " + fov);
-                        }
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {}
+                SeekBarWithText popView = new SeekBarWithText(getContext());
+                popView.setMinMax(FOV_MIN, FOV_MAX)
+                        .setProgress(fov - FOV_MIN)
+                        .setText("Current Field of View : " + fov)
+                        .setListener(new SeekBar.OnSeekBarChangeListener(){
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                                fov = progress + FOV_MIN;
+                                popView.setText("Current Field of View : " + fov);
+                            }
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {}
 
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {}
-                    });
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {}
+                        });
 
-            popDialog.setPositiveButton("OK", (dialog, which) -> {
-                fovItem.setTitle("Compass Field of View : " + fov + " degrees");
-                mOverlay.setFoV(fov);
-                drawer.closeDrawer(GravityCompat.START);
-                dialog.dismiss();
+                popDialog.setPositiveButton("OK", (dialog, which) -> {
+                    i.setTitle("Compass Field of View : " + fov + " degrees");
+                    mOverlay.setFoV(fov);
+                    dialog.dismiss();
+                });
+
+                popDialog.setView(popView);
+                popDialog.create();
+                popDialog.show();
+                return false;
             });
+
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " +  drawDistance+ " meters")
+            .setOnMenuItemClickListener((i) -> {
+                AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
+                TextView title = new TextView(drawer.getContext());
+                title.setText("");
+                title.setPadding(10, 10, 10, 10);
+                title.setGravity(Gravity.CENTER);
+                title.setTextSize(20);
+                title.setText("Please Select a Draw Distance");
+                popDialog.setCustomTitle(title);
+
+                /**Note the 100s here are to get the bar to move in increments of 100
+                 * because android is fucking stupid and doesnt allow you to set the step size
+                 * of the fucking seekbar you have to define a set amount of steps
+                 * and scale it when storing because fuck android**/
+                SeekBarWithText popView = new SeekBarWithText(getContext());
+                popView.setMinMax(DD_MIN / 100, DD_MAX / 100)
+                       .setProgress((drawDistance - DD_MIN) / 100)
+                       .setText("Current Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"))
+                       .setListener(new SeekBar.OnSeekBarChangeListener(){
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                                    drawDistance = (progress * 100) + DD_MIN;
+                                        popView.setText("Current Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"));
+
+                            }
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {}
+                       });
+
+                popDialog.setPositiveButton("OK", (dialog, which) -> {
+                    i.setTitle("Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"));
+                    mOverlay.setDD(drawDistance);
+                    dialog.dismiss();
+                });
 
             popDialog.setView(popView);
             popDialog.create();
             popDialog.show();
-            return true;
-        });
-
-        MenuItem ddItem = menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " +  drawDistance+ " meters");
-        ddItem.setOnMenuItemClickListener((i) -> {
-            AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
-            TextView title = new TextView(drawer.getContext());
-            title.setText("");
-            title.setPadding(10, 10, 10, 10);
-            title.setGravity(Gravity.CENTER);
-            title.setTextSize(20);
-            title.setText("Please Select a Draw Distance");
-            popDialog.setCustomTitle(title);
-
-            /**Note the 100s here are to get the bar to move in increments of 100
-               because android is fucking stupid and doesnt allow you to set the step size
-               of the fucking seekbar you have to define a set amount of steps
-               and scale it when storing because fuck android**/
-            SeekBarWithText popView = new SeekBarWithText(getContext());
-            popView.setMinMax(DD_MIN / 100, DD_MAX / 100)
-                   .setProgress((drawDistance - DD_MIN) / 100)
-                   .setText("Current Draw Distance : " + drawDistance)
-                   .setListener(new SeekBar.OnSeekBarChangeListener(){
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                                drawDistance = (progress * 100) + DD_MIN;
-                                popView.setText("Current Draw Distance : " + drawDistance + " meters");
-
-                        }
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {}
-
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {}
-                   });
-
-            popDialog.setPositiveButton("OK", (dialog, which) -> {
-                ddItem.setTitle("Draw Distance : " + drawDistance + " meters");
-                mOverlay.setDD(drawDistance);
-                drawer.closeDrawer(GravityCompat.START);
-                dialog.dismiss();
-            });
-
-            popDialog.setView(popView);
-            popDialog.create();
-            popDialog.show();
-            return true;
+            return false;
         });
     }
 }
