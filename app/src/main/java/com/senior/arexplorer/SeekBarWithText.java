@@ -28,23 +28,22 @@ public class SeekBarWithText extends LinearLayout {
 
     }
 
-    public SeekBarWithText setSeekbarMinMaxStep(int min, int max, int step){
+    public SeekBarWithText setMinMax(int min, int max){
         seekBar.setMax(max - min);
-        seekBar.setKeyProgressIncrement(step);
         return this;
     }
 
-    public SeekBarWithText setSeekbarText(String textIn){
+    public SeekBarWithText setText(String textIn){
         text.setText(textIn);
         return this;
     }
 
-    public SeekBarWithText setSeekbarProgress(int progress){
+    public SeekBarWithText setProgress(int progress){
         seekBar.setProgress(progress);
         return this;
     }
 
-    public SeekBarWithText setSeekbarListener(SeekBar.OnSeekBarChangeListener listener){
+    public SeekBarWithText setListener(SeekBar.OnSeekBarChangeListener listener){
         seekBar.setOnSeekBarChangeListener(listener);
         return this;
     }
