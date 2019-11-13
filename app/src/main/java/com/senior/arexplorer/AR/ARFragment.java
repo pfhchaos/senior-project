@@ -170,7 +170,7 @@ public class ARFragment extends Fragment implements IFragSettings {
                 return false;
             });
 
-        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " +  drawDistance+ " meters")
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"))
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 TextView title = new TextView(drawer.getContext());
