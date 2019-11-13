@@ -61,6 +61,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onStart() {
         currentLocation = new CurrentLocation(getActivity());
+        if (currentLocation == null) {
+            Toast.makeText(getActivity(), "currentLocation is null. this should not happen", Toast.LENGTH_SHORT).show();
+        }
         PlaceFetcher backend = new GooglePlaceFetcher(getActivity(), currentLocation);
 
         mapView.onStart();
@@ -115,7 +118,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         this.googleMap.moveCamera(cameraUpdate);
     }
 
-
     @Override
     public void loadSettings(Menu menu, DrawerLayout drawer) {
         menu.removeGroup(R.id.settings);
@@ -140,4 +142,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
                     return false;
                 });
     }
+
 }
