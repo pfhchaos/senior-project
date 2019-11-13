@@ -24,7 +24,7 @@ public class SettingsFragment extends Fragment implements IFragSettings{
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
-    /**
+    /*
      * You guys can use this as a template for loadSettings in other fragments.
      * Two ways are shown. if you need the item for something after use the first, otherwise the second is less verbose
      * The variable passed in is the same as the MenuItem item, it is what was clicked.

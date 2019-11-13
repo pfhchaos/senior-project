@@ -60,7 +60,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onStart() {
-        currentLocation = new CurrentLocation(getActivity());
+        currentLocation = new CurrentLocation(getContext());
+        System.out.printf("%s : %s, %s\n", currentLocation, currentLocation.getLatitude(), currentLocation.getLongitude());
         if (currentLocation == null) {
             Toast.makeText(getActivity(), "currentLocation is null. this should not happen", Toast.LENGTH_SHORT).show();
         }

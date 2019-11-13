@@ -20,6 +20,8 @@ import com.senior.arexplorer.IFragSettings;
 import com.senior.arexplorer.SeekBarWithText;
 
 
+import java.util.function.Function;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.CameraX;
@@ -134,7 +136,6 @@ public class ARFragment extends Fragment implements IFragSettings {
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 TextView title = new TextView(drawer.getContext());
-                title.setText("");
                 title.setPadding(10, 10, 10, 10);
                 title.setGravity(Gravity.CENTER);
                 title.setTextSize(20);
@@ -174,17 +175,16 @@ public class ARFragment extends Fragment implements IFragSettings {
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 TextView title = new TextView(drawer.getContext());
-                title.setText("");
                 title.setPadding(10, 10, 10, 10);
                 title.setGravity(Gravity.CENTER);
                 title.setTextSize(20);
                 title.setText("Please Select a Draw Distance");
                 popDialog.setCustomTitle(title);
 
-                /**Note the 100s here are to get the bar to move in increments of 100
+                /*Note the 100s here are to get the bar to move in increments of 100
                  * because android is fucking stupid and doesnt allow you to set the step size
                  * of the fucking seekbar you have to define a set amount of steps
-                 * and scale it when storing because fuck android**/
+                 * and scale it when storing because fuck android*/
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(DD_MIN / 100, DD_MAX / 100)
                        .setProgress((drawDistance - DD_MIN) / 100)
