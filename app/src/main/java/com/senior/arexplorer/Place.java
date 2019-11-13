@@ -2,6 +2,8 @@ package com.senior.arexplorer;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,6 +76,18 @@ public class Place implements Serializable {
 
     public double getLongitude() {
         return this.longitude;
+    }
+
+    public Location getLocation(Location here) {
+        Location loc = new Location(here);
+        loc.setLatitude(this.latitude);
+        loc.setLongitude(this.longitude);
+
+        return loc;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(this.latitude, this.longitude);
     }
 
     public double getElevation() {

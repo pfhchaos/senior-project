@@ -11,6 +11,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -18,31 +19,38 @@ import java.util.Collection;
 
 public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener, Response.Listener<String> {
 
-    CurrentLocation currentLocation;
+    LocationManager locationManager;
     private final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     private RequestQueue requestQueue;
     Collection<Place> places;
-    public final int radious = 10;
+    public final int radius = 1000;
+    String lastRequest;
+    PlaceFetcherHandler placeFetcherHandler = null;
 
-    public GooglePlaceFetcher(Activity mActivity, CurrentLocation currentLocation) {
-        this.currentLocation = currentLocation;
+    public GooglePlaceFetcher(Activity mActivity, LocationManager locationManager, PlaceFetcherHandler placeFetcherHandler) {
+        this.locationManager = locationManager;
+        this.placeFetcherHandler = placeFetcherHandler;
 
         requestQueue = Volley.newRequestQueue(mActivity);
         places = new ArrayList<>();
+    }
 
-        Location here = this.currentLocation.getLocation();
-        if (currentLocation == null) {
+    public void fetchData(Activity mActivity) {
+        Location here = this.locationManager.getLocation(mActivity.getApplicationContext());
+        if (locationManager == null) {
             Toast.makeText(mActivity, "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radious);
-        System.err.println(request);
+        String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radius);
         StringRequest stringRequest = new StringRequest(request, this, this);
+        this.lastRequest = request;
 
         requestQueue.add(stringRequest);
     }
+
     @Override
     public Collection<Place> getPlaces() {
-        return null;
+        //todo: this is dangerous. clone places before returning
+        return this.places;
     }
 
     @Override
@@ -57,8 +65,12 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
         JSONArray results = null;
         try {
             googleResp = new JSONObject(response);
-            next_page_token = googleResp.getString("next_page_token");
+            try {
+                next_page_token = googleResp.getString("next_page_token");
+            }
+            catch (JSONException ex) {}
             results = googleResp.getJSONArray("results");
+            System.out.println(results.length() + " places fetched");
             for (int i = 0; i < results.length(); i++) {
                 Place place = new Place();
 
@@ -75,6 +87,14 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
                 place.setName(row.getString("name"));
 
                 places.add(place);
+            }
+
+            if (next_page_token != null) {
+                StringRequest stringRequest = new StringRequest(lastRequest + "&pagetoken=" + next_page_token, this, this);
+                requestQueue.add(stringRequest);
+            }
+            else {
+                this.placeFetcherHandler.placeFetchComplete();
             }
         }
         catch (Exception ex) {

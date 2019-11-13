@@ -3,28 +3,23 @@ package com.senior.arexplorer;
 import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
+public class LocationManager {
 
-public class CurrentLocation {
-    Context mContext;
+    private static LocationManager locationManager = null;
 
-    public CurrentLocation(Context mContext) {
-        this.mContext = mContext;
+    private LocationManager() {}
+
+    public static LocationManager getLocationManager() {
+        if (locationManager == null) {
+            locationManager = new LocationManager();
+        }
+        return locationManager;
     }
 
-    public void onStop() {
-        this.mContext = null;
-    }
-
-    public void onStart(Context mContext) {
-        this.mContext = mContext;
-    }
-
-    private String getProvider(LocationManager locMgr, int accuracy, String
+    private String getProvider(android.location.LocationManager locMgr, int accuracy, String
             defProvider) {
         Criteria criteria = new Criteria();
         criteria.setAccuracy(accuracy);
@@ -40,8 +35,8 @@ public class CurrentLocation {
         return providerName;
     }
 
-    public Location getLocation() {
-        LocationManager locMgr = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+    public Location getLocation(Context mContext) {
+        android.location.LocationManager locMgr = (android.location.LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         // location = this.getLocation();
 
@@ -67,11 +62,11 @@ public class CurrentLocation {
         return location;
     }
 
-    double getLatitude() {
-        return getLocation().getLatitude();
+    double getLatitude(Context mContext) {
+        return getLocation(mContext).getLatitude();
     }
-    double getLongitude() {
-        return getLocation().getLongitude();
+    double getLongitude(Context mContext) {
+        return getLocation(mContext).getLongitude();
     }
 
 }
