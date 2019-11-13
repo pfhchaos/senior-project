@@ -1,5 +1,7 @@
 package com.senior.arexplorer;
 
+import android.location.Location;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,10 @@ public class Place implements Serializable {
        this.elevation = elevation;
     }
 
+    //double distanceFrom(Location cur) {
+    //    return
+    //`}
+
     public void addType(String type) {
         this.types.add(type);
     }
@@ -81,5 +87,16 @@ public class Place implements Serializable {
 
     public long getTimeRetrieved() {
         return this.timeRetrieved;
+    }
+
+    public String toString() {
+        String ret = "";
+        ret += "name: " + this.name + "\n";
+        ret += "description: " + this.description + "\n";
+        ret += "latitude: " + this.latitude + "\n";
+        ret += "longitude: " + this.longitude + "\n";
+        ret += "elevation: " + this.elevation + "\n";
+
+        return ret;
     }
 }
