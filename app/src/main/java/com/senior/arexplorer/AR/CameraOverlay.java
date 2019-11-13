@@ -23,6 +23,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     Bitmap compass;
     float heading = 0;
     float scale;
+    int fov = 90;
+    int drawDistance = 1000;
     CompassAssistant assistant;
 
 
@@ -46,7 +48,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         compass = BitmapFactory.decodeResource(getResources(), R.drawable.compass);
         scale = (float) compass.getWidth() / 720;
-        System.out.println(scale * 360 + " " + compass.getWidth());
+        //System.out.println(scale * 360 + " " + compass.getWidth());
 
     }
 
@@ -83,12 +85,19 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     private void calcCompass(){
         int width = compass.getWidth();
-        int offset = (int) (90 * scale);
+        int offset = (int) (fov * scale);
         int mid = width / 2 +  (int) ((heading) * scale);
 
         curCompass.set(mid - offset,0,mid + offset, compass.getHeight());
     }
 
+    void setFoV(int newFoV){
+        fov = newFoV;
+    }
+
+    void setDD(int newDrawDistance){
+        drawDistance = newDrawDistance;
+    }
 
     private float previousCompassBearing = -1f;
 
@@ -120,12 +129,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 break;
         }
 
-        System.out.printf("CompassBearing: %f\nAccuracySensorStatus: %s\n", normalizedBearing, status);
+        //System.out.printf("CompassBearing: %f\nAccuracySensorStatus: %s\n", normalizedBearing, status);
         invalidate();
     }
 
     @Override
-    public void onCompassAccuracyChange(int compassStatus) {
-
-    }
+    public void onCompassAccuracyChange(int compassStatus) {}
 }
