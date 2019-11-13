@@ -32,8 +32,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     private GoogleMap googleMap;
     private MapView mapView;
     private LocationManager locationManager;
-    private PlaceFetcher backend;
-    private float zoom = 10;
+    private GooglePlaceFetcher backend;
+    private float zoom = 2;
 
     @Nullable
     @Override
@@ -61,7 +61,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         if (locationManager == null) {
             Toast.makeText(getActivity(), "locationManager is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        this.backend = new GooglePlaceFetcher(getActivity(), locationManager, this);
+        this.backend = GooglePlaceFetcher.getGooglePlaceFetcher(getActivity(), locationManager);
+        this.backend.addHandler(this);
 
         mapView.onStart();
         super.onStart();

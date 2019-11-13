@@ -25,11 +25,20 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
     Collection<Place> places;
     public final int radius = 1000;
     String lastRequest;
-    PlaceFetcherHandler placeFetcherHandler = null;
+    Collection<PlaceFetcherHandler> placeFetcherHandlers = null;
 
-    public GooglePlaceFetcher(Activity mActivity, LocationManager locationManager, PlaceFetcherHandler placeFetcherHandler) {
+    private static GooglePlaceFetcher googlePlaceFetcher = null;
+
+    public static GooglePlaceFetcher getGooglePlaceFetcher(Activity mActivity, LocationManager locationManager) {
+        if (googlePlaceFetcher == null) {
+            googlePlaceFetcher = new GooglePlaceFetcher(mActivity, locationManager);
+        }
+        return googlePlaceFetcher;
+    }
+
+    private GooglePlaceFetcher(Activity mActivity, LocationManager locationManager) {
         this.locationManager = locationManager;
-        this.placeFetcherHandler = placeFetcherHandler;
+        this.placeFetcherHandlers = new ArrayList<>();
 
         requestQueue = Volley.newRequestQueue(mActivity);
         places = new ArrayList<>();
@@ -45,6 +54,16 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
         this.lastRequest = request;
 
         requestQueue.add(stringRequest);
+    }
+
+    @Override
+    public void addHandler(PlaceFetcherHandler handler) {
+        this.placeFetcherHandlers.add(handler);
+    }
+
+    @Override
+    public void removeHandler(PlaceFetcherHandler handler) {
+        this.placeFetcherHandlers.remove(handler);
     }
 
     @Override
@@ -94,7 +113,9 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
                 requestQueue.add(stringRequest);
             }
             else {
-                this.placeFetcherHandler.placeFetchComplete();
+                for (PlaceFetcherHandler handler: this.placeFetcherHandlers) {
+                    handler.placeFetchComplete();
+                }
             }
         }
         catch (Exception ex) {
