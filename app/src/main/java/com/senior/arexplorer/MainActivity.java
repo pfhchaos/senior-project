@@ -47,10 +47,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             drawer.openDrawer(GravityCompat.START);
         }
+        //
+        if(savedInstanceState!=null){
+            // data to retrieve from previous state
+
+        }
+
         LoadData(); //create database and load
 
 
     }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        //savedInstanceState.putInt("key", value);
+        // we have to find what need to save
+        // 
+    }
+
 
     private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&

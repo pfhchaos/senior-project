@@ -17,7 +17,7 @@ public class Place implements Serializable {
 
     private long timeRetrieved;
 
-    public Place() {
+    public Place() { // need to modify for  Arguments based
         this.name = "";
         this.description = "";
         this.latitude = 0.0;
