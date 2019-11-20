@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -14,10 +15,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.senior.arexplorer.AR.ARFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final int PERMISSION_REQUEST_LOCATION = 1;
@@ -44,10 +47,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             drawer.openDrawer(GravityCompat.START);
         }
+        //
+        if(savedInstanceState!=null){
+            // data to retrieve from previous state
+
+        }
+
         LoadData(); //create database and load
 
 
     }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        //savedInstanceState.putInt("key", value);
+        // we have to find what need to save
+        // 
+    }
+
 
     private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
@@ -101,29 +118,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        IFragSettings tempFrag = null;
+        Menu menu = ((NavigationView) findViewById(R.id.nav_view)).getMenu();
+
         switch(menuItem.getItemId()){
             case R.id.nav_home :
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+                tempFrag = new HomeFragment();
                 break;
 
             case R.id.nav_map :
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
+                tempFrag =   new MapFragment();
                 break;
 
             case R.id.nav_ar :
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ARFragment()).commit();
+                tempFrag = new ARFragment();
                 break;
             case R.id.nav_login :
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new DataBaseFragment()).commit();
+                tempFrag =  new DataBaseFragment();
                 break;
 
             case R.id.nav_settings :
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
+                tempFrag =  new SettingsFragment();
                 break;
 
-            case R.id.nav_save:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SaveLocationFragment()).commit();
+            case R.id.nav_save :
+                tempFrag = new SaveLocationFragment();
                 break;
+
+            default :
+                break;
+        }
+        if(tempFrag != null){
+            tempFrag.loadSettings(menu, drawer);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, (Fragment)tempFrag).commit();
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

@@ -1,18 +1,18 @@
 package com.senior.arexplorer;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -22,22 +22,18 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler {
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private static final int PERMISSION_REQUEST_LOCATION = 1;
-    private static final String ZOOM_KEY = "zoom_key";
-    private static final String MAP_OPTIONS_LIST_KEY = "map_options_list_key";
-    private float zoom = 10;
-    ArrayList<MarkerOptions> markerOptionsList;
-    ArrayList<Marker> markerList;
-
+    private LocationManager locationManager;
+    private GooglePlaceFetcher backend;
+    private float zoom = 2;
 
     @Nullable
     @Override
@@ -45,9 +41,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Gets the MapView from the XML layout and creates it
-        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView = v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
+
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
         } catch (Exception e) {
@@ -60,6 +57,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onStart() {
+        locationManager = LocationManager.getLocationManager();
+        if (locationManager == null) {
+            Toast.makeText(getActivity(), "locationManager is null. this should not happen", Toast.LENGTH_SHORT).show();
+        }
+        this.backend = GooglePlaceFetcher.getGooglePlaceFetcher(getActivity(), locationManager);
+        this.backend.addHandler(this);
+
         mapView.onStart();
         super.onStart();
     }
@@ -98,10 +102,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap gMap) {
         googleMap = gMap;
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        //googleMap.addMarker(new MarkerOptions().position(/*some location*/));
-        //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(/*some location*/, 10));
-        moveToLocation(getLocation());
-
+        moveToLocation(locationManager.getLocation(getContext()));
+        backend.fetchData(getActivity());
     }
 
     private void moveToLocation(Location location) {
@@ -110,50 +112,41 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         this.googleMap.moveCamera(cameraUpdate);
     }
 
-    private String getProvider(LocationManager locMgr, int accuracy, String
-            defProvider) {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(accuracy);
-        // get best provider regardless of whether it is enabled
-        String providerName = locMgr.getBestProvider(criteria, false);
-        if (providerName == null)
-            providerName = defProvider;
-        // if neither that nor the default are enabled, prompt user to change settings
-        if (!locMgr.isProviderEnabled(providerName)) {
-            View parent = getActivity().findViewById(R.id.mapLayout);
-            Toast.makeText(getActivity(),
-                    "Location Provider Not Enabled: Goto Settings?", Toast.LENGTH_SHORT)
-                    .show();
-        }
+    @Override
+    public void loadSettings(Menu menu, DrawerLayout drawer) {
+        menu.removeGroup(R.id.settings);
 
-        return providerName;
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Save Location")
+                .setOnMenuItemClickListener((i) ->{
+                    AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
+
+                    View view = ((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                            .inflate(R.layout.fragment_save, null);
+
+                    //From here we can grab the views with view.getViewByID and assign on clicks to the popup
+
+                    popDialog.setView(view);
+
+                    popDialog.setPositiveButton("OK", (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+
+                    popDialog.create();
+                    popDialog.show();
+                    return false;
+                });
     }
 
-    private Location getLocation() {
-        LocationManager locMgr = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Location location = null;
-        // location = this.getLocation();
+    @Override
+    public void placeFetchComplete() {
+        Collection<Place> places = backend.getPlaces();
+        Location here = locationManager.getLocation(getContext());
 
-        String provider;
-        if (location == null) {
-            provider = getProvider(locMgr, Criteria.ACCURACY_FINE, locMgr.GPS_PROVIDER);
-            try {
-                location = locMgr.getLastKnownLocation(provider);
-            } catch(SecurityException e) {
-                Log.e("Error", "Security Exception: " + e.getMessage());
-            }
-        }
-        if (location == null) {
-            provider = getProvider(locMgr, Criteria.ACCURACY_COARSE, locMgr.NETWORK_PROVIDER);
-            try {
-                location = locMgr.getLastKnownLocation(provider);
-            } catch(SecurityException e) {
-                Log.e("Error", "Security Exception: " + e.getMessage());
-            }
-        }
-        if (location == null) Toast.makeText(getActivity(), "Cannot get current location.", Toast.LENGTH_SHORT).show();
+        System.err.println("entered callback from place fetcher");
 
-        return location;
+        for (Place p: places) {
+            googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
+        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), 10));
     }
-
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
@@ -26,7 +28,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveLocationFragment extends Fragment {
+public class SaveLocationFragment extends Fragment implements IFragSettings{
 
     private TextView nameInputTextView;
     private TextView descInputTextView;
@@ -125,4 +127,10 @@ public class SaveLocationFragment extends Fragment {
         //save stuff here
         super.onPause();
     }
+
+    @Override
+    public void loadSettings(Menu menu, DrawerLayout drawer) {
+
+    }
+
 }
