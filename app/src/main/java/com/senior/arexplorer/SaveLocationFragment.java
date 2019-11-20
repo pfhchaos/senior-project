@@ -52,7 +52,7 @@ public class SaveLocationFragment extends Fragment {
             if(photoFile != null){
 
                 //SOMETHING'S WRONG HERE
-                Uri photoURI = FileProvider.getUriForFile(getContext(), "com.example.android.fileprovider", photoFile);
+                Uri photoURI = FileProvider.getUriForFile(getContext(), "com.senior.arexplorer.fileprovider", photoFile);
                 takePicIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePicIntent, REQUEST_IMAGE_CAPTURE);
             }
@@ -71,10 +71,11 @@ public class SaveLocationFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            pictureImageView.setImageBitmap(imageBitmap);
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK && data != null){
+            Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+            if(imageBitmap != null){
+                pictureImageView.setImageBitmap(imageBitmap);
+            }
         }
     }
 
@@ -83,11 +84,11 @@ public class SaveLocationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_save, container, false);
 
-        nameInputTextView = getView().findViewById(R.id.nameInput);
-        descInputTextView = getView().findViewById(R.id.saveDescription);
-        privateSwitch = getView().findViewById(R.id.privateSwitch);
+        nameInputTextView = inflate.findViewById(R.id.nameInput);
+        descInputTextView = inflate.findViewById(R.id.saveDescription);
+        privateSwitch = inflate.findViewById(R.id.privateSwitch);
 
-        takePicButton = getView().findViewById(R.id.pictureButton);
+        takePicButton = inflate.findViewById(R.id.pictureButton);
         takePicButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -96,7 +97,7 @@ public class SaveLocationFragment extends Fragment {
                 dispatchTakePictureIntent();
             }
         });
-        saveButton = getView().findViewById(R.id.saveButton);
+        saveButton = inflate.findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -104,7 +105,7 @@ public class SaveLocationFragment extends Fragment {
                 saveData();
             }
         });
-        pictureImageView = getView().findViewById(R.id.pictureView);
+        pictureImageView = inflate.findViewById(R.id.pictureView);
         return inflate;
     }
 
