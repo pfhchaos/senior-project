@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This manager class handles compass events such as starting the tracking of device bearing, or
- * when a new compass update occurs.
+ * This manager class handles compassVector events such as starting the tracking of device bearing, or
+ * when a new compassVector update occurs.
  */
 public class CompassAssistant implements SensorEventListener {
 
@@ -30,7 +30,7 @@ public class CompassAssistant implements SensorEventListener {
     // Filtering coefficient 0 < ALPHA < 1
     private static final float ALPHA = 0.45f;
 
-    // Controls the compass update rate in milliseconds
+    // Controls the compassVector update rate in milliseconds
     private static final int COMPASS_UPDATE_RATE_MS = 17;
 
     private final WindowManager windowManager;
@@ -56,7 +56,7 @@ public class CompassAssistant implements SensorEventListener {
     private float[] magneticValues = new float[3];
 
     /**
-     * Construct a new instance of the this class. A internal compass listeners needed to separate it
+     * Construct a new instance of the this class. A internal compassVector listeners needed to separate it
      * from the cleared list of public listeners.
      */
     public CompassAssistant(WindowManager windowManager, SensorManager sensorManager) {
@@ -107,7 +107,7 @@ public class CompassAssistant implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        // check when the last time the compass was updated, return if too soon.
+        // check when the last time the compassVector was updated, return if too soon.
         long currentTime = SystemClock.elapsedRealtime();
         if (currentTime < compassUpdateNextTimestamp) {
             return;
@@ -273,21 +273,21 @@ public class CompassAssistant implements SensorEventListener {
     }
 
     /**
-     * Callbacks related to the compass
+     * Callbacks related to the compassVector
      */
     public interface CompassAssistantListener {
 
         /**
-         * Callback's invoked when a new compass update occurs. You can listen into the compass updates
+         * Callback's invoked when a new compassVector update occurs. You can listen into the compassVector updates
          * using (CompassAssistantListener)} and implementing these
          * callbacks. Note that this interface is also used internally to to update the UI chevron/arrow.
          *
-         * @param userHeading the new compass heading
+         * @param userHeading the new compassVector heading
          */
         void onCompassChanged(float userHeading);
 
         /**
-         * This gets invoked when the compass accuracy status changes from one value to another. It
+         * This gets invoked when the compassVector accuracy status changes from one value to another. It
          * provides an integer value which is identical to the {@code SensorManager} class constants:
          * <ul>
          * <li>{@link android.hardware.SensorManager#SENSOR_STATUS_NO_CONTACT}</li>

@@ -6,28 +6,24 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.IFragSettings;
 import com.senior.arexplorer.SeekBarWithText;
 
-
-import java.util.function.Function;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.arch.core.util.Function;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
-import androidx.core.view.GravityCompat;
+import androidx.core.util.Supplier;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
@@ -35,9 +31,9 @@ public class ARFragment extends Fragment implements IFragSettings {
 
     private CameraOverlay mOverlay;
     private TextureView camView;
-    private final int FOV_MIN = 45, FOV_MAX = 180; //in degrees
+    private final int FOV_MIN = 45, FOV_MAX = 360; //in degrees
     private final int DD_MIN = 100, DD_MAX = 10000; //in meters
-    private int fov = 90, drawDistance = 1000;
+    private int fov = 180, drawDistance = 1000;
 
 
     @Nullable
@@ -59,7 +55,6 @@ public class ARFragment extends Fragment implements IFragSettings {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //mOverlay.kill();
     }
 
     @Override
@@ -72,8 +67,6 @@ public class ARFragment extends Fragment implements IFragSettings {
     public void onResume(){
         super.onResume();
         mOverlay.toggleTimer();
-
-
     }
 
 
@@ -131,32 +124,27 @@ public class ARFragment extends Fragment implements IFragSettings {
 
     public void loadSettings(Menu menu, DrawerLayout drawer){
         menu.removeGroup(R.id.settings);
+        Function<String, TextView> getTitle = (i) -> {
+          TextView title = new TextView(drawer.getContext());
+          title.setText(i);
+          title.setPadding(10, 10, 10, 10);
+          title.setGravity(Gravity.CENTER);
+          title.setTextSize(20);
+          return title;
+        };
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
-                TextView title = new TextView(drawer.getContext());
-                title.setPadding(10, 10, 10, 10);
-                title.setGravity(Gravity.CENTER);
-                title.setTextSize(20);
-                title.setText("Please Select a Field of View");
-                popDialog.setCustomTitle(title);
+                popDialog.setCustomTitle(getTitle.apply("Please Select a Compass Field of View"));
 
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(FOV_MIN, FOV_MAX)
                         .setProgress(fov - FOV_MIN)
                         .setText("Current Field of View : " + fov)
-                        .setListener(new SeekBar.OnSeekBarChangeListener(){
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+                        .setListener((progress) -> {
                                 fov = progress + FOV_MIN;
                                 popView.setText("Current Field of View : " + fov);
-                            }
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {}
                         });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
@@ -166,20 +154,17 @@ public class ARFragment extends Fragment implements IFragSettings {
                 });
 
                 popDialog.setView(popView);
-                popDialog.create();
                 popDialog.show();
                 return false;
             });
 
-        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"))
+        Supplier<String> formatDistance = () ->
+                ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters");
+
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " + formatDistance.get() )
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
-                TextView title = new TextView(drawer.getContext());
-                title.setPadding(10, 10, 10, 10);
-                title.setGravity(Gravity.CENTER);
-                title.setTextSize(20);
-                title.setText("Please Select a Draw Distance");
-                popDialog.setCustomTitle(title);
+                popDialog.setCustomTitle(getTitle.apply("Please Select a Draw Distance"));
 
                 /*Note the 100s here are to get the bar to move in increments of 100
                  * because android is fucking stupid and doesnt allow you to set the step size
@@ -187,24 +172,15 @@ public class ARFragment extends Fragment implements IFragSettings {
                  * and scale it when storing because fuck android*/
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(DD_MIN / 100, DD_MAX / 100)
-                       .setProgress((drawDistance - DD_MIN) / 100)
-                       .setText("Current Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"))
-                       .setListener(new SeekBar.OnSeekBarChangeListener(){
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                                    drawDistance = (progress * 100) + DD_MIN;
-                                        popView.setText("Current Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"));
-
-                            }
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {}
-                       });
+                        .setProgress((drawDistance - DD_MIN) / 100)
+                        .setText("Current Draw Distance : " + formatDistance.get())
+                        .setListener((progress) -> {
+                            drawDistance = (progress * 100) + DD_MIN;
+                            popView.setText("Current Draw Distance : " + formatDistance.get());
+                        });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
-                    i.setTitle("Draw Distance : " + ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters"));
+                    i.setTitle("Draw Distance : " + formatDistance.get());
                     mOverlay.setDD(drawDistance);
                     dialog.dismiss();
                 });
