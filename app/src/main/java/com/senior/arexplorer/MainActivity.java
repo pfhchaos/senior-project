@@ -228,5 +228,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public String getName(){
+        return "From Activity";
+    }
+
+
 
 }

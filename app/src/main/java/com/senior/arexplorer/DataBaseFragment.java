@@ -29,6 +29,10 @@ public class DataBaseFragment extends Fragment implements IFragSettings{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.fragment_data_base, container, false);
         MainActivity activity = new MainActivity();
+        String Name = activity.getName();
+
+        TextView name = (TextView)view.findViewById(R.id.TextViewName);
+        name.setText(Name);
         return view;
 
     }
