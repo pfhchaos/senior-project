@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-
+import android.content.Intent;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -18,6 +18,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.widget.AdapterView;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.CursorAdapter;
+import android.widget.SimpleCursorAdapter;
 
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
@@ -26,6 +31,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final int PERMISSION_REQUEST_CAMERA = 10;
     DrawerLayout drawer;
+    public SQLiteDatabase db;
+    private Cursor favoritesCursor;
+    public Cursor cursor;
     SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
 
 
@@ -53,7 +61,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
 
-        LoadData(); //create database and load
+       // LoadData(); //create database and load
+
+       // loadPlace();
 
 
     }
@@ -62,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onSaveInstanceState(savedInstanceState);
         //savedInstanceState.putInt("key", value);
         // we have to find what need to save
-        // 
+        //
     }
 
 
@@ -171,6 +181,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String lNameText = cursor.getString(1);
                 String emailText = cursor.getString(2);
                 String passwordText = cursor.getString(3);
+                /*
+                //display data
+                TextView fName =(TextView)findViewById(R.id.textViewFname);
+                fName.setText(fNameText);
+                TextView lName =(TextView)findViewById(R.id.textViewLname);
+                lName.setText(lNameText);
+                TextView email =(TextView)findViewById(R.id.textViewEmail);
+                email.setText(emailText);
+                TextView pass =(TextView)findViewById(R.id.textViewPassword);
+                pass.setText(passwordText);
+                */
 
             }
         }catch(SQLiteException e){
@@ -182,5 +203,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //database end
 
     }
+
+    public void loadPlace(){
+
+       // SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
+        ListView listUser = (ListView) findViewById(R.id.list_users);
+        try {
+            db = databaseHelper.getReadableDatabase();
+            cursor = db.query("USER",
+                    new String[]{"_id", "lName"},
+                    null, null, null, null, null);
+            SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
+                    android.R.layout.simple_list_item_1,
+                    cursor,
+                    new String[]{"lName"},
+                    new int[]{android.R.id.text1},
+                    0);
+            listUser.setAdapter(listAdapter);
+        } catch(SQLiteException e) {
+            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+
+    }
+
 
 }
