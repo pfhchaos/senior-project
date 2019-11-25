@@ -314,6 +314,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         Log.v("googleApiClient","current location is " + location);
 
+
+
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
@@ -322,18 +324,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, (LocationListener)here, null);
     }
 
-<<<<<<< HEAD
     public String getName(){
         return "From Activity";
     }
 
-
-=======
     @Override
     public void onConnectionSuspended(int i) {
         Log.v("googleApiClient", "Connection to Google Location Services suspended!");
     }
->>>>>>> 201cabbc10c0bd3bc710dd322a69ad4091494343
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
