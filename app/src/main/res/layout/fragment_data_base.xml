@@ -11,4 +11,33 @@
         android:layout_height="match_parent"
         android:text="@string/hello_blank_fragment" />
 
+    <EditText
+        android:id="@+id/editTextfname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp"
+        android:ems="10"
+        android:inputType="text" >
+    </EditText>
+    <EditText
+        android:id="@+id/editTextlname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="25dp"
+        android:ems="10"
+        android:inputType="text" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:ems="10"
+        android:inputType="textEmailAddress" />
+
+
+
 </FrameLayout>

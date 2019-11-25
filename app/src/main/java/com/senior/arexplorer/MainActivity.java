@@ -1,37 +1,65 @@
 package com.senior.arexplorer;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-
+import android.content.Intent;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.widget.AdapterView;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.CursorAdapter;
+import android.widget.SimpleCursorAdapter;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
+import com.google.android.gms.location.LocationServices;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final int PERMISSION_REQUEST_CAMERA = 10;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final long LOCATION_UPDATE_INTERVAL = 5000;
+    private static final long LOCATION_FASTEST_INTERVAL = 5000;
+
     DrawerLayout drawer;
+    public SQLiteDatabase db;
+    private Cursor favoritesCursor;
+    public Cursor cursor;
     SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
 
+    private Here here;
+    private GoogleApiClient googleApiClient;
+    private GooglePlaceFetcher googlePlaceFetcher;
 
+
+    //lifecycle methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v("main activity lifecycle","onCreate");
         setContentView(R.layout.activity_main);
 
         drawer = findViewById(R.id.drawer_layout);
@@ -47,29 +75,86 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             drawer.openDrawer(GravityCompat.START);
         }
-        LoadData(); //create database and load
+        //
+        if(savedInstanceState!=null){
+            // data to retrieve from previous state
 
+        }
+
+       // LoadData(); //create database and load
+
+       // loadPlace();
+
+        this.here = here.getHere();
+        this.googlePlaceFetcher = GooglePlaceFetcher.getGooglePlaceFetcher(this, this.here);
+
+        this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
     }
 
+    @Override
+    public void onResume() {
+       super.onResume();
+        Log.v("main activity lifecycle","onResume");
+
+       if (!checkPlayServices()) {
+           Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT);
+       }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.v("main activity lifecycle","onStart");
+
+        if (this.googleApiClient != null) {
+            this.googleApiClient.connect();
+        }
+        else {
+            Log.e("googleApiClient", "googleApiClient is null!");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.v("main activity lifecycle","onPause");
+        //TODO: pause location updates here
+
+        /*
+        if (googleApiClient != null  &&  googleApiClient.isConnected()) {
+          LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+          googleApiClient.disconnect();
+        }
+         */
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        Log.v("main activity lifecycle","onSaveInstanceState");
+        //savedInstanceState.putInt("key", value);
+        // we have to find what need to save
+        //
+    }
+
+    @Override
+    public void onStop() {
+        Log.v("main activity lifecycle","onStop");
+        this.here.cleanUp();
+        this.googlePlaceFetcher.cleanUp();
+        super.onStop();
+    }
+
+    //permission methods
     private void checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{
                             Manifest.permission.CAMERA,
                             Manifest.permission.ACCESS_FINE_LOCATION
                     },
-                    PERMISSION_REQUEST_CAMERA);
-        }
-        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions( this,
-                    new String[] {Manifest.permission.CAMERA},
-                    PERMISSION_REQUEST_CAMERA);
-        }
-        else if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions( this,
-                    new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_REQUEST_CAMERA);
         }
     }
@@ -93,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    //navigation methods
     @Override
     public void onBackPressed() {
         if(drawer.isDrawerOpen(GravityCompat.START)){
@@ -142,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    //database methods
     private void LoadData(){
         // for database
 
@@ -157,6 +244,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String lNameText = cursor.getString(1);
                 String emailText = cursor.getString(2);
                 String passwordText = cursor.getString(3);
+                /*
+                //display data
+                TextView fName =(TextView)findViewById(R.id.textViewFname);
+                fName.setText(fNameText);
+                TextView lName =(TextView)findViewById(R.id.textViewLname);
+                lName.setText(lNameText);
+                TextView email =(TextView)findViewById(R.id.textViewEmail);
+                email.setText(emailText);
+                TextView pass =(TextView)findViewById(R.id.textViewPassword);
+                pass.setText(passwordText);
+                */
 
             }
         }catch(SQLiteException e){
@@ -169,4 +267,68 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public void loadPlace() {
+
+        // SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
+        ListView listUser = (ListView) findViewById(R.id.list_users);
+        try {
+            db = databaseHelper.getReadableDatabase();
+            cursor = db.query("USER",
+                    new String[]{"_id", "lName"},
+                    null, null, null, null, null);
+            SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
+                    android.R.layout.simple_list_item_1,
+                    cursor,
+                    new String[]{"lName"},
+                    new int[]{android.R.id.text1},
+                    0);
+            listUser.setAdapter(listAdapter);
+        } catch (SQLiteException e) {
+            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    //google location services
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+            } else {
+                //finish();
+
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.v("googleApiClient", "Connection to Google Location Services connected!");
+        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        Log.v("googleApiClient","current location is " + location);
+
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(LOCATION_FASTEST_INTERVAL);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, (LocationListener)here, null);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.v("googleApiClient", "Connection to Google Location Services suspended!");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.v("googleApiClient", "Connection to Google Location Services failed!");
+    }
 }

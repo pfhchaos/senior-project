@@ -2,6 +2,8 @@ package com.senior.arexplorer;
 
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,17 +17,13 @@ public class Place implements Serializable {
 
     private Collection<String> types;
 
-    private long timeRetrieved;
-
-    public Place() {
+    public Place() { // need to modify for  Arguments based
         this.name = "";
         this.description = "";
         this.latitude = 0.0;
         this.longitude = 0.0;
         this.elevation = 0.0;
         this.types = new ArrayList<>();
-
-        this.timeRetrieved = 0;
     }
 
     public void setName(String name) {
@@ -56,8 +54,8 @@ public class Place implements Serializable {
         this.types.add(type);
     }
 
-    public void setTimeRetrieved(long timeRetrieved) {
-        this.timeRetrieved = timeRetrieved;
+    public void removeType(String type) {
+        this.types.remove(type);
     }
 
     public String getName() {
@@ -76,6 +74,18 @@ public class Place implements Serializable {
         return this.longitude;
     }
 
+    public Location getLocation(Location here) {
+        Location loc = new Location(here);
+        loc.setLatitude(this.latitude);
+        loc.setLongitude(this.longitude);
+
+        return loc;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(this.latitude, this.longitude);
+    }
+
     public double getElevation() {
         return this.elevation;
     }
@@ -83,10 +93,6 @@ public class Place implements Serializable {
     public Collection<String> getTypes() {
         //TODO: clone types before returning it
         return this.types;
-    }
-
-    public long getTimeRetrieved() {
-        return this.timeRetrieved;
     }
 
     public String toString() {

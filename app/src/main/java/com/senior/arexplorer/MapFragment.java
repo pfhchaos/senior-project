@@ -2,9 +2,7 @@ package com.senior.arexplorer;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
@@ -26,17 +23,17 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Collection;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings {
+
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler {
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private CurrentLocation currentLocation;
-    private PlaceFetcher backend;
-    private float zoom = 10;
+    private GooglePlaceFetcher backend;
+    private float zoom = 18;
 
     @Nullable
     @Override
@@ -44,7 +41,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Gets the MapView from the XML layout and creates it
-        mapView = (MapView) v.findViewById(R.id.mapView);
+        mapView = v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
 
@@ -60,15 +57,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onStart() {
-        currentLocation = new CurrentLocation(getContext());
-        System.out.printf("%s : %s, %s\n", currentLocation, currentLocation.getLatitude(), currentLocation.getLongitude());
-        if (currentLocation == null) {
-            Toast.makeText(getActivity(), "currentLocation is null. this should not happen", Toast.LENGTH_SHORT).show();
+        Here here = Here.getHere();
+        if (here == null) {
+            Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        PlaceFetcher backend = new GooglePlaceFetcher(getActivity(), currentLocation);
+        this.backend = GooglePlaceFetcher.getGooglePlaceFetcher(getActivity(), here);
+        this.backend.addHandler(this);
 
         mapView.onStart();
-        currentLocation.onStart(getActivity());
         super.onStart();
     }
 
@@ -87,7 +83,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onStop() {
         mapView.onStop();
-        currentLocation.onStop();
         super.onStop();
     }
 
@@ -105,12 +100,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onMapReady(GoogleMap gMap) {
+        Location location = null;
         googleMap = gMap;
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        //googleMap.addMarker(new MarkerOptions().position(/*some location*/));
-        //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(/*some location*/, 10));
-        moveToLocation(currentLocation.getLocation());
-
+        while ((location = Here.getHere().getLocation()) == null) {
+            try {
+                Log.d("map fragment", "location is null. sleeping");
+                Thread.sleep(10);
+            } catch (Exception ex) {
+                Log.e("map fragment", "sleep was interrupted. i blame you");
+            }
+        }
+        moveToLocation(location);
+        backend.fetchData(getActivity());
     }
 
     private void moveToLocation(Location location) {
@@ -144,4 +146,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
                 });
     }
 
+    @Override
+    public void placeFetchComplete() {
+        Collection<Place> places = backend.getPlaces();
+        Location here = Here.getHere().getLocation();
+
+        System.err.println("entered callback from place fetcher");
+
+        for (Place p: places) {
+            googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
+        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));
+    }
 }

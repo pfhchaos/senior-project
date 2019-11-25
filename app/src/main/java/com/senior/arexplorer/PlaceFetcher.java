@@ -5,5 +5,10 @@ import android.app.Activity;
 import java.util.Collection;
 
 public interface PlaceFetcher {
-    public Collection<Place> getPlaces();
+
+    Collection<Place> getPlaces();
+
+    void fetchData(Activity mActivity);
+    void addHandler(PlaceFetcherHandler handler);
+    void removeHandler(PlaceFetcherHandler handler);
 }
