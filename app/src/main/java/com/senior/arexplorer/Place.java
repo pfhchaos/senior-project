@@ -17,8 +17,6 @@ public class Place implements Serializable {
 
     private Collection<String> types;
 
-    private long timeRetrieved;
-
     public Place() { // need to modify for  Arguments based
         this.name = "";
         this.description = "";
@@ -26,8 +24,6 @@ public class Place implements Serializable {
         this.longitude = 0.0;
         this.elevation = 0.0;
         this.types = new ArrayList<>();
-
-        this.timeRetrieved = 0;
     }
 
     public void setName(String name) {
@@ -58,8 +54,8 @@ public class Place implements Serializable {
         this.types.add(type);
     }
 
-    public void setTimeRetrieved(long timeRetrieved) {
-        this.timeRetrieved = timeRetrieved;
+    public void removeType(String type) {
+        this.types.remove(type);
     }
 
     public String getName() {
@@ -97,10 +93,6 @@ public class Place implements Serializable {
     public Collection<String> getTypes() {
         //TODO: clone types before returning it
         return this.types;
-    }
-
-    public long getTimeRetrieved() {
-        return this.timeRetrieved;
     }
 
     public String toString() {

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -31,9 +32,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private LocationManager locationManager;
     private GooglePlaceFetcher backend;
-    private float zoom = 2;
+    private float zoom = 18;
 
     @Nullable
     @Override
@@ -57,11 +57,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onStart() {
-        locationManager = LocationManager.getLocationManager();
-        if (locationManager == null) {
-            Toast.makeText(getActivity(), "locationManager is null. this should not happen", Toast.LENGTH_SHORT).show();
+        Here here = Here.getHere();
+        if (here == null) {
+            Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        this.backend = GooglePlaceFetcher.getGooglePlaceFetcher(getActivity(), locationManager);
+        this.backend = GooglePlaceFetcher.getGooglePlaceFetcher(getActivity(), here);
         this.backend.addHandler(this);
 
         mapView.onStart();
@@ -100,9 +100,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onMapReady(GoogleMap gMap) {
+        Location location = null;
         googleMap = gMap;
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        moveToLocation(locationManager.getLocation(getContext()));
+        while ((location = Here.getHere().getLocation()) == null) {
+            try {
+                Log.d("map fragment", "location is null. sleeping");
+                Thread.sleep(10);
+            } catch (Exception ex) {
+                Log.e("map fragment", "sleep was interrupted. i blame you");
+            }
+        }
+        moveToLocation(location);
         backend.fetchData(getActivity());
     }
 
@@ -140,13 +149,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void placeFetchComplete() {
         Collection<Place> places = backend.getPlaces();
-        Location here = locationManager.getLocation(getContext());
+        Location here = Here.getHere().getLocation();
 
         System.err.println("entered callback from place fetcher");
 
         for (Place p: places) {
             googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
         }
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), 10));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));
     }
 }
