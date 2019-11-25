@@ -2,6 +2,7 @@ package com.senior.arexplorer;
 
 import android.app.Activity;
 import android.location.Location;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -18,26 +19,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener, Response.Listener<String> {
-
-    LocationManager locationManager;
-    private final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
-    private RequestQueue requestQueue;
-    Collection<Place> places;
+    public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
-    String lastRequest;
-    Collection<PlaceFetcherHandler> placeFetcherHandlers = null;
 
-    private static GooglePlaceFetcher googlePlaceFetcher = null;
+    private Here here;
+    private RequestQueue requestQueue;
+    private Collection<Place> places;
+    private String lastRequest;
+    private Collection<PlaceFetcherHandler> placeFetcherHandlers = null;
+    private long lastUpdated;
 
-    public static GooglePlaceFetcher getGooglePlaceFetcher(Activity mActivity, LocationManager locationManager) {
+    private static GooglePlaceFetcher googlePlaceFetcher;
+
+    public static GooglePlaceFetcher getGooglePlaceFetcher(Activity mActivity, Here here) {
         if (googlePlaceFetcher == null) {
-            googlePlaceFetcher = new GooglePlaceFetcher(mActivity, locationManager);
+            googlePlaceFetcher = new GooglePlaceFetcher(mActivity, here);
         }
         return googlePlaceFetcher;
     }
 
-    private GooglePlaceFetcher(Activity mActivity, LocationManager locationManager) {
-        this.locationManager = locationManager;
+    private GooglePlaceFetcher(Activity mActivity, Here here) {
+        this.here = here;
         this.placeFetcherHandlers = new ArrayList<>();
 
         requestQueue = Volley.newRequestQueue(mActivity);
@@ -45,8 +47,8 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
     }
 
     public void fetchData(Activity mActivity) {
-        Location here = this.locationManager.getLocation(mActivity.getApplicationContext());
-        if (locationManager == null) {
+        Location here = this.here.getLocation();
+        if (this.here == null) {
             Toast.makeText(mActivity, "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radius);
@@ -114,6 +116,7 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
             }
             else {
                 for (PlaceFetcherHandler handler: this.placeFetcherHandlers) {
+                    this.lastUpdated = System.currentTimeMillis();
                     handler.placeFetchComplete();
                 }
             }
@@ -122,6 +125,10 @@ public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener,
             ex.printStackTrace();
             return;
         }
-        System.err.println(results);
+        Log.d("googlePlaceFetcher", results.toString());
+    }
+
+    public void cleanUp() {
+        GooglePlaceFetcher.googlePlaceFetcher = null;
     }
 }
