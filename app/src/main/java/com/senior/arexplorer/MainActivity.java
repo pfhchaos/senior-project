@@ -1,6 +1,7 @@
 package com.senior.arexplorer;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -36,7 +37,7 @@ import com.senior.arexplorer.AR.ARFragment;
 import com.google.android.gms.location.LocationServices;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final int PERMISSION_REQUEST_CAMERA = 10;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -266,6 +267,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public void loadPlace() {
+
+        // SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
+        ListView listUser = (ListView) findViewById(R.id.list_users);
+        try {
+            db = databaseHelper.getReadableDatabase();
+            cursor = db.query("USER",
+                    new String[]{"_id", "lName"},
+                    null, null, null, null, null);
+            SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
+                    android.R.layout.simple_list_item_1,
+                    cursor,
+                    new String[]{"lName"},
+                    new int[]{android.R.id.text1},
+                    0);
+            listUser.setAdapter(listAdapter);
+        } catch (SQLiteException e) {
+            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
     //google location services
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -308,29 +331,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.v("googleApiClient", "Connection to Google Location Services failed!");
     }
-    public void loadPlace(){
-
-       // SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
-        ListView listUser = (ListView) findViewById(R.id.list_users);
-        try {
-            db = databaseHelper.getReadableDatabase();
-            cursor = db.query("USER",
-                    new String[]{"_id", "lName"},
-                    null, null, null, null, null);
-            SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
-                    android.R.layout.simple_list_item_1,
-                    cursor,
-                    new String[]{"lName"},
-                    new int[]{android.R.id.text1},
-                    0);
-            listUser.setAdapter(listAdapter);
-        } catch(SQLiteException e) {
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
-
-    }
-
-
 }
