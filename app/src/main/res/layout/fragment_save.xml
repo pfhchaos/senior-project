@@ -65,6 +65,7 @@
         android:id="@+id/pictureView"
         android:layout_width="match_parent"
         android:layout_height="484dp"
+        android:visibility="visible"
         tools:srcCompat="@tools:sample/avatars[3]" />
 
 </LinearLayout>

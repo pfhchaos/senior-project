@@ -1,4 +1,5 @@
 package com.senior.arexplorer;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.Context;
@@ -37,7 +38,8 @@ public class CreateDatabase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db,int oldVersion, int newVersion ){
 
-
+        db.execSQL("DROP TABLE IF EXISTS USER");
+        onCreate(db);
 
     }
 
@@ -50,6 +52,12 @@ public class CreateDatabase extends SQLiteOpenHelper {
                    db.insert("USER",null, users);
 
 
+    }
+
+    public Cursor getData(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  db.rawQuery( "select * from USER where _id="+id+"", null );
+        return res;
     }
 
 
