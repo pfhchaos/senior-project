@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.Utils;
 
 import android.app.Activity;
 
@@ -11,4 +11,5 @@ public interface PlaceFetcher {
     void fetchData(Activity mActivity);
     void addHandler(PlaceFetcherHandler handler);
     void removeHandler(PlaceFetcherHandler handler);
+
 }

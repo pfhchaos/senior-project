@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.Utils;
 
 import android.location.Location;
 
@@ -105,4 +105,8 @@ public class Place implements Serializable {
 
         return ret;
     }
+
+    //context dependent handlers
+    //transient boolean onClick(Event event);
+    //transient boolean onLongClick(Event event);
 }

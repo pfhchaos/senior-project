@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.Utils;
 
 import android.app.Activity;
 import android.location.Location;
@@ -17,6 +17,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import com.senior.arexplorer.Utils.Place;
+import com.senior.arexplorer.Utils.PlaceFetcher;
 
 public class GooglePlaceFetcher implements PlaceFetcher, Response.ErrorListener, Response.Listener<String> {
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";

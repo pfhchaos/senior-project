@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import android.content.Intent;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -21,10 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import android.widget.AdapterView;
-import android.view.View;
 import android.widget.ListView;
-import android.widget.CursorAdapter;
 import android.widget.SimpleCursorAdapter;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -35,6 +32,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
 import com.google.android.gms.location.LocationServices;
+import com.senior.arexplorer.Utils.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Here;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {

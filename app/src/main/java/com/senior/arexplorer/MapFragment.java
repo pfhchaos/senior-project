@@ -24,6 +24,10 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.senior.arexplorer.Utils.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Here;
+import com.senior.arexplorer.Utils.Place;
+import com.senior.arexplorer.Utils.PlaceFetcherHandler;
 
 import java.util.Collection;
 
@@ -102,6 +106,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     public void onMapReady(GoogleMap gMap) {
         Location location = null;
         googleMap = gMap;
+        googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         while ((location = Here.getHere().getLocation()) == null) {
             try {
@@ -151,7 +156,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Collection<Place> places = backend.getPlaces();
         Location here = Here.getHere().getLocation();
 
-        System.err.println("entered callback from place fetcher");
+        Log.d("mapFragment","entered callback from place fetcher");
 
         for (Place p: places) {
             googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
