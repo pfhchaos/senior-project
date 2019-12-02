@@ -6,12 +6,14 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.senior.arexplorer.Utils.IFragSettings;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-public class HomeFragment extends Fragment implements  IFragSettings{
+public class HomeFragment extends Fragment implements IFragSettings {
 
     @Nullable
     @Override

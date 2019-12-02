@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.senior.arexplorer.R;
-import com.senior.arexplorer.IFragSettings;
+import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.SeekBarWithText;
 
 import androidx.annotation.NonNull;

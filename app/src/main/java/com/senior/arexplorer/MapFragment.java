@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.Utils.GooglePlaceFetcher;
 import com.senior.arexplorer.Utils.Here;
+import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.Place;
 import com.senior.arexplorer.Utils.PlaceFetcherHandler;
 

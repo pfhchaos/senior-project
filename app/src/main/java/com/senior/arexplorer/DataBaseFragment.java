@@ -1,10 +1,6 @@
 package com.senior.arexplorer;
 
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,13 +12,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.senior.arexplorer.Utils.IFragSettings;
 
 
-public class DataBaseFragment extends Fragment implements IFragSettings{
+public class DataBaseFragment extends Fragment implements IFragSettings {
 
     @Nullable
     @Override
