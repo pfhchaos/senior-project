@@ -7,14 +7,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
-import android.hardware.SensorManager;
 import android.location.Location;
-import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 
 
-import com.senior.arexplorer.AR.Assistant.CompassAssistant;
+import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.R;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.senior.arexplorer.AR.Assistant;
+package com.senior.arexplorer.Utils;
 
 import android.content.Context;
 import android.hardware.Sensor;

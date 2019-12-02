@@ -32,10 +32,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
 import com.google.android.gms.location.LocationServices;
-import com.senior.arexplorer.Utils.PlaceFetcher;
 import com.senior.arexplorer.Utils.GooglePlaceFetcher;
 import com.senior.arexplorer.Utils.Here;
-import com.senior.arexplorer.AR.Assistant.CompassAssistant;
+import com.senior.arexplorer.Utils.CompassAssistant;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
