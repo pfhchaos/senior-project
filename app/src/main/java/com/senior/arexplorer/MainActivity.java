@@ -319,12 +319,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         Log.v("googleApiClient","current location is " + location);
 
+
+
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
         locationRequest.setFastestInterval(LOCATION_FASTEST_INTERVAL);
 
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, (LocationListener)here, null);
+    }
+
+    public String getName(){
+        return "From Activity";
     }
 
     @Override
