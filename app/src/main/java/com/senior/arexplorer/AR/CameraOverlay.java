@@ -2,30 +2,39 @@ package com.senior.arexplorer.AR;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.VectorDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
+
 import com.senior.arexplorer.AR.Assistant.CompassAssistant;
 import com.senior.arexplorer.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import androidx.appcompat.widget.AppCompatDrawableManager;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener {
     private boolean isRunning = true;
     Paint p = new Paint();
     Rect rect = new Rect(), curCompass = new Rect();
-    Bitmap compass;
+    Bitmap compass, compassMarker;
     float heading = 0;
     float scale;
-    int fov = 90;
+    int fov = 180;
     int drawDistance = 1000;
     CompassAssistant assistant;
+
+    Location curLoc;
+    List<Location> nearby;
 
 
     public CameraOverlay(Context context){
@@ -34,44 +43,74 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void init(Context context){
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        assistant = new CompassAssistant(windowManager, sensorManager);
-        assistant.addCompassListener(this);
-
-        assistant.onStart();
-
+        CompassAssistant.getInstance(context).addCompassListener(this);
 
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
 
-        compass = BitmapFactory.decodeResource(getResources(), R.drawable.compass);
-        scale = (float) compass.getWidth() / 720;
-        //System.out.println(scale * 360 + " " + compass.getWidth());
+        VectorDrawable drawable = (VectorDrawable) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
+        compass = getBitmap(drawable);
 
+        drawable = (VectorDrawable) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
+        compassMarker = getBitmap(drawable);
+
+        scale = (float) compass.getWidth() / 720;
+
+
+        //todo : everything after this is for testing purposes, remove later
+        curLoc = new Location("dummyprovider");
+        //pub
+//        curLoc.setLatitude(47.49218543922342);
+//        curLoc.setLongitude(-117.5838589668274);
+        //CSE
+        curLoc.setLatitude(47.4899634586667);
+        curLoc.setLongitude(-117.58538246154787);
+        //fountain
+//        curLoc.setLatitude(47.49133725545527);
+//        curLoc.setLongitude(-117.58288800716402);
+
+
+        nearby = new ArrayList<>();
+
+
+        nearby.add(new Location("dummyProvider"){{
+            //ewu fountain
+            setLatitude(47.49133725545527);
+            setLongitude(-117.58288800716402);
+        }});
+        nearby.add(new Location("dummyProvider"){{
+            //pub
+        setLatitude(47.49218543922342);
+        setLongitude(-117.5838589668274);
+        }});
+
+    }
+
+    private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        vectorDrawable.draw(canvas);
+        return bitmap;
     }
 
     public void toggleTimer(){
-        if(!isRunning){
-            assistant.onStart();
-        }
-        else {
-            assistant.onStop();
-        }
+//        if(!isRunning){
+//            assistant.onStart();
+//        }
+//        else {
+//            assistant.onStop();
+//        }
         isRunning = !isRunning;
     }
 
-    public void kill(){
-        isRunning = false;
-
-        assistant.onStop();
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        p.setColor(Color.BLUE);
+        p.setColor(Color.parseColor("fuchsia"));
         p.setStyle(Paint.Style.FILL);
 
         float sx = (float) getWidth() / 10000;
@@ -79,16 +118,51 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.scale(sx,sy);
 
         rect.set(500,500,9500,1000);
-        calcCompass();
+        calcCompass(canvas);
         canvas.drawBitmap(compass, curCompass, rect, null);
+
+
+        for(Location l : nearby){
+            drawNearbyRect(l, canvas);
+//            canvas.drawRect(rect, p);
+//            canvas.drawBitmap(compassMarker, null, rect, p);
+
+            //Log.d("rect", "Rect location is " + rect);
+        }
     }
 
-    private void calcCompass(){
+    private void calcCompass(Canvas canvas){
+        int height = compass.getHeight();
         int width = compass.getWidth();
-        int offset = (int) (fov * scale);
-        int mid = width / 2 +  (int) ((heading) * scale);
+        int offset = (int) (fov/2 * scale);
+        int mid = width / 2 +  (int) (heading * scale);
 
-        curCompass.set(mid - offset,0,mid + offset, compass.getHeight());
+        //Log.d("CamOver", "Width : " + width + " Height : " + height);
+
+        curCompass.set(mid - offset,0,mid + offset, height);
+    }
+
+    private void drawNearbyRect(Location destLoc, Canvas canvas){
+        double headingTo = curLoc.bearingTo(destLoc);
+        double relativeHeading = (headingTo - heading);
+        //this next bit just takes us from [0,360] to [-180,180]
+        relativeHeading = (relativeHeading + 180) % 360 - 180;
+
+        double dist = curLoc.distanceTo(destLoc);
+
+        //if our heading is within our FoV
+        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance){
+            int newScale = 9000 / fov;
+            int center = (int)(5000 + relativeHeading * newScale);
+
+            rect.set(center - 250, 250 , center + 250, 750);
+
+            int alpha =(int)( (1 - dist / drawDistance) * 255);
+            p.setAlpha(alpha);
+
+            canvas.drawBitmap(compassMarker, null, rect, p);
+        }
+
     }
 
     void setFoV(int newFoV){
@@ -110,26 +184,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         previousCompassBearing = userHeading;
         heading = normalizedBearing;
 
-        String status = "NO_CONTACT";
-        switch (assistant.getLastAccuracySensorStatus()) {
-            case SensorManager.SENSOR_STATUS_NO_CONTACT:
-                status = "NO_CONTACT";
-                break;
-            case SensorManager.SENSOR_STATUS_UNRELIABLE:
-                status = "UNRELIABLE";
-                break;
-            case SensorManager.SENSOR_STATUS_ACCURACY_LOW:
-                status = "ACCURACY_LOW";
-                break;
-            case SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM:
-                status = "ACCURACY_MEDIUM";
-                break;
-            case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
-                status = "ACCURACY_HIGH";
-                break;
-        }
-
-        //System.out.printf("CompassBearing: %f\nAccuracySensorStatus: %s\n", normalizedBearing, status);
         invalidate();
     }
 

@@ -65,7 +65,10 @@
         android:id="@+id/pictureView"
         android:layout_width="match_parent"
         android:layout_height="484dp"
+        android:baselineAlignBottom="false"
+        android:cropToPadding="true"
+        android:scaleType="fitCenter"
         android:visibility="visible"
-        tools:srcCompat="@tools:sample/avatars[3]" />
+        app:srcCompat="@color/colorAccent" />
 
 </LinearLayout>

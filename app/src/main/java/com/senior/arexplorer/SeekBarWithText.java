@@ -5,9 +5,12 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class SeekBarWithText extends LinearLayout {
+import androidx.core.util.Consumer;
+
+public class SeekBarWithText extends LinearLayout implements SeekBar.OnSeekBarChangeListener {
     TextView text;
     SeekBar seekBar;
+    Consumer<Integer> listenerAction;
 
     public SeekBarWithText(Context context) {
         super(context);
@@ -43,9 +46,19 @@ public class SeekBarWithText extends LinearLayout {
         return this;
     }
 
-    public SeekBarWithText setListener(SeekBar.OnSeekBarChangeListener listener){
-        seekBar.setOnSeekBarChangeListener(listener);
+    public SeekBarWithText setListener(Consumer<Integer> actionIn){
+        seekBar.setOnSeekBarChangeListener(this);
+        listenerAction = actionIn;
         return this;
     }
 
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
+        listenerAction.accept(progress);
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {}
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {}
 }
