@@ -43,13 +43,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void init(Context context){
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        assistant = new CompassAssistant(windowManager, sensorManager);
-        assistant.addCompassListener(this);
-
-        assistant.onStart();
-
+        CompassAssistant.getInstance(context).addCompassListener(this);
 
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
@@ -67,11 +61,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //todo : everything after this is for testing purposes, remove later
         curLoc = new Location("dummyprovider");
         //pub
-        curLoc.setLatitude(47.49218543922342);
-        curLoc.setLongitude(-117.5838589668274);
+//        curLoc.setLatitude(47.49218543922342);
+//        curLoc.setLongitude(-117.5838589668274);
         //CSE
-//        curLoc.setLatitude(47.4899634586667);
-//        curLoc.setLongitude(-117.58538246154787);
+        curLoc.setLatitude(47.4899634586667);
+        curLoc.setLongitude(-117.58538246154787);
         //fountain
 //        curLoc.setLatitude(47.49133725545527);
 //        curLoc.setLongitude(-117.58288800716402);
@@ -84,6 +78,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             //ewu fountain
             setLatitude(47.49133725545527);
             setLongitude(-117.58288800716402);
+        }});
+        nearby.add(new Location("dummyProvider"){{
+            //pub
+        setLatitude(47.49218543922342);
+        setLongitude(-117.5838589668274);
         }});
 
     }
@@ -98,12 +97,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void toggleTimer(){
-        if(!isRunning){
-            assistant.onStart();
-        }
-        else {
-            assistant.onStop();
-        }
+//        if(!isRunning){
+//            assistant.onStart();
+//        }
+//        else {
+//            assistant.onStop();
+//        }
         isRunning = !isRunning;
     }
 
@@ -149,23 +148,17 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = (relativeHeading + 180) % 360 - 180;
 
-        //Log.d("camOver", "Heading  to destLoc is " + headingTo);
-        //Log.d("camOver", "Relative Heading : " + relativeHeading);
+        double dist = curLoc.distanceTo(destLoc);
 
         //if our heading is within our FoV
-        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2){
-            int size = 250;
+        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance){
             int newScale = 9000 / fov;
             int center = (int)(5000 + relativeHeading * newScale);
 
-            rect.set(center - size, rect.top - (250) , center + size, rect.bottom - 250);
+            rect.set(center - 250, 250 , center + 250, 750);
 
-//            Log.d("camOver", "\nHeading : " + heading + "\nRelative Heading : " + relativeHeading);
-//            Log.d("camOver", "\nScaled Heading : "  + (heading * scale) + "\nScaled Relative " + (relativeHeading * scale));
-
-            int alpha =(int)( (1 - curLoc.distanceTo(destLoc) / drawDistance) * 255);
+            int alpha =(int)( (1 - dist / drawDistance) * 255);
             p.setAlpha(alpha);
-            //Log.d("camOver", "alpha is " + alpha);
 
             canvas.drawBitmap(compassMarker, null, rect, p);
         }

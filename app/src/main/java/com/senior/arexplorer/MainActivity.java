@@ -35,6 +35,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
 import com.google.android.gms.location.LocationServices;
+import com.senior.arexplorer.AR.Assistant.CompassAssistant;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Here here;
     private GoogleApiClient googleApiClient;
     private GooglePlaceFetcher googlePlaceFetcher;
+    private CompassAssistant compassAssistant;
 
 
     //lifecycle methods
@@ -90,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
+        this.compassAssistant = CompassAssistant.getInstance(this);
+        compassAssistant.onStart();
     }
 
     @Override
@@ -143,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.v("main activity lifecycle","onStop");
         this.here.cleanUp();
         this.googlePlaceFetcher.cleanUp();
+        this.compassAssistant.cleanUp();
         super.onStop();
     }
 
