@@ -69,6 +69,6 @@
         android:cropToPadding="true"
         android:scaleType="fitCenter"
         android:visibility="visible"
-        app:srcCompat="@color/design_default_color_primary" />
+        app:srcCompat="@color/colorAccent2" />
 
 </LinearLayout>

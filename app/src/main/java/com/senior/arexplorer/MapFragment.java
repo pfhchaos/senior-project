@@ -24,11 +24,17 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Places.Here;
+import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.Places.HereListener;
+import com.senior.arexplorer.Utils.Places.Place;
+import com.senior.arexplorer.Utils.Places.PlaceFetcherHandler;
 
 import java.util.Collection;
 
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler {
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler, HereListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
@@ -58,6 +64,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onStart() {
         Here here = Here.getHere();
+        here.addListener(this);
         if (here == null) {
             Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
@@ -102,6 +109,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     public void onMapReady(GoogleMap gMap) {
         Location location = null;
         googleMap = gMap;
+        googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         while ((location = Here.getHere().getLocation()) == null) {
             try {
@@ -151,11 +159,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Collection<Place> places = backend.getPlaces();
         Location here = Here.getHere().getLocation();
 
-        System.err.println("entered callback from place fetcher");
+        Log.d("mapFragment","entered callback from place fetcher");
 
         for (Place p: places) {
             googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), zoom));
     }
 }

@@ -27,6 +27,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.senior.arexplorer.AR.saveObj;
+import com.senior.arexplorer.Utils.IFragSettings;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,7 +38,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveLocationFragment extends Fragment implements IFragSettings{
+public class SaveLocationFragment extends Fragment implements IFragSettings {
 
     private TextView nameInputTextView;
     private TextView descInputTextView;

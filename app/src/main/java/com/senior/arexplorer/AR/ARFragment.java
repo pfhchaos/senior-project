@@ -14,8 +14,10 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.senior.arexplorer.R;
-import com.senior.arexplorer.IFragSettings;
+import com.senior.arexplorer.Utils.CompassAssistant;
+import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.SeekBarWithText;
+import com.senior.arexplorer.Utils.Places.Here;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,24 +51,30 @@ public class ARFragment extends Fragment implements IFragSettings {
         overlay.addView(mOverlay);
         mOverlay.toggleTimer();
 
+
+        Here.getHere().addListener(mOverlay);
+        CompassAssistant.getInstance(view.getContext()).addCompassListener(mOverlay);
+
         return view;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Here.getHere().removeListener(mOverlay);
+        CompassAssistant.getInstance().removeCompassListener(mOverlay);
     }
 
     @Override
     public void onPause(){
         super.onPause();
-        mOverlay.toggleTimer();
+        CompassAssistant.getInstance(getActivity()).onStop();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        mOverlay.toggleTimer();
+        CompassAssistant.getInstance(getActivity()).onStart();
     }
 
 

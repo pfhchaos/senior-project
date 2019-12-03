@@ -1,5 +1,6 @@
-package com.senior.arexplorer.AR.Assistant;
+package com.senior.arexplorer.Utils;
 
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -55,11 +56,13 @@ public class CompassAssistant implements SensorEventListener {
     private float[] gravityValues = new float[3];
     private float[] magneticValues = new float[3];
 
+    private static CompassAssistant instance;
+
     /**
      * Construct a new instance of the this class. A internal compassVector listeners needed to separate it
      * from the cleared list of public listeners.
      */
-    public CompassAssistant(WindowManager windowManager, SensorManager sensorManager) {
+    private CompassAssistant(WindowManager windowManager, SensorManager sensorManager) {
         this.windowManager = windowManager;
         this.sensorManager = sensorManager;
         compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
@@ -260,6 +263,25 @@ public class CompassAssistant implements SensorEventListener {
         } else {
             return event.values;
         }
+    }
+
+    public static CompassAssistant getInstance(Context context){
+        if(instance == null){
+            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            instance = new CompassAssistant(windowManager, sensorManager);
+        }
+        return instance;
+    }
+
+    public static CompassAssistant getInstance(){
+        if(instance == null) Log.e("CompassAssistant", "There is no instance yet, need to pass context");
+        return instance;
+    }
+
+    public void cleanUp(){
+        instance.onStop();
+        instance = null;
     }
 
     public static float shortestRotation(float heading, float previousHeading) {

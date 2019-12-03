@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.Utils.Places;
 
 import android.location.Location;
 
@@ -11,18 +11,22 @@ import java.util.Collection;
 public class Place implements Serializable {
     private String name;
     private String description;
-    private Double latitude;
-    private Double longitude;
-    private Double elevation;
+    private Location loc;
 
     private Collection<String> types;
 
     public Place() { // need to modify for  Arguments based
+        this(new Location("dummy"));
+    }
+
+    public Place(Location curr){
+        this.loc = new Location(curr);
+        this.loc.setLatitude(0);
+        this.loc.setLongitude(0);
+        this.loc.setAltitude(0);
+
         this.name = "";
         this.description = "";
-        this.latitude = 0.0;
-        this.longitude = 0.0;
-        this.elevation = 0.0;
         this.types = new ArrayList<>();
     }
 
@@ -35,20 +39,20 @@ public class Place implements Serializable {
     }
 
     public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+        this.loc.setLatitude(latitude);
     }
 
     public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+        this.loc.setLongitude(longitude);
     }
 
     public void setElevation(Double elevation) {
-       this.elevation = elevation;
+       this.loc.setAltitude(elevation);
     }
 
-    //double distanceFrom(Location cur) {
-    //    return
-    //`}
+    double distanceTo(Location cur) {
+        return loc.distanceTo(cur);
+    }
 
     public void addType(String type) {
         this.types.add(type);
@@ -67,27 +71,23 @@ public class Place implements Serializable {
     }
 
     public double getLatitude() {
-        return this.latitude;
+        return loc.getLatitude();
     }
 
     public double getLongitude() {
-        return this.longitude;
+        return loc.getLongitude();
     }
 
-    public Location getLocation(Location here) {
-        Location loc = new Location(here);
-        loc.setLatitude(this.latitude);
-        loc.setLongitude(this.longitude);
-
+    public Location getLocation() {
         return loc;
     }
 
     public LatLng getLatLng() {
-        return new LatLng(this.latitude, this.longitude);
+        return new LatLng(loc.getLatitude(), loc.getLongitude());
     }
 
     public double getElevation() {
-        return this.elevation;
+        return loc.getAltitude();
     }
 
     public Collection<String> getTypes() {
@@ -99,10 +99,14 @@ public class Place implements Serializable {
         String ret = "";
         ret += "name: " + this.name + "\n";
         ret += "description: " + this.description + "\n";
-        ret += "latitude: " + this.latitude + "\n";
-        ret += "longitude: " + this.longitude + "\n";
-        ret += "elevation: " + this.elevation + "\n";
+        ret += "latitude: " + loc.getLatitude() + "\n";
+        ret += "longitude: " + loc.getLongitude() + "\n";
+        ret += "elevation: " + loc.getAltitude() + "\n";
 
         return ret;
     }
+
+    //context dependent handlers
+    //transient boolean onClick(Event event);
+    //transient boolean onLongClick(Event event);
 }

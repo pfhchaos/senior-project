@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.Utils.Places;
 
 import android.app.Activity;
 import android.location.Location;
