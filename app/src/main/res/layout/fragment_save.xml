@@ -64,11 +64,11 @@
     <ImageView
         android:id="@+id/pictureView"
         android:layout_width="match_parent"
-        android:layout_height="484dp"
+        android:layout_height="match_parent"
         android:baselineAlignBottom="false"
         android:cropToPadding="true"
         android:scaleType="fitCenter"
         android:visibility="visible"
-        app:srcCompat="@color/colorAccent" />
+        app:srcCompat="@color/design_default_color_primary" />
 
 </LinearLayout>
