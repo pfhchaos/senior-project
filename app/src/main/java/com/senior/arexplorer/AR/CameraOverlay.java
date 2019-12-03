@@ -192,7 +192,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     public void onCompassAccuracyChange(int compassStatus) {}
 
     @Override
-    public void onLocationUpdate(Location location) {
+    public void onLocationChanged(Location location) {
         curLoc = location;
     }
 }
