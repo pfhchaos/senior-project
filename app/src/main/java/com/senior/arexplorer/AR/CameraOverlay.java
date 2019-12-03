@@ -161,7 +161,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
 
     }
-
     void setFoV(int newFoV){
         fov = newFoV;
     }
