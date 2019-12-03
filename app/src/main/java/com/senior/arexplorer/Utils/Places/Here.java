@@ -11,13 +11,13 @@ import java.util.Collection;
 public class Here implements LocationListener {
 
     private static Here here = null;
-    private Collection<LocationListener> callbacks;
+    private Collection<HereListener> callbacks;
 
     private Location currentLocation;
 
     private Here() {
         Log.d("location manager", "here is instanciated");
-        this.callbacks = new ArrayList<LocationListener>();
+        this.callbacks = new ArrayList<HereListener>();
     }
 
     public static Here getHere() {
@@ -40,11 +40,11 @@ public class Here implements LocationListener {
         Here.here = null;
     }
 
-    public void addListener(LocationListener listener) {
+    public void addListener(HereListener listener) {
         this.callbacks.add(listener);
     }
 
-    public void removeListener(LocationListener listener) {
+    public void removeListener(HereListener listener) {
         this.callbacks.remove(listener);
     }
 
@@ -52,7 +52,7 @@ public class Here implements LocationListener {
     public void onLocationChanged(Location location) {
         if (location != null) {
             this.currentLocation = location;
-            for (LocationListener listener: callbacks) {
+            for (HereListener listener: callbacks) {
                 listener.onLocationChanged(this.currentLocation);
             }
         }
