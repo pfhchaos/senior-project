@@ -27,13 +27,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.Places.HereListener;
 import com.senior.arexplorer.Utils.Places.Place;
 import com.senior.arexplorer.Utils.Places.PlaceFetcherHandler;
 
 import java.util.Collection;
 
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler {
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler, HereListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
@@ -163,5 +164,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
             googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));
+    }
+
+    @Override
+    public void onLocationUpdate(Location location) {
+
     }
 }
