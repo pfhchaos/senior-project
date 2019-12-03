@@ -2,6 +2,7 @@ package com.senior.arexplorer;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
@@ -137,8 +139,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
                 .setOnMenuItemClickListener((i) ->{
                     AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
 
-                    View view = ((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                            .inflate(R.layout.fragment_save, null);
+                    View view = new SaveView(getContext(), null);
+                            //((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                            //.inflate(R.layout.fragment_save, null);
 
                     //From here we can grab the views with view.getViewByID and assign on clicks to the popup
 
@@ -149,7 +152,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
                     });
 
                     popDialog.create();
-                    popDialog.show();
+
+                    int width = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * .97);
+                    int height = (int) (Resources.getSystem().getDisplayMetrics().heightPixels * .97);
+
+                    popDialog.show().getWindow().setLayout(width,height);
                     return false;
                 });
     }
