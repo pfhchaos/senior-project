@@ -24,11 +24,11 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.senior.arexplorer.Utils.GooglePlaceFetcher;
-import com.senior.arexplorer.Utils.Here;
+import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.Place;
-import com.senior.arexplorer.Utils.PlaceFetcherHandler;
+import com.senior.arexplorer.Utils.Places.Place;
+import com.senior.arexplorer.Utils.Places.PlaceFetcherHandler;
 
 import java.util.Collection;
 

@@ -32,8 +32,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
 import com.google.android.gms.location.LocationServices;
-import com.senior.arexplorer.Utils.GooglePlaceFetcher;
-import com.senior.arexplorer.Utils.Here;
+import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 

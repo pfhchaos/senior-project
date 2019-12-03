@@ -28,7 +28,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     float scale;
     int fov = 180;
     int drawDistance = 1000;
-    CompassAssistant assistant;
 
     Location curLoc;
     List<Location> nearby;
@@ -115,8 +114,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.scale(sx,sy);
 
         rect.set(500,500,9500,1000);
-        calcCompass(canvas);
-        canvas.drawBitmap(compass, curCompass, rect, null);
+        drawCompass(canvas);
 
 
         for(Location l : nearby){
@@ -128,7 +126,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
     }
 
-    private void calcCompass(Canvas canvas){
+    private void drawCompass(Canvas canvas){
         int height = compass.getHeight();
         int width = compass.getWidth();
         int offset = (int) (fov/2 * scale);
@@ -137,6 +135,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //Log.d("CamOver", "Width : " + width + " Height : " + height);
 
         curCompass.set(mid - offset,0,mid + offset, height);
+
+        canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
     private void drawNearbyRect(Location destLoc, Canvas canvas){
