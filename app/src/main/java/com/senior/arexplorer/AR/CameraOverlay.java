@@ -41,7 +41,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void init(Context context){
-        CompassAssistant.getInstance(context).addCompassListener(this);
 
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
@@ -55,21 +54,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         scale = (float) compass.getWidth() / 720;
 
-
-        //todo : everything after this is for testing purposes, remove later
-//        curLoc = new Location("dummyprovider");
-        //pub
-//        curLoc.setLatitude(47.49218543922342);
-//        curLoc.setLongitude(-117.5838589668274);
-        //CSE
-//        curLoc.setLatitude(47.4899634586667);
-//        curLoc.setLongitude(-117.58538246154787);
-        //fountain
-//        curLoc.setLatitude(47.49133725545527);
-//        curLoc.setLongitude(-117.58288800716402);
-
-        curLoc = Here.getHere().getLocation();
-        Here.getHere().addListener(this);
+        curLoc = new Location("dummyProvider") {{
+            //ewu fountain
+            setLatitude(47.49133725545527);
+            setLongitude(-117.58288800716402);
+        }};
 
         nearby = new ArrayList<>();
 
@@ -84,6 +73,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setLatitude(47.49218543922342);
         setLongitude(-117.5838589668274);
         }});
+        nearby.add(new Location("dummyProvider"){{
+            //CSE
+            setLatitude(47.4899634586667);
+            setLongitude(-117.58538246154787);
+        }});
 
     }
 
@@ -97,12 +91,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void toggleTimer(){
-//        if(!isRunning){
-//            assistant.onStart();
-//        }
-//        else {
-//            assistant.onStop();
-//        }
         isRunning = !isRunning;
     }
 
@@ -110,8 +98,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        p.setColor(Color.parseColor("fuchsia"));
+        p.setColor(Color.parseColor("red"));
         p.setStyle(Paint.Style.FILL);
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(300);
 
         float sx = (float) getWidth() / 10000;
         float sy = (float) getHeight() / 10000;
@@ -120,13 +110,14 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         rect.set(500,500,9500,1000);
         drawCompass(canvas);
 
-
-        for(Location l : nearby){
-            drawNearbyRect(l, canvas);
-//            canvas.drawRect(rect, p);
-//            canvas.drawBitmap(compassMarker, null, rect, p);
-
-            //Log.d("rect", "Rect location is " + rect);
+        if(curLoc.getProvider() == "dummyProvider" || curLoc == null){
+            canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
+        }
+        else {
+            for (Location l : nearby) {
+                drawNearbyRect(l, canvas);
+                //Log.d("rect", "Rect location is " + rect);
+            }
         }
     }
 
@@ -193,6 +184,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public void onLocationChanged(Location location) {
-        curLoc = location;
+        if(location != null) curLoc = location;
     }
 }

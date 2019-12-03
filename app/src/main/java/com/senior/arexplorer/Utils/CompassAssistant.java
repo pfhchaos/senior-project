@@ -274,6 +274,11 @@ public class CompassAssistant implements SensorEventListener {
         return instance;
     }
 
+    public static CompassAssistant getInstance(){
+        if(instance == null) Log.e("CompassAssistant", "There is no instance yet, need to pass context");
+        return instance;
+    }
+
     public void cleanUp(){
         instance.onStop();
         instance = null;
