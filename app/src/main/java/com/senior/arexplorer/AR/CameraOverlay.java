@@ -98,10 +98,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        p.setColor(Color.parseColor("red"));
-        p.setStyle(Paint.Style.FILL);
-        p.setTextAlign(Paint.Align.CENTER);
-        p.setTextSize(300);
 
         float sx = (float) getWidth() / 10000;
         float sy = (float) getHeight() / 10000;
@@ -111,6 +107,18 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         drawCompass(canvas);
 
         if(curLoc.getProvider() == "dummyProvider" || curLoc == null){
+            p.setTextAlign(Paint.Align.CENTER);
+            p.setStyle(Paint.Style.FILL);
+            p.setTextSize(300);
+
+
+            p.setColor(Color.parseColor("black"));
+            p.setStyle(Paint.Style.STROKE);
+            canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
+
+            p.setColor(Color.parseColor("red"));
+            p.setStyle(Paint.Style.FILL);
+            p.setStrokeWidth(8);
             canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
         }
         else {
