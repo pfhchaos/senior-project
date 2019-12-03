@@ -13,13 +13,15 @@ import android.view.View;
 
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.R;
+import com.senior.arexplorer.Utils.Places.Here;
+import com.senior.arexplorer.Utils.Places.HereListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
-public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener {
+public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
     private boolean isRunning = true;
     Paint p = new Paint();
     Rect rect = new Rect(), curCompass = new Rect();
@@ -55,17 +57,19 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
 
         //todo : everything after this is for testing purposes, remove later
-        curLoc = new Location("dummyprovider");
+//        curLoc = new Location("dummyprovider");
         //pub
 //        curLoc.setLatitude(47.49218543922342);
 //        curLoc.setLongitude(-117.5838589668274);
         //CSE
-        curLoc.setLatitude(47.4899634586667);
-        curLoc.setLongitude(-117.58538246154787);
+//        curLoc.setLatitude(47.4899634586667);
+//        curLoc.setLongitude(-117.58538246154787);
         //fountain
 //        curLoc.setLatitude(47.49133725545527);
 //        curLoc.setLongitude(-117.58288800716402);
 
+        curLoc = Here.getHere().getLocation();
+        Here.getHere().addListener(this);
 
         nearby = new ArrayList<>();
 
@@ -161,6 +165,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
 
     }
+
     void setFoV(int newFoV){
         fov = newFoV;
     }
@@ -185,4 +190,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public void onCompassAccuracyChange(int compassStatus) {}
+
+    @Override
+    public void onLocationUpdate(Location location) {
+        curLoc = location;
+    }
 }
