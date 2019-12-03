@@ -64,6 +64,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onStart() {
         Here here = Here.getHere();
+        here.addListener(this);
         if (here == null) {
             Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
@@ -167,7 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     }
 
     @Override
-    public void onLocationUpdate(Location location) {
-
+    public void onLocationChanged(Location location) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), zoom));
     }
 }
