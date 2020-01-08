@@ -7,21 +7,25 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-//import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.senior.arexplorer.R;
 
@@ -34,7 +38,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveView extends View {
+public class SaveView extends RelativeLayout {
 
     private TextView nameInputTextView;
     private TextView descInputTextView;
@@ -47,83 +51,74 @@ public class SaveView extends View {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    public SaveView(Context context, AttributeSet attrs) {
+    public SaveView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = LayoutInflater.from(context);
-        SaveView s =(SaveView) inflater.inflate(R.layout.fragment_save, null, false);
+        View inflate = inflater.inflate(R.layout.fragment_save, null, false);
 
-        nameInputTextView = this.findViewById(R.id.nameInput);
-        descInputTextView = this.findViewById(R.id.saveDescription);
-        privateSwitch = this.findViewById(R.id.privateSwitch);
+        nameInputTextView = inflate.findViewById(R.id.nameInput);
+        descInputTextView = inflate.findViewById(R.id.saveDescription);
+        privateSwitch = inflate.findViewById(R.id.privateSwitch);
 
-        Result r = new Result();
-
-        takePicButton = this.findViewById(R.id.pictureButton);
-        takePicButton.setOnClickListener(new View.OnClickListener(){
+        takePicButton = inflate.findViewById(R.id.pictureButton);
+        takePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 //cause camera intent to take picture
-                r.dispatchTakePictureIntent();
+                dispatchTakePictureIntent();
                 Log.i("button", "you clicked take picture!");
             }
         });
-        saveButton = this.findViewById(R.id.saveButton);
-        saveButton.setOnClickListener(new View.OnClickListener(){
+        saveButton = inflate.findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 Log.i("button", "you clicked save!");
                 saveData();
             }
         });
-        pictureImageView = this.findViewById(R.id.pictureView);
+        pictureImageView = inflate.findViewById(R.id.pictureView);
+
+
+        addView(inflate);
     }
 
+    private void dispatchTakePictureIntent(){
+        Intent takePicIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(takePicIntent.resolveActivity(getContext().getPackageManager()) != null){
 
-
-    public class Result extends Fragment {
-        private void dispatchTakePictureIntent(){
-            Intent takePicIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if(takePicIntent.resolveActivity(getActivity().getPackageManager()) != null){
-
-                File photoFile = null;
-                try{
-                    photoFile = createImageFile();
-                }
-                catch(IOException e){
-                    System.out.println(e);
-                }
-                if(photoFile != null){
-                    Uri photoURI = FileProvider.getUriForFile(getContext(), "com.senior.arexplorer.fileprovider", photoFile);
-                    takePicIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePicIntent, REQUEST_IMAGE_CAPTURE);
-                }
+            File photoFile = null;
+            try{
+                photoFile = createImageFile();
+            }
+            catch(IOException e){
+                System.out.println(e);
+            }
+            if(photoFile != null){
+                Uri photoURI = FileProvider.getUriForFile(getContext(), "com.senior.arexplorer.fileprovider", photoFile);
+                takePicIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                getContext().startActivity(takePicIntent);
             }
         }
-
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data){
-            Log.i("onActivityRequest", "requestCode: "+requestCode+"\t resultCode: "+resultCode+"\t Intent: "+data);
-            if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
-                //pictureImageView.setImageBitmap(imageBitmap);
-                setPic();
-            }
-        }
-
-        private File createImageFile() throws IOException{
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imgFileName = "JPEG_"+timeStamp+"_";
-            File storeDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            File img = File.createTempFile(imgFileName,".jpg", storeDir);
-
-            curPhotoPath = img.getAbsolutePath();
-            return img;
-        }
-
-
     }
 
+    private File createImageFile() throws IOException{
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imgFileName = "JPEG_"+timeStamp+"_";
+        File storeDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File img = File.createTempFile(imgFileName,".jpg", storeDir);
 
+        curPhotoPath = img.getAbsolutePath();
+        return img;
+    }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        Log.i("onActivityRequest", "requestCode: "+requestCode+"\t resultCode: "+resultCode+"\t Intent: "+data);
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
+            //pictureImageView.setImageBitmap(imageBitmap);
+            setPic();
+        }
+    }
 
     private void setPic() {
         Log.i("setPic", "you're in setPic method!");
@@ -218,7 +213,6 @@ public class SaveView extends View {
         }
     }
 
-
     private void saveData() {
         String userID,locName,locDesc,fileName;
         double locLatitude,locLongitude,locElevation;
@@ -254,3 +248,4 @@ public class SaveView extends View {
     }
 
 }
+
