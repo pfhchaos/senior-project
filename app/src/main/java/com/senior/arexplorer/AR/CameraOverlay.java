@@ -78,6 +78,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             setLatitude(47.4899634586667);
             setLongitude(-117.58538246154787);
         }});
+        nearby.add(new Location("dummyProvider"){{
+            //google HQish
+            setLatitude(37.4225);
+            setLongitude(-122.0845);
+        }});
 
     }
 
@@ -108,7 +113,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         if(curLoc.getProvider() == "dummyProvider" || curLoc == null){
             p.setTextAlign(Paint.Align.CENTER);
-            p.setStyle(Paint.Style.FILL);
             p.setTextSize(300);
 
 
@@ -118,7 +122,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
             p.setColor(Color.parseColor("red"));
             p.setStyle(Paint.Style.FILL);
-            p.setStrokeWidth(8);
+            p.setStrokeWidth(7);
             canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
         }
         else {
