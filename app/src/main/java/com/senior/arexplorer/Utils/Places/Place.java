@@ -1,13 +1,18 @@
 package com.senior.arexplorer.Utils.Places;
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.location.Location;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static androidx.camera.core.CameraX.getContext;
 
 public class Place implements Serializable {
     private String name;
@@ -111,7 +116,12 @@ public class Place implements Serializable {
         return ret;
     }
 
-
+    public void onShortTouch(Context context){
+        Toast.makeText(context, getName() + " is " +
+                                    new DecimalFormat("#.##").format(Here.getHere().getLocation().distanceTo(getLocation())) +
+                                    "m away.",
+                Toast.LENGTH_SHORT).show();
+    }
 
     //context dependent handlers
     //transient boolean onClick(Event event);

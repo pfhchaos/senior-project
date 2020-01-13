@@ -42,10 +42,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     public CameraOverlay(Context context){
         super(context);
-        init(context);
+        init();
     }
 
-    public void init(Context context){
+    public void init(){
 
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
@@ -120,7 +120,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         rect.set(500,500,9500,1000);
         drawCompass(canvas);
 
-        if(curLoc.getProvider() == "dummyProvider" || curLoc == null){
+        if(curLoc.getProvider().equalsIgnoreCase("dummyProvider") || curLoc == null){
             p.setTextAlign(Paint.Align.CENTER);
             p.setTextSize(300);
 
@@ -211,9 +211,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-//        Stream.of(nearby).filter( (poi) -> ((Place)poi).getCompassRect().contains((int)event.getX(), (int)event.getY()))
-//                .sorted((o1,o2) -> (int)(curLoc.distanceTo(((Place)o1).getLocation()) - curLoc.distanceTo(((Place)o2).getLocation())))
-//                .findFirst();
 
        float[] mClickCoords = new float[2];
 
@@ -235,27 +232,20 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-//            Log.d("CamOver", event.getX() + ", " + event.getY());
-
             Place closest = null;
             float minDist = Integer.MAX_VALUE;
             for (Place poi : nearby) {
-//                Log.d("CamOver", poi.getCompassRect().toShortString());
                 if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
                     float curDist = curLoc.distanceTo(poi.getLocation());
                     if (closest == null || curDist < minDist) {
                         closest = poi;
                         minDist = curDist;
-//                        Log.d("CamOver", "Setting closest to " + poi.getName());
                     }
                 }
             }
 
             if(closest != null) {
-//                Log.d("CamOver", closest + "");
-
-                Toast.makeText(getContext(), closest.getName() + " is " + new DecimalFormat("#.##").format(minDist) + "m away.",
-                        Toast.LENGTH_SHORT).show();
+                closest.onShortTouch(getContext());
             }
         }
         return true;
