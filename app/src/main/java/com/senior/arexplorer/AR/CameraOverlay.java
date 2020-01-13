@@ -4,18 +4,21 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
-
-import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.R;
-import com.senior.arexplorer.Utils.Places.Here;
+import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.HereListener;
+import com.senior.arexplorer.Utils.Places.Place;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +33,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     float scale;
     int fov = 180;
     int drawDistance = 1000;
+    float sx = (float) getWidth() / 10000;
+    float sy = (float) getHeight() / 10000;
 
     Location curLoc;
-    List<Location> nearby;
+    List<Place> nearby;
 
 
     public CameraOverlay(Context context){
@@ -63,23 +68,27 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         nearby = new ArrayList<>();
 
 
-        nearby.add(new Location("dummyProvider"){{
+        nearby.add(new Place(){{
             //ewu fountain
+            setName("Fountain");
             setLatitude(47.49133725545527);
             setLongitude(-117.58288800716402);
         }});
-        nearby.add(new Location("dummyProvider"){{
+        nearby.add(new Place(){{
             //pub
-        setLatitude(47.49218543922342);
-        setLongitude(-117.5838589668274);
+            setName("PUB");
+            setLatitude(47.49218543922342);
+            setLongitude(-117.5838589668274);
         }});
-        nearby.add(new Location("dummyProvider"){{
+        nearby.add(new Place(){{
             //CSE
+            setName("CSE");
             setLatitude(47.4899634586667);
             setLongitude(-117.58538246154787);
         }});
-        nearby.add(new Location("dummyProvider"){{
+        nearby.add(new Place(){{
             //google HQish
+            setName("GooglePlex");
             setLatitude(37.4225);
             setLongitude(-122.0845);
         }});
@@ -104,8 +113,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        float sx = (float) getWidth() / 10000;
-        float sy = (float) getHeight() / 10000;
+        sx = (float) getWidth() / 10000;
+        sy = (float) getHeight() / 10000;
         canvas.scale(sx,sy);
 
         rect.set(500,500,9500,1000);
@@ -126,8 +135,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
         }
         else {
-            for (Location l : nearby) {
-                drawNearbyRect(l, canvas);
+            for (Place poi : nearby) {
+                calcNearbyRect(poi);
+                canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
                 //Log.d("rect", "Rect location is " + rect);
             }
         }
@@ -146,7 +156,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void drawNearbyRect(Location destLoc, Canvas canvas){
+    private void calcNearbyRect(Place poi){
+        Location destLoc = poi.getLocation();
         double headingTo = curLoc.bearingTo(destLoc);
         double relativeHeading = (headingTo - heading);
         //this next bit just takes us from [0,360] to [-180,180]
@@ -159,12 +170,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             int newScale = 9000 / fov;
             int center = (int)(5000 + relativeHeading * newScale);
 
-            rect.set(center - 250, 250 , center + 250, 750);
+            poi.getCompassRect().set(center - 250, 250 , center + 250, 750);
 
             int alpha =(int)( (1 - dist / drawDistance) * 255);
             p.setAlpha(alpha);
 
-            canvas.drawBitmap(compassMarker, null, rect, p);
         }
 
     }
@@ -197,5 +207,57 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     @Override
     public void onLocationChanged(Location location) {
         if(location != null) curLoc = location;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+//        Stream.of(nearby).filter( (poi) -> ((Place)poi).getCompassRect().contains((int)event.getX(), (int)event.getY()))
+//                .sorted((o1,o2) -> (int)(curLoc.distanceTo(((Place)o1).getLocation()) - curLoc.distanceTo(((Place)o2).getLocation())))
+//                .findFirst();
+
+       float[] mClickCoords = new float[2];
+
+
+        mClickCoords[0] = event.getX();
+        mClickCoords[1] = event.getY();
+
+        Matrix matrix = new Matrix();
+        matrix.set(getMatrix());
+
+        matrix.preTranslate(0, 0);
+        matrix.preScale(sx, sy, 0, 0);
+
+        matrix.invert(matrix);
+
+        matrix.mapPoints(mClickCoords);
+
+        event.setLocation(mClickCoords[0], mClickCoords[1]);
+
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+//            Log.d("CamOver", event.getX() + ", " + event.getY());
+
+            Place closest = null;
+            float minDist = Integer.MAX_VALUE;
+            for (Place poi : nearby) {
+//                Log.d("CamOver", poi.getCompassRect().toShortString());
+                if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
+                    float curDist = curLoc.distanceTo(poi.getLocation());
+                    if (closest == null || curDist < minDist) {
+                        closest = poi;
+                        minDist = curDist;
+//                        Log.d("CamOver", "Setting closest to " + poi.getName());
+                    }
+                }
+            }
+
+            if(closest != null) {
+//                Log.d("CamOver", closest + "");
+
+                Toast.makeText(getContext(), closest.getName() + " is " + new DecimalFormat("#.##").format(minDist) + "m away.",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        return true;
     }
 }

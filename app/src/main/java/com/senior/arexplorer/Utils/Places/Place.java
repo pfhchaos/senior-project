@@ -1,5 +1,6 @@
 package com.senior.arexplorer.Utils.Places;
 
+import android.graphics.Rect;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,6 +13,7 @@ public class Place implements Serializable {
     private String name;
     private String description;
     private Location loc;
+    private Rect compassRect;
 
     private Collection<String> types;
 
@@ -28,6 +30,7 @@ public class Place implements Serializable {
         this.name = "";
         this.description = "";
         this.types = new ArrayList<>();
+        this.compassRect = new Rect();
     }
 
     public void setName(String name) {
@@ -95,6 +98,8 @@ public class Place implements Serializable {
         return this.types;
     }
 
+    public Rect getCompassRect(){ return compassRect; }
+
     public String toString() {
         String ret = "";
         ret += "name: " + this.name + "\n";
@@ -105,6 +110,8 @@ public class Place implements Serializable {
 
         return ret;
     }
+
+
 
     //context dependent handlers
     //transient boolean onClick(Event event);
