@@ -9,16 +9,15 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.HereListener;
 import com.senior.arexplorer.Utils.Places.Place;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,19 +25,20 @@ import androidx.appcompat.widget.AppCompatDrawableManager;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
     private boolean isRunning = true;
-    Paint p = new Paint();
-    Rect rect = new Rect(), curCompass = new Rect();
-    Bitmap compass, compassMarker;
-    float heading = 0;
-    float scale;
-    int fov = 180;
-    int drawDistance = 1000;
-    float sx = (float) getWidth() / 10000;
-    float sy = (float) getHeight() / 10000;
+    private Paint p = new Paint();
+    private Rect rect = new Rect(), curCompass = new Rect();
+    private Bitmap compass, compassMarker;
+    private float heading = 0;
+    private float scale;
+    private int fov = 180;
+    private int drawDistance = 1000;
+    private float sx = (float) getWidth() / 10000;
+    private float sy = (float) getHeight() / 10000;
 
-    Location curLoc;
-    List<Place> nearby;
-
+    private Location curLoc;
+    private Place lastTouchedLocation;
+    private List<Place> nearby;
+    private long lastTouchTime;
 
     public CameraOverlay(Context context){
         super(context);
@@ -211,7 +211,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-
        float[] mClickCoords = new float[2];
 
 
@@ -230,24 +229,33 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         event.setLocation(mClickCoords[0], mClickCoords[1]);
 
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-
-            Place closest = null;
-            float minDist = Integer.MAX_VALUE;
-            for (Place poi : nearby) {
-                if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
-                    float curDist = curLoc.distanceTo(poi.getLocation());
-                    if (closest == null || curDist < minDist) {
-                        closest = poi;
-                        minDist = curDist;
-                    }
+        Place closest = null;
+        float minDist = Integer.MAX_VALUE;
+        for (Place poi : nearby) {
+            if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
+                float curDist = curLoc.distanceTo(poi.getLocation());
+                if (closest == null || curDist < minDist) {
+                    closest = poi;
+                    minDist = curDist;
                 }
             }
-
-            if(closest != null) {
-                closest.onShortTouch(getContext());
-            }
         }
-        return true;
+
+        switch(event.getAction()) {
+            case MotionEvent.ACTION_DOWN :
+                lastTouchedLocation = closest;
+                lastTouchTime = System.currentTimeMillis();
+                return true;
+            case MotionEvent.ACTION_UP :
+                if (closest != null && closest == lastTouchedLocation)
+                    if (System.currentTimeMillis() - lastTouchTime <= 1000)
+                        return closest.onShortTouch(getContext());
+                    else
+                        return closest.onLongTouch(getContext());
+                lastTouchTime = 0;
+                lastTouchedLocation = null;
+                break;
+        }
+        return false;
     }
 }

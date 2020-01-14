@@ -116,13 +116,18 @@ public class Place implements Serializable {
         return ret;
     }
 
-    public void onShortTouch(Context context){
-        Toast.makeText(context, getName() + " is " +
-                                    new DecimalFormat("#.##").format(Here.getHere().getLocation().distanceTo(getLocation())) +
-                                    "m away.",
-                Toast.LENGTH_SHORT).show();
+    public boolean onShortTouch(Context context){
+        float dist = Here.getHere().getLocation().distanceTo(getLocation());
+        String toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
+        Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+        return true;
     }
 
+    public boolean onLongTouch(Context context){
+        Toast.makeText(context, "Long touch detected!", Toast.LENGTH_SHORT).show();
+
+        return true;
+    }
     //context dependent handlers
     //transient boolean onClick(Event event);
     //transient boolean onLongClick(Event event);
