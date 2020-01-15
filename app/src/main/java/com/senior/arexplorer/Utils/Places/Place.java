@@ -14,7 +14,7 @@ import java.util.Collection;
 
 import static androidx.camera.core.CameraX.getContext;
 
-public class Place implements Serializable {
+public class Place implements Serializable, Comparable<Place> {
     private String name;
     private String description;
     private Location loc;
@@ -128,6 +128,14 @@ public class Place implements Serializable {
 
         return true;
     }
+
+    @Override
+    public int compareTo(Place place) {
+        Location here = Here.getHere().getLocation();
+        int retInt = (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
+        return retInt;
+    }
+
     //context dependent handlers
     //transient boolean onClick(Event event);
     //transient boolean onLongClick(Event event);

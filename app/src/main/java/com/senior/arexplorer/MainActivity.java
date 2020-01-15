@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
        // loadPlace();
 
-        this.here = here.getHere();
+        this.here = Here.getHere();
         this.googlePlaceFetcher = GooglePlaceFetcher.getGooglePlaceFetcher(this, this.here);
 
         this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
         Log.v("main activity lifecycle","onSaveInstanceState");
         //savedInstanceState.putInt("key", value);
@@ -165,13 +165,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onRequestPermissionsResult(int rqst, String perms[], int[] res) {
+    public void onRequestPermissionsResult(int rqst,@NonNull String[] perms,@NonNull int[] res) {
         switch(rqst){
             case PERMISSION_REQUEST_CAMERA :
             case PERMISSION_REQUEST_LOCATION :
                 // if the request is cancelled, the result arrays are empty.
                 if (res.length>0 && res[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted! We can now init the map
+                    break;
                 } else {
                     Toast.makeText(this, "This app is useless without loc and camera permissions",
                             Toast.LENGTH_SHORT).show();
@@ -260,8 +261,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 TextView pass =(TextView)findViewById(R.id.textViewPassword);
                 pass.setText(passwordText);
                 */
-
             }
+
+            cursor.close();
         }catch(SQLiteException e){
             Toast toast = Toast.makeText(this, "Database unavailable",Toast.LENGTH_SHORT);
             toast.show();
