@@ -1,7 +1,6 @@
 package com.senior.arexplorer;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
@@ -26,21 +25,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
-import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Places.GooglePoI;
+import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.Places.HereListener;
-import com.senior.arexplorer.Utils.Places.Place;
-import com.senior.arexplorer.Utils.Places.PlaceFetcherHandler;
+import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
 
 import java.util.Collection;
 
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PlaceFetcherHandler, HereListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PoIFetcherHandler, HereListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private GooglePlaceFetcher backend;
+    private GooglePoIFetcher backend;
     private float zoom = 18;
 
     @Nullable
@@ -65,12 +64,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onStart() {
-        Here here = Here.getHere();
+        Here here = Here.getInstance();
         here.addListener(this);
         if (here == null) {
             Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        this.backend = GooglePlaceFetcher.getGooglePlaceFetcher(getActivity(), here);
+        this.backend = GooglePoIFetcher.getGooglePlaceFetcher(getActivity());
         this.backend.addHandler(this);
 
         mapView.onStart();
@@ -113,7 +112,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         googleMap = gMap;
         googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
-        while ((location = Here.getHere().getLocation()) == null) {
+        while ((location = Here.getInstance().getLocation()) == null) {
             try {
                 Log.d("map fragment", "location is null. sleeping");
                 Thread.sleep(10);
@@ -163,12 +162,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void placeFetchComplete() {
-        Collection<Place> places = backend.getPlaces();
-        Location here = Here.getHere().getLocation();
+        Collection<GooglePoI> googlePoIs = backend.getGooglePoIs();
+        Location here = Here.getInstance().getLocation();
 
         Log.d("mapFragment","entered callback from place fetcher");
 
-        for (Place p: places) {
+        for (GooglePoI p: googlePoIs) {
             googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));

@@ -11,14 +11,12 @@ import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
+import com.senior.arexplorer.Utils.Places.GooglePoI;
 import com.senior.arexplorer.Utils.Places.HereListener;
-import com.senior.arexplorer.Utils.Places.Place;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     float sy = (float) getHeight() / 10000;
 
     Location curLoc;
-    List<Place> nearby;
+    List<GooglePoI> nearby;
 
 
     public CameraOverlay(Context context){
@@ -65,33 +63,36 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             setLongitude(-117.58288800716402);
         }};
 
+        /*
         nearby = new ArrayList<>();
 
 
-        nearby.add(new Place(){{
+        nearby.add(new GooglePoI(){{
             //ewu fountain
             setName("Fountain");
             setLatitude(47.49133725545527);
             setLongitude(-117.58288800716402);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new GooglePoI(){{
             //pub
             setName("PUB");
             setLatitude(47.49218543922342);
             setLongitude(-117.5838589668274);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new GooglePoI(){{
             //CSE
             setName("CSE");
             setLatitude(47.4899634586667);
             setLongitude(-117.58538246154787);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new GooglePoI(){{
             //google HQish
             setName("GooglePlex");
             setLatitude(37.4225);
             setLongitude(-122.0845);
         }});
+
+        */
 
     }
 
@@ -135,7 +136,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
         }
         else {
-            for (Place poi : nearby) {
+            for (GooglePoI poi : nearby) {
                 calcNearbyRect(poi);
                 canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
                 //Log.d("rect", "Rect location is " + rect);
@@ -156,7 +157,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void calcNearbyRect(Place poi){
+    private void calcNearbyRect(GooglePoI poi){
         Location destLoc = poi.getLocation();
         double headingTo = curLoc.bearingTo(destLoc);
         double relativeHeading = (headingTo - heading);
@@ -232,9 +233,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-            Place closest = null;
+            GooglePoI closest = null;
             float minDist = Integer.MAX_VALUE;
-            for (Place poi : nearby) {
+            for (GooglePoI poi : nearby) {
                 if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
                     float curDist = curLoc.distanceTo(poi.getLocation());
                     if (closest == null || curDist < minDist) {

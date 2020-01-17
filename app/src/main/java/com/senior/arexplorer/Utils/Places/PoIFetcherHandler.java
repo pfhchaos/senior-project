@@ -1,5 +1,5 @@
 package com.senior.arexplorer.Utils.Places;
 
-public interface PlaceFetcherHandler {
+public interface PoIFetcherHandler {
     void placeFetchComplete();
 }

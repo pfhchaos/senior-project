@@ -32,10 +32,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
 import com.google.android.gms.location.LocationServices;
-import com.senior.arexplorer.Utils.Places.GooglePlaceFetcher;
+import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.WebRequester;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
@@ -53,8 +54,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Here here;
     private GoogleApiClient googleApiClient;
-    private GooglePlaceFetcher googlePlaceFetcher;
+    private GooglePoIFetcher googlePlaceFetcher;
     private CompassAssistant compassAssistant;
+    private WebRequester webRequester;
 
 
     //lifecycle methods
@@ -87,12 +89,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
        // loadPlace();
 
-        this.here = here.getHere();
-        this.googlePlaceFetcher = GooglePlaceFetcher.getGooglePlaceFetcher(this, this.here);
+        Here.init(this);
+        this.here = Here.getInstance();
+        this.googlePlaceFetcher = GooglePoIFetcher.getGooglePlaceFetcher(this);
 
         this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
         this.compassAssistant = CompassAssistant.getInstance(this);
+        WebRequester.init(getApplicationContext());
+        this.webRequester = WebRequester.getInstance();
         compassAssistant.onStart();
     }
 

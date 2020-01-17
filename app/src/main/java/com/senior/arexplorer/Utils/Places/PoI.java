@@ -12,9 +12,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static androidx.camera.core.CameraX.getContext;
-
-public class Place implements Serializable {
+public abstract class PoI implements Serializable {
     private String name;
     private String description;
     private Location loc;
@@ -22,19 +20,12 @@ public class Place implements Serializable {
 
     private Collection<String> types;
 
-    public Place() { // need to modify for  Arguments based
-        this(new Location("dummy"));
-    }
-
-    public Place(Location curr){
-        this.loc = new Location(curr);
-        this.loc.setLatitude(0);
-        this.loc.setLongitude(0);
-        this.loc.setAltitude(0);
+    public PoI() {
+        this.loc = new Location("dummy");
 
         this.name = "";
         this.description = "";
-        this.types = new ArrayList<>();
+        this.types = new ArrayList<String>();
         this.compassRect = new Rect();
     }
 
@@ -117,13 +108,11 @@ public class Place implements Serializable {
     }
 
     public void onShortTouch(Context context){
-        Toast.makeText(context, getName() + " is " +
-                                    new DecimalFormat("#.##").format(Here.getHere().getLocation().distanceTo(getLocation())) +
-                                    "m away.",
-                Toast.LENGTH_SHORT).show();
+        String toDisp = getName() + " is " + new DecimalFormat("#.##").format(Here.getInstance().getLocation().distanceTo(getLocation())) + "m away.";
+        Toast.makeText(context, toDisp, Toast.LENGTH_SHORT).show();
     }
 
-    //context dependent handlers
-    //transient boolean onClick(Event event);
-    //transient boolean onLongClick(Event event);
+    public void onLongTouch(Context context) {
+        Toast.makeText(context, this.toString(), Toast.LENGTH_SHORT).show();
+    }
 }
