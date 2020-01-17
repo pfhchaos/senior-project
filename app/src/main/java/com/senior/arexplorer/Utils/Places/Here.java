@@ -1,5 +1,6 @@
 package com.senior.arexplorer.Utils.Places;
 
+import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
@@ -10,19 +11,43 @@ import java.util.Collection;
 
 public class Here implements LocationListener {
 
-    private static Here here = null;
-    private Collection<HereListener> callbacks;
+    private static Here instance = null;
+    private static Context applicationContext;
 
+    private Collection<HereListener> callbacks;
     private Location currentLocation;
 
     private Here() {
-        Log.d("location manager", "here is instanciated");
+        Log.d("location manager", "here is instantiated.");
         this.callbacks = new ArrayList<HereListener>();
     }
 
-    public static Here getHere() {
-        if (Here.here == null) Here.here = new Here();
-        return Here.here;
+    public static Here getInstance() {
+        if (Here.applicationContext == null) {
+            Log.e("Here", "Attempted to instantionate without initalizing!");
+            return null;
+        }
+        if (Here.instance == null) Here.getInstanceSynced();
+        return Here.instance;
+    }
+
+    private static synchronized Here getInstanceSynced() {
+        if (Here.applicationContext == null) {
+            Log.e("Here", "Attempted to instantionate without initalizing!");
+            return null;
+        }
+        if (Here.instance == null) Here.instance = new Here();
+        return Here.instance;
+    }
+
+    public static synchronized void init(Context context) {
+        Log.d("location manager", "here is initialized.");
+        if (Here.applicationContext == null) {
+            Here.applicationContext = context.getApplicationContext();
+        }
+        else {
+            Log.e("Here","Attempted to initialize Here twice!");
+        }
     }
 
     public Location getLocation() {
@@ -37,7 +62,7 @@ public class Here implements LocationListener {
     }
 
     public void cleanUp() {
-        Here.here = null;
+        Here.instance = null;
     }
 
     public void addListener(HereListener listener) {
@@ -57,5 +82,4 @@ public class Here implements LocationListener {
             }
         }
     }
-
 }

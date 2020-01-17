@@ -52,7 +52,7 @@ public class ARFragment extends Fragment implements IFragSettings {
         mOverlay.toggleTimer();
 
 
-        Here.getHere().addListener(mOverlay);
+        Here.getInstance().addListener(mOverlay);
         CompassAssistant.getInstance(view.getContext()).addCompassListener(mOverlay);
 
         return view;
@@ -61,7 +61,7 @@ public class ARFragment extends Fragment implements IFragSettings {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Here.getHere().removeListener(mOverlay);
+        Here.getInstance().removeListener(mOverlay);
         CompassAssistant.getInstance().removeCompassListener(mOverlay);
     }
 

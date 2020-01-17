@@ -11,10 +11,10 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import androidx.annotation.NonNull;
 
-public class Place implements Serializable, Comparable<Place> {
+public abstract class PoI implements Serializable, Comparable<PoI> {
+
     private String name;
     private String description;
     private Location loc;
@@ -22,19 +22,12 @@ public class Place implements Serializable, Comparable<Place> {
 
     private Collection<String> types;
 
-    public Place() { // need to modify for  Arguments based
-        this(new Location("dummy"));
-    }
-
-    public Place(Location curr){
-        this.loc = new Location(curr);
-        this.loc.setLatitude(0);
-        this.loc.setLongitude(0);
-        this.loc.setAltitude(0);
+    public PoI() {
+        this.loc = new Location("dummy");
 
         this.name = "";
         this.description = "";
-        this.types = new ArrayList<>();
+        this.types = new ArrayList<String>();
         this.compassRect = new Rect();
     }
 
@@ -117,7 +110,7 @@ public class Place implements Serializable, Comparable<Place> {
     }
 
     public boolean onShortTouch(Context context){
-        float dist = Here.getHere().getLocation().distanceTo(getLocation());
+        float dist = Here.getInstance().getLocation().distanceTo(getLocation());
         String toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
         Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
         return true;
@@ -130,11 +123,10 @@ public class Place implements Serializable, Comparable<Place> {
     }
 
     @Override
-    public int compareTo(@NonNull Place place) {
-        Location here = Here.getHere().getLocation();
+    public int compareTo(PoI place) {
+        Location here = Here.getInstance().getLocation();
         if(here == null)
             here = place.getLocation();
-
         return (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
     }
 

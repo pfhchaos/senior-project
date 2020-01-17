@@ -9,13 +9,14 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.HereListener;
-import com.senior.arexplorer.Utils.Places.Place;
+import com.senior.arexplorer.Utils.Places.PoI;
 
 import java.util.TreeSet;
 
@@ -32,10 +33,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private int drawDistance = 1000;
     private float sx = (float) getWidth() / 10000;
     private float sy = (float) getHeight() / 10000;
+    private float previousCompassBearing = -1f;
 
     private Location curLoc;
-    private Place lastTouchedLocation;
-    private TreeSet<Place> nearby;
+    private PoI lastTouchedLocation;
+    private TreeSet<PoI> nearby;
     private long lastTouchTime;
 
     public CameraOverlay(Context context){
@@ -66,31 +68,30 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         nearby = new TreeSet<>();
 
 
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //ewu fountain
             setName("Fountain");
             setLatitude(47.49133725545527);
             setLongitude(-117.58288800716402);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //pub
             setName("PUB");
             setLatitude(47.49218543922342);
             setLongitude(-117.5838589668274);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //CSE
             setName("CSE");
             setLatitude(47.4899634586667);
             setLongitude(-117.58538246154787);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //google HQish
             setName("GooglePlex");
             setLatitude(37.4225);
             setLongitude(-122.0845);
         }});
-
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -133,7 +134,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
         }
         else {
-            for (Place poi : nearby.descendingSet()) {
+            for (PoI poi : nearby.descendingSet()) {
                 drawNearbyRect(poi, canvas);
                 //Log.d("rect", "Rect location is " + rect);
             }
@@ -153,7 +154,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void drawNearbyRect(Place poi, Canvas canvas){
+    private void drawNearbyRect(PoI poi, Canvas canvas){
         Location destLoc = poi.getLocation();
         double headingTo = curLoc.bearingTo(destLoc);
         double relativeHeading = (headingTo - heading);
@@ -175,7 +176,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
             canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
         }
-
     }
 
     void setFoV(int newFoV){
@@ -185,8 +185,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     void setDD(int newDrawDistance){
         drawDistance = newDrawDistance;
     }
-
-    private float previousCompassBearing = -1f;
 
     @Override
     public void onCompassChanged(float userHeading) {
@@ -222,9 +220,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         event.setLocation(mClickCoords[0], mClickCoords[1]);
 
         boolean handled = false;
-        Place closest = null;
-        TreeSet<Place> touched = new TreeSet<>();
-        for (Place poi : nearby) {
+        PoI closest = null;
+        TreeSet<PoI> touched = new TreeSet<>();
+        for (PoI poi : nearby) {
             if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
                 touched.add(poi);
                 if(touched.first() == poi)
