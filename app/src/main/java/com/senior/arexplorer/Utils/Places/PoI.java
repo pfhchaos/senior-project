@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public abstract class PoI implements Serializable {
+public abstract class PoI implements Serializable, Comparable<PoI> {
     private String name;
     private String description;
     private Location loc;
@@ -107,12 +107,27 @@ public abstract class PoI implements Serializable {
         return ret;
     }
 
-    public void onShortTouch(Context context){
-        String toDisp = getName() + " is " + new DecimalFormat("#.##").format(Here.getInstance().getLocation().distanceTo(getLocation())) + "m away.";
-        Toast.makeText(context, toDisp, Toast.LENGTH_SHORT).show();
+    public boolean onShortTouch(Context context){
+        float dist = Here.getInstance().getLocation().distanceTo(getLocation());
+        String toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
+        Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+        return true;
     }
 
-    public void onLongTouch(Context context) {
-        Toast.makeText(context, this.toString(), Toast.LENGTH_SHORT).show();
+    public boolean onLongTouch(Context context){
+        Toast.makeText(context, "Long touch detected!", Toast.LENGTH_SHORT).show();
+
+        return true;
     }
+
+    @Override
+    public int compareTo(PoI place) {
+        Location here = Here.getInstance().getLocation();
+        int retInt = (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
+        return retInt;
+    }
+
+    //context dependent handlers
+    //transient boolean onClick(Event event);
+    //transient boolean onLongClick(Event event);
 }
