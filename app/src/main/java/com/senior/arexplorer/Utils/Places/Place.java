@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static androidx.camera.core.CameraX.getContext;
+import androidx.annotation.NonNull;
 
 public class Place implements Serializable, Comparable<Place> {
     private String name;
@@ -130,10 +130,12 @@ public class Place implements Serializable, Comparable<Place> {
     }
 
     @Override
-    public int compareTo(Place place) {
+    public int compareTo(@NonNull Place place) {
         Location here = Here.getHere().getLocation();
-        int retInt = (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
-        return retInt;
+        if(here == null)
+            here = place.getLocation();
+
+        return (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
     }
 
     //context dependent handlers

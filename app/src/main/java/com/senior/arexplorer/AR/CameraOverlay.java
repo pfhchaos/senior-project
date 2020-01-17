@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -135,8 +134,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
         else {
             for (Place poi : nearby.descendingSet()) {
-                calcNearbyRect(poi);
-                canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
+                drawNearbyRect(poi, canvas);
                 //Log.d("rect", "Rect location is " + rect);
             }
         }
@@ -155,7 +153,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void calcNearbyRect(Place poi){
+    private void drawNearbyRect(Place poi, Canvas canvas){
         Location destLoc = poi.getLocation();
         double headingTo = curLoc.bearingTo(destLoc);
         double relativeHeading = (headingTo - heading);
@@ -175,6 +173,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             if(alpha > 255) alpha = 255;
             p.setAlpha(alpha);
 
+            canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
         }
 
     }
@@ -211,7 +210,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-       float[] mClickCoords = new float[2];
+        float[] mClickCoords = new float[2];
         mClickCoords[0] = event.getX();
         mClickCoords[1] = event.getY();
         Matrix matrix = new Matrix();
