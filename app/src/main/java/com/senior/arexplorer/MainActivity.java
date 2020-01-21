@@ -1,5 +1,17 @@
 package com.senior.arexplorer;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,34 +21,27 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.location.Location;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
-import com.google.android.gms.location.LocationServices;
-import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
-import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
+import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.WebRequester;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
@@ -50,13 +55,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public SQLiteDatabase db;
     private Cursor favoritesCursor;
     public Cursor cursor;
-    SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
+    //SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
+    private LocalDB localDB;
 
     private Here here;
     private GoogleApiClient googleApiClient;
     private GooglePoIFetcher googlePlaceFetcher;
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
+    private AWSAppSyncClient mAWSAppSyncClient;
+
 
 
     //lifecycle methods
@@ -85,9 +93,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
 
-       // LoadData(); //create database and load
+        /**************************************************************
+         * aws code start
+         */
+        mAWSAppSyncClient = AWSAppSyncClient.builder()
+                .context(getApplicationContext())
+                .awsConfiguration(new AWSConfiguration(getApplicationContext()))
+                .build();
+
+        try{
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+        }catch(Exception e){
+            System.err.println("Cannot create connection");
+        }
+        Connection connection=null;
+        TextView sample;
+        try{
+            connection = DriverManager.getConnection("jdbc:mysql://ardatabase-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/arExplorer","admin","SecretPass");
+            Statement statement = connection.createStatement();
+
+           // sample = (TextView) findViewById(R.id.sample);
+            ResultSet resultset = statement.executeQuery("select * from USERS");
+            while(resultset.next()){
+                System.out.println("Solution"+resultset.getString(1));
+               // txtLat.append(resultset.getString(1));
+
+            }
+        }catch(Exception e){
+           // sample = (TextView) findViewById(R.id.sample);
+            System.err.println("Error");
+          //  sample.append(e.toString());
+        }
+
+        /**************************************************************
+         * aws code end
+         */
+
+        // LoadData(); //create database and load
 
        // loadPlace();
+
+        LocalDB.init(this);
+        this.localDB = LocalDB.getInstance();
 
         Here.init(this);
         this.here = Here.getInstance();
@@ -99,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         WebRequester.init(getApplicationContext());
         this.webRequester = WebRequester.getInstance();
         compassAssistant.onStart();
-    }
+    } // onCreate end
 
     @Override
     public void onResume() {
@@ -240,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //database methods
+    /*
     private void LoadData(){
         // for database
 
@@ -266,8 +314,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 TextView pass =(TextView)findViewById(R.id.textViewPassword);
                 pass.setText(passwordText);
                 */
-            }
-
+          //  }
+/*
             cursor.close();
         }catch(SQLiteException e){
             Toast toast = Toast.makeText(this, "Database unavailable",Toast.LENGTH_SHORT);
@@ -278,7 +326,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //database end
 
     }
-
+    */
+/*
     public void loadPlace() {
 
         // SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
@@ -300,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             toast.show();
         }
     }
-
+*/
     //google location services
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -339,6 +388,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public String getName(){
         return "From Activity";
     }
+
+    /*
+    aws code start
+     */
+
+
+
+    /*****************
+     * aws code end
+     * ******************
+     */
 
     @Override
     public void onConnectionSuspended(int i) {
