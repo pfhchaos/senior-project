@@ -30,6 +30,7 @@ import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.Places.HereListener;
+import com.senior.arexplorer.Utils.Places.PoI;
 import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
 
 import java.util.Collection;
@@ -162,12 +163,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void placeFetchComplete() {
-        Collection<GooglePoI> googlePoIs = backend.getGooglePoIs();
+        Collection<PoI> googlePoIs = backend.getPoIs();
         Location here = Here.getInstance().getLocation();
 
         Log.d("mapFragment","entered callback from place fetcher");
 
-        for (GooglePoI p: googlePoIs) {
+        for (PoI p: googlePoIs) {
             googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));

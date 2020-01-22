@@ -65,8 +65,9 @@ public class SaveView extends RelativeLayout {
             @Override
             public void onClick(View view) {
                 //cause camera intent to take picture
-                dispatchTakePictureIntent();
                 Log.i("button", "you clicked take picture!");
+                dispatchTakePictureIntent();
+
             }
         });
         saveButton = inflate.findViewById(R.id.saveButton);
@@ -107,6 +108,7 @@ public class SaveView extends RelativeLayout {
         String imgFileName = "JPEG_"+timeStamp+"_";
         File storeDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File img = File.createTempFile(imgFileName,".jpg", storeDir);
+        Log.i("createImageFile", "in createImageFile method");
 
         curPhotoPath = img.getAbsolutePath();
         return img;

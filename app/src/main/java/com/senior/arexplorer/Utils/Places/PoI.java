@@ -135,6 +135,9 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
     }
 
+    public boolean save() {
+        return true;
+    }
     //context dependent handlers
     //transient boolean onClick(Event event);
     //transient boolean onLongClick(Event event);
