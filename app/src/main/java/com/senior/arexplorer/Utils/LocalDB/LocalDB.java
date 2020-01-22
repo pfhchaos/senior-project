@@ -72,4 +72,6 @@ public class LocalDB {
         Cursor res =  localDB.rawQuery( "select * from USER where _id="+id+"", null );
         return res;
     }
+
+    //TODO: function to nuke database
 }

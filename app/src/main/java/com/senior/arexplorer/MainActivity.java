@@ -21,8 +21,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.amazonaws.mobile.config.AWSConfiguration;
-import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
+//import com.amazonaws.mobile.config.AWSConfiguration;
+//import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private GooglePoIFetcher googlePlaceFetcher;
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
-    private AWSAppSyncClient mAWSAppSyncClient;
+    //private AWSAppSyncClient mAWSAppSyncClient;
 
 
 
@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /**************************************************************
          * aws code start
          */
+        /*
         mAWSAppSyncClient = AWSAppSyncClient.builder()
                 .context(getApplicationContext())
                 .awsConfiguration(new AWSConfiguration(getApplicationContext()))
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             System.err.println("Error");
           //  sample.append(e.toString());
         }
+        */
 
         /**************************************************************
          * aws code end
