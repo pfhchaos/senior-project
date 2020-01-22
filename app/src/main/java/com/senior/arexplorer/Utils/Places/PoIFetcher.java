@@ -4,12 +4,19 @@ import android.app.Activity;
 
 import java.util.Collection;
 
-public interface PoIFetcher {
+public abstract class PoIFetcher {
 
-    Collection<PoI> getPoIs();
+    protected Collection<PoIFetcherHandler> poIFetcherHandlers = null;
+    protected Collection<PoI> poIs;
 
-    void fetchData(Activity mActivity);
-    void addHandler(PoIFetcherHandler handler);
-    void removeHandler(PoIFetcherHandler handler);
+    abstract Collection<PoI> getPoIs();
+    abstract void fetchData(Activity mActivity);
 
+    public void addHandler(PoIFetcherHandler handler) {
+        this.poIFetcherHandlers.add(handler);
+    }
+
+    public void removeHandler(PoIFetcherHandler handler) {
+        this.poIFetcherHandlers.remove(handler);
+    }
 }

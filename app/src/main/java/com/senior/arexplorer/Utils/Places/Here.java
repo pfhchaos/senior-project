@@ -98,11 +98,14 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     @Override
     public void onErrorResponse(VolleyError error) {
-
+        Log.e("Here","No response from Google Elevation API");
+        Log.e("Here",error.toString());
     }
 
     @Override
     public void onResponse(String response) {
+        Log.d("Here", "Response recieved from Google Elevation API\n" + response);
+        Log.v("Here", response);
 
     }
 }

@@ -17,14 +17,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class GooglePoIFetcher implements PoIFetcher, Response.ErrorListener, Response.Listener<String> {
+public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 
     private Here here;
-    private Collection<PoI> poIs;
     private String lastRequest;
-    private Collection<PoIFetcherHandler> poIFetcherHandlers = null;
     private long lastUpdated;
 
     private static GooglePoIFetcher googlePlaceFetcher;
