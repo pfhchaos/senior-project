@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try{
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         }catch(Exception e){
-            System.err.println("Cannot create connection");
+            Log.d("MainActivity","error jdbc driver");
         }
         Connection connection=null;
         TextView sample;
@@ -114,14 +114,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
            // sample = (TextView) findViewById(R.id.sample);
             ResultSet resultset = statement.executeQuery("select * from USERS");
+          //  ResultSet resultset = statement.executeQuery("INSERT INTO USERS (id, fName, lName, email, password) VALUES (1,'md', 'kashem', 'kasem@yahoo.com','secret')");
+            Log.d("MainActivity"," called try ");
             while(resultset.next()){
-                System.out.println("Solution"+resultset.getString(1));
+               // System.out.println("Solution"+resultset.getString(1).toString());
                // txtLat.append(resultset.getString(1));
+                Log.d("MainActivity","resultset");
 
             }
         }catch(Exception e){
            // sample = (TextView) findViewById(R.id.sample);
-            System.err.println("Error");
+            Log.d("MainActivity","resultset on catch error");
           //  sample.append(e.toString());
         }
 
