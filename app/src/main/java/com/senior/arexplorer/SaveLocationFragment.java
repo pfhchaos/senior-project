@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.IFragSettings;
@@ -232,7 +233,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         priv = privateSwitch.isChecked();
 
         saveObj s = new saveObj(userID,locName,locDesc,locLatitude,locLongitude,locElevation,priv);
-        s.setBLOB(dbBM);
+        if(dbBM != null) s.setBLOB(dbBM);
 
         try {
             FileOutputStream fos = getContext().openFileOutput(fileName, Context.MODE_PRIVATE);
@@ -246,6 +247,15 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
             Log.e("file error","got into file i/o catch");
         }
 
+        switchFrag();
+    }
+
+    private void switchFrag() {
+        MapFragment mf = new MapFragment();
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_container,mf);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
     @Override
@@ -253,6 +263,8 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         //save stuff here
         super.onPause();
     }
+
+
 
     @Override
     public void loadSettings(Menu menu, DrawerLayout drawer) {
