@@ -19,7 +19,6 @@ public class CreateDatabase extends SQLiteOpenHelper {
     //create tables here
     @Override
     public void onCreate(SQLiteDatabase db){
-      // todo add check to see if the table already exist.
        db.execSQL("CREATE TABLE USER("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      + "fName TEXT,"
                      + "lName TEXT,"
