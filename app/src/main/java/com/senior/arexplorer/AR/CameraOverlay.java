@@ -174,8 +174,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             if(alpha > 255) alpha = 255;
             p.setAlpha(alpha);
 
+            poi.setCompassRender(true);
             canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
         }
+        else
+            poi.setCompassRender(false);
     }
 
     void setFoV(int newFoV){

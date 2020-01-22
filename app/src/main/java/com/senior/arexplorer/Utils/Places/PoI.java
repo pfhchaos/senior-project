@@ -19,6 +19,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private String description;
     private Location loc;
     private Rect compassRect;
+    private boolean compassRender = false;
 
     private Collection<String> types;
 
@@ -97,6 +98,10 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     }
 
     public Rect getCompassRect(){ return compassRect; }
+
+    public void setCompassRender(boolean shouldRender){
+        compassRender = shouldRender;
+    }
 
     public String toString() {
         String ret = "";
