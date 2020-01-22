@@ -31,4 +31,37 @@ public class saveObj implements Serializable {
         }
 
     }
+
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public String getLocationDesc() {
+        return locationDesc;
+    }
+
+    public double getLocationLatitude() {
+        return locationLatitude;
+    }
+
+    public double getLocationLongitude() {
+        return locationLongitude;
+    }
+
+    public double getLocationElevation() {
+        return locationElevation;
+    }
+
+    public boolean isPriv() {
+        return priv;
+    }
+
+    public byte[] getBlob() {
+        return blob;
+    }
 }
