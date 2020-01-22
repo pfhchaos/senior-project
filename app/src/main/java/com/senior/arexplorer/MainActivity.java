@@ -34,6 +34,7 @@ import com.senior.arexplorer.AR.ARFragment;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Places.Backend;
 import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.WebRequester;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Here here;
     private GoogleApiClient googleApiClient;
-    private GooglePoIFetcher googlePlaceFetcher;
+    private Backend backend;
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
     //private AWSAppSyncClient mAWSAppSyncClient;
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Here.init(this);
         this.here = Here.getInstance();
-        this.googlePlaceFetcher = GooglePoIFetcher.getGooglePlaceFetcher(this);
+        this.backend = Backend.getInstance();
 
         this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onStop() {
         Log.v("main activity lifecycle","onStop");
         this.here.cleanUp();
-        this.googlePlaceFetcher.cleanUp();
+        this.backend.cleanUp();
         this.compassAssistant.cleanUp();
         super.onStop();
     }
@@ -238,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
         }
-
     }
 
     //navigation methods

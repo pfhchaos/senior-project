@@ -25,6 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
+import com.senior.arexplorer.Utils.Places.Backend;
 import com.senior.arexplorer.Utils.Places.GooglePoI;
 import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
@@ -40,7 +41,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private GooglePoIFetcher backend;
+    private Backend backend;
     private float zoom = 18;
 
     @Nullable
@@ -70,7 +71,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         if (here == null) {
             Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        this.backend = GooglePoIFetcher.getGooglePlaceFetcher(getActivity());
+        this.backend = Backend.getInstance();
         this.backend.addHandler(this);
 
         mapView.onStart();
@@ -122,7 +123,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
             }
         }
         moveToLocation(location);
-        backend.fetchData(getActivity());
+        backend.fetchData();
     }
 
     private void moveToLocation(Location location) {
