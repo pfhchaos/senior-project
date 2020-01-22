@@ -10,7 +10,7 @@ public abstract class PoIFetcher {
     protected Collection<PoI> poIs;
 
     abstract Collection<PoI> getPoIs();
-    abstract void fetchData(Activity mActivity);
+    abstract void fetchData();
 
     public void addHandler(PoIFetcherHandler handler) {
         this.poIFetcherHandlers.add(handler);
@@ -19,4 +19,6 @@ public abstract class PoIFetcher {
     public void removeHandler(PoIFetcherHandler handler) {
         this.poIFetcherHandlers.remove(handler);
     }
+
+    public abstract void cleanUp();
 }

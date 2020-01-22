@@ -1,9 +1,7 @@
 package com.senior.arexplorer.Utils.Places;
 
-import android.app.Activity;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -21,13 +19,12 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 
-    private Here here;
     private String lastRequest;
     private long lastUpdated;
 
     private static GooglePoIFetcher googlePlaceFetcher;
 
-    public static GooglePoIFetcher getGooglePlaceFetcher(Activity mActivity) {
+    public static GooglePoIFetcher getInstance() {
         if (googlePlaceFetcher == null) {
             googlePlaceFetcher = new GooglePoIFetcher();
         }
@@ -35,16 +32,15 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
     }
 
     private GooglePoIFetcher() {
-        this.here = Here.getInstance();
         this.poIFetcherHandlers = new ArrayList<>();
 
         poIs = new ArrayList<>();
     }
 
-    public void fetchData(Activity mActivity) {
-        Location here = this.here.getLocation();
-        if (this.here == null) {
-            Toast.makeText(mActivity, "here is null. this should not happen", Toast.LENGTH_SHORT).show();
+    public void fetchData() {
+        Location here = Here.getInstance().getLocation();
+        if (here == null) {
+            Log.e("GooglePoIFetcher","here is null. this should not happen");
         }
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radius);
         StringRequest stringRequest = new StringRequest(request, this, this);
