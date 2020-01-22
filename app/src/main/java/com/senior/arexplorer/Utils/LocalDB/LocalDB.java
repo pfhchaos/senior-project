@@ -72,4 +72,12 @@ public class LocalDB {
         Cursor res =  localDB.rawQuery( "select * from USER where _id="+id+"", null );
         return res;
     }
+
+    public Cursor getLocalData(int id) {
+        //TODO: different shit here
+        //SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =  localDB.rawQuery( "select * from LOCAL_DATA where _id="+id+"", null );
+        return res;
+    }
+
 }
