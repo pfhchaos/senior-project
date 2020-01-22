@@ -51,12 +51,14 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        Log.e("GooglePoi","No response from Google Elevation API");
+        Log.e("GooglePoI","No response from Google Elevation API");
+        Log.e("GooglePoI", error.toString());
     }
 
     @Override
     public void onResponse(String response) {
         Log.d("GooglePoI", "Response recieved from Google Elevation API");
+        Log.v("GooglePoI", response);
 
     }
 }

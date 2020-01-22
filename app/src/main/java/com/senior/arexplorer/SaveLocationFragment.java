@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.Places.Here;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -222,9 +223,9 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
         userID = "test1";       //TODO
 
-        locLatitude = 0;
-        locLongitude = 0;
-        locElevation = 0;
+        locLatitude = Here.getInstance().getLatitude();
+        locLongitude = Here.getInstance().getLongitude();
+        locElevation = Here.getInstance().getElevation();
 
         fileName = "save_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 

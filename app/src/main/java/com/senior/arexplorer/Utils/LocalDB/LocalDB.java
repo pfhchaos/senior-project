@@ -45,7 +45,7 @@ public class LocalDB {
         }
     }
 
-    public void insertUsers( String fName, String lName, String email, String password){
+    private static void insertUsers( String fName, String lName, String email, String password){
                    ContentValues users = new ContentValues();
                    users.put("fName",fName);
                    users.put("lName",lName);
@@ -54,7 +54,7 @@ public class LocalDB {
         localDB.insert("USER",null, users);
     }
 
-    public void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
+    private static void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
         ContentValues values = new ContentValues();
         values.put("name",name);
         values.put("description",description);
@@ -72,12 +72,4 @@ public class LocalDB {
         Cursor res =  localDB.rawQuery( "select * from USER where _id="+id+"", null );
         return res;
     }
-
-    public Cursor getLocalData(int id) {
-        //TODO: different shit here
-        //SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  localDB.rawQuery( "select * from LOCAL_DATA where _id="+id+"", null );
-        return res;
-    }
-
 }
