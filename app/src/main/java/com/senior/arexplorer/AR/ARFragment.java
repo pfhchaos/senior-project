@@ -52,7 +52,7 @@ public class ARFragment extends Fragment implements IFragSettings {
         mOverlay.toggleTimer();
 
 
-        Here.getHere().addListener(mOverlay);
+        Here.getInstance().addListener(mOverlay);
         CompassAssistant.getInstance(view.getContext()).addCompassListener(mOverlay);
 
         return view;
@@ -61,7 +61,7 @@ public class ARFragment extends Fragment implements IFragSettings {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Here.getHere().removeListener(mOverlay);
+        Here.getInstance().removeListener(mOverlay);
         CompassAssistant.getInstance().removeCompassListener(mOverlay);
     }
 
@@ -174,10 +174,10 @@ public class ARFragment extends Fragment implements IFragSettings {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 popDialog.setCustomTitle(getTitle.apply("Please Select a Draw Distance"));
 
-                /*Note the 100s here are to get the bar to move in increments of 100
-                 * because android is fucking stupid and doesnt allow you to set the step size
+                /* Note the 100s here are to get the bar to move in increments of 100
+                 * because fucking android is fucking stupid and doesnt allow you to set the fucking step size
                  * of the fucking seekbar you have to define a set amount of steps
-                 * and scale it when storing because fuck android*/
+                 * and fucking scale it when storing because fuck android*/
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(DD_MIN / 100, DD_MAX / 100)
                         .setProgress((drawDistance - DD_MIN) / 100)

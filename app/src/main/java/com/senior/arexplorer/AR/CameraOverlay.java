@@ -16,10 +16,9 @@ import android.view.View;
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.HereListener;
-import com.senior.arexplorer.Utils.Places.Place;
+import com.senior.arexplorer.Utils.Places.PoI;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
@@ -34,10 +33,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private int drawDistance = 1000;
     private float sx = (float) getWidth() / 10000;
     private float sy = (float) getHeight() / 10000;
+    private float previousCompassBearing = -1f;
 
     private Location curLoc;
-    private Place lastTouchedLocation;
-    private List<Place> nearby;
+    private PoI lastTouchedLocation;
+    private TreeSet<PoI> nearby;
     private long lastTouchTime;
 
     public CameraOverlay(Context context){
@@ -65,34 +65,33 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             setLongitude(-117.58288800716402);
         }};
 
-        nearby = new ArrayList<>();
+        nearby = new TreeSet<>();
 
 
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //ewu fountain
             setName("Fountain");
             setLatitude(47.49133725545527);
             setLongitude(-117.58288800716402);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //pub
             setName("PUB");
             setLatitude(47.49218543922342);
             setLongitude(-117.5838589668274);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //CSE
             setName("CSE");
             setLatitude(47.4899634586667);
             setLongitude(-117.58538246154787);
         }});
-        nearby.add(new Place(){{
+        nearby.add(new PoI(){{
             //google HQish
             setName("GooglePlex");
             setLatitude(37.4225);
             setLongitude(-122.0845);
         }});
-
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -135,9 +134,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
         }
         else {
-            for (Place poi : nearby) {
-                calcNearbyRect(poi);
-                canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
+            for (PoI poi : nearby.descendingSet()) {
+                drawNearbyRect(poi, canvas);
                 //Log.d("rect", "Rect location is " + rect);
             }
         }
@@ -156,7 +154,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void calcNearbyRect(Place poi){
+    private void drawNearbyRect(PoI poi, Canvas canvas){
         Location destLoc = poi.getLocation();
         double headingTo = curLoc.bearingTo(destLoc);
         double relativeHeading = (headingTo - heading);
@@ -172,11 +170,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
             poi.getCompassRect().set(center - 250, 250 , center + 250, 750);
 
-            int alpha =(int)( (1 - dist / drawDistance) * 255);
+            int alpha =(int)( (1 - dist / drawDistance) * 255) + 50;
+            if(alpha > 255) alpha = 255;
             p.setAlpha(alpha);
 
+            canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
         }
-
     }
 
     void setFoV(int newFoV){
@@ -186,8 +185,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     void setDD(int newDrawDistance){
         drawDistance = newDrawDistance;
     }
-
-    private float previousCompassBearing = -1f;
 
     @Override
     public void onCompassChanged(float userHeading) {
@@ -211,33 +208,25 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
-       float[] mClickCoords = new float[2];
-
-
+        float[] mClickCoords = new float[2];
         mClickCoords[0] = event.getX();
         mClickCoords[1] = event.getY();
-
         Matrix matrix = new Matrix();
         matrix.set(getMatrix());
-
         matrix.preTranslate(0, 0);
         matrix.preScale(sx, sy, 0, 0);
-
         matrix.invert(matrix);
-
         matrix.mapPoints(mClickCoords);
-
         event.setLocation(mClickCoords[0], mClickCoords[1]);
 
-        Place closest = null;
-        float minDist = Integer.MAX_VALUE;
-        for (Place poi : nearby) {
+        boolean handled = false;
+        PoI closest = null;
+        TreeSet<PoI> touched = new TreeSet<>();
+        for (PoI poi : nearby) {
             if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
-                float curDist = curLoc.distanceTo(poi.getLocation());
-                if (closest == null || curDist < minDist) {
+                touched.add(poi);
+                if(touched.first() == poi)
                     closest = poi;
-                    minDist = curDist;
-                }
             }
         }
 
@@ -245,17 +234,18 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             case MotionEvent.ACTION_DOWN :
                 lastTouchedLocation = closest;
                 lastTouchTime = System.currentTimeMillis();
-                return true;
+                handled = true;
+                break;
             case MotionEvent.ACTION_UP :
                 if (closest != null && closest == lastTouchedLocation)
                     if (System.currentTimeMillis() - lastTouchTime <= 1000)
-                        return closest.onShortTouch(getContext());
+                        handled = closest.onShortTouch(getContext());
                     else
-                        return closest.onLongTouch(getContext());
+                        handled = closest.onLongTouch(getContext());
                 lastTouchTime = 0;
                 lastTouchedLocation = null;
                 break;
         }
-        return false;
+        return handled;
     }
 }
