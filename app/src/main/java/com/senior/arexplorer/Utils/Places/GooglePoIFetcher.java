@@ -22,7 +22,7 @@ public class GooglePoIFetcher implements PoIFetcher, Response.ErrorListener, Res
     public final int radius = 1000;
 
     private Here here;
-    private Collection<GooglePoI> googlePoIs;
+    private Collection<PoI> poIs;
     private String lastRequest;
     private Collection<PoIFetcherHandler> poIFetcherHandlers = null;
     private long lastUpdated;
@@ -40,7 +40,7 @@ public class GooglePoIFetcher implements PoIFetcher, Response.ErrorListener, Res
         this.here = Here.getInstance();
         this.poIFetcherHandlers = new ArrayList<>();
 
-        googlePoIs = new ArrayList<>();
+        poIs = new ArrayList<>();
     }
 
     public void fetchData(Activity mActivity) {
@@ -66,9 +66,9 @@ public class GooglePoIFetcher implements PoIFetcher, Response.ErrorListener, Res
     }
 
     @Override
-    public Collection<GooglePoI> getGooglePoIs() {
+    public Collection<PoI> getPoIs() {
         //todo: this is dangerous. clone googlePoIs before returning
-        return this.googlePoIs;
+        return this.poIs;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class GooglePoIFetcher implements PoIFetcher, Response.ErrorListener, Res
             for (int i = 0; i < results.length(); i++) {
                 JSONObject poi = results.getJSONObject(i);
 
-                googlePoIs.add(new GooglePoI(poi));
+                poIs.add(new GooglePoI(poi));
             }
 
             if (next_page_token != null) {

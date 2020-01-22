@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public interface PoIFetcher {
 
-    Collection<GooglePoI> getGooglePoIs();
+    Collection<PoI> getPoIs();
 
     void fetchData(Activity mActivity);
     void addHandler(PoIFetcherHandler handler);
