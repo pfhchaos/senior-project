@@ -10,23 +10,27 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.location.LocationListener;
 import com.senior.arexplorer.Utils.WebRequester;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String> {
 
-    public final String elevationAPIurl = "https://maps.googleapis.com/maps/elevation/json";
+    public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
 
     private static Here instance = null;
     private static Context applicationContext;
 
     private Collection<HereListener> callbacks;
     private Location currentLocation;
-    private double elevation;
+    private boolean isReady;
 
     private Here() {
         Log.d("location manager", "here is instantiated.");
         this.callbacks = new ArrayList<HereListener>();
+        this.isReady = false;
     }
 
     public static Here getInstance() {
@@ -68,8 +72,12 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         return this.currentLocation.getLongitude();
     }
 
+    public void setElevation(Double elevation) {
+        this.currentLocation.setAltitude(elevation);
+    }
+
     public double getElevation() {
-        return elevation;
+        return this.currentLocation.getAltitude();
     }
 
     public void cleanUp() {
@@ -92,10 +100,20 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
                 listener.onLocationChanged(this.currentLocation);
             }
 
+            /*
+            if (location.hasAltitude()) {
+                Log.d("Here", "currentLocation has altitude of " + location.getAltitude());
+            }
+            else {
+                Log.d("Here", "currentLocation does not have an altitude");
+            }
+            */
+
             //TODO: google elevation API call
             String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
             StringRequest stringRequest = new StringRequest(request, this, this);
             WebRequester.getInstance().getRequestQueue().add(stringRequest);
+            this.isReady = true;
         }
     }
 
@@ -110,5 +128,17 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         Log.d("Here", "Response recieved from Google Elevation API\n" + response);
         Log.v("Here", response);
 
+        JSONObject elevationResp = null;
+        JSONArray results = null;
+        try {
+            elevationResp = new JSONObject(response);
+
+            results = elevationResp.getJSONArray("results");
+            this.setElevation(results.getJSONObject(0).getDouble("elevation"));
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
     }
 }

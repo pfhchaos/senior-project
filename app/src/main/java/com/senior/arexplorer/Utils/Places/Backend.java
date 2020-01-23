@@ -59,4 +59,12 @@ public class Backend {
             source.cleanUp();
         }
     }
+
+    public boolean isReady() {
+        boolean ret = true;
+        for (PoIFetcher source : sources) {
+            ret &= source.isReady();
+        }
+        return ret;
+    }
 }

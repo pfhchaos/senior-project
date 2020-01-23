@@ -21,4 +21,5 @@ public abstract class PoIFetcher {
     }
 
     public abstract void cleanUp();
+    public abstract boolean isReady();
 }
