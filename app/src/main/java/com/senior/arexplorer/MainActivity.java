@@ -34,6 +34,7 @@ import com.senior.arexplorer.AR.ARFragment;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Places.Backend;
 import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.WebRequester;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Here here;
     private GoogleApiClient googleApiClient;
-    private GooglePoIFetcher googlePlaceFetcher;
+    private Backend backend;
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
     //private AWSAppSyncClient mAWSAppSyncClient;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try{
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         }catch(Exception e){
-            System.err.println("Cannot create connection");
+            Log.d("MainActivity","error jdbc driver");
         }
         Connection connection=null;
         TextView sample;
@@ -115,14 +116,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
            // sample = (TextView) findViewById(R.id.sample);
             ResultSet resultset = statement.executeQuery("select * from USERS");
+          //  ResultSet resultset = statement.executeQuery("INSERT INTO USERS (id, fName, lName, email, password) VALUES (1,'md', 'kashem', 'kasem@yahoo.com','secret')");
+            Log.d("MainActivity"," called try ");
             while(resultset.next()){
-                System.out.println("Solution"+resultset.getString(1));
+               // System.out.println("Solution"+resultset.getString(1).toString());
                // txtLat.append(resultset.getString(1));
+                Log.d("MainActivity","resultset");
 
             }
         }catch(Exception e){
            // sample = (TextView) findViewById(R.id.sample);
-            System.err.println("Error");
+            Log.d("MainActivity","resultset on catch error");
           //  sample.append(e.toString());
         }
         */
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Here.init(this);
         this.here = Here.getInstance();
-        this.googlePlaceFetcher = GooglePoIFetcher.getGooglePlaceFetcher(this);
+        this.backend = Backend.getInstance();
 
         this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
@@ -200,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onStop() {
         Log.v("main activity lifecycle","onStop");
         this.here.cleanUp();
-        this.googlePlaceFetcher.cleanUp();
+        this.backend.cleanUp();
         this.compassAssistant.cleanUp();
         super.onStop();
     }
@@ -235,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
         }
-
     }
 
     //navigation methods

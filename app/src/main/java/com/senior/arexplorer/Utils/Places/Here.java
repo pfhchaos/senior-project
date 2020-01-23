@@ -68,6 +68,10 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         return this.currentLocation.getLongitude();
     }
 
+    public double getElevation() {
+        return elevation;
+    }
+
     public void cleanUp() {
         Here.instance = null;
     }
@@ -89,8 +93,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             }
 
             //TODO: google elevation API call
-            Here here = Here.getInstance();
-            String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude());
+            String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
             StringRequest stringRequest = new StringRequest(request, this, this);
             WebRequester.getInstance().getRequestQueue().add(stringRequest);
         }

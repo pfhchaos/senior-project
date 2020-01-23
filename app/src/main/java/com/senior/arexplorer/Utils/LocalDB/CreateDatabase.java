@@ -19,7 +19,6 @@ public class CreateDatabase extends SQLiteOpenHelper {
     //create tables here
     @Override
     public void onCreate(SQLiteDatabase db){
-      // todo add check to see if the table already exist.
        db.execSQL("CREATE TABLE USER("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      + "fName TEXT,"
                      + "lName TEXT,"
@@ -34,16 +33,13 @@ public class CreateDatabase extends SQLiteOpenHelper {
                 + "longitude TEXT,"
                 + "elevation TEXT,"
                 + "image_resource_id INTEGER);");
-
-        //insertUsers(  "Md", "kashem", "kasem@yahoo.com", "secret");
-
-
     }
     //do not change header
     @Override
     public void onUpgrade(SQLiteDatabase db,int oldVersion, int newVersion ){
 
         db.execSQL("DROP TABLE IF EXISTS USER");
+        db.execSQL("DROP TABLE IF EXISTS LOCAL_DATA");
         onCreate(db);
 
     }
