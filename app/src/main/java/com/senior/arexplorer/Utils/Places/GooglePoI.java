@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class GooglePoI extends PoI implements Serializable, Response.ErrorListener, Response.Listener<String>{
-    public final String elevationAPIurl = "https://maps.googleapis.com/maps/elevation/json";
+    public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
 
     public GooglePoI(JSONObject poi) {
         super();
@@ -57,8 +57,20 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
     @Override
     public void onResponse(String response) {
-        Log.d("GooglePoI", "Response recieved from Google Elevation API");
-        Log.v("GooglePoI", response);
+        Log.d("Here", "Response recieved from Google Elevation API\n" + response);
+        Log.v("Here", response);
 
+        JSONObject elevationResp = null;
+        JSONArray results = null;
+        try {
+            elevationResp = new JSONObject(response);
+
+            results = elevationResp.getJSONArray("results");
+            this.setElevation(results.getJSONObject(0).getDouble("elevation"));
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
     }
 }

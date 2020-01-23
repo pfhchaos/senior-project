@@ -10,12 +10,15 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.location.LocationListener;
 import com.senior.arexplorer.Utils.WebRequester;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String> {
 
-    public final String elevationAPIurl = "https://maps.googleapis.com/maps/elevation/json";
+    public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
 
     private static Here instance = null;
     private static Context applicationContext;
@@ -68,6 +71,10 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         return this.currentLocation.getLongitude();
     }
 
+//    public void setElevation(Double elevation) {
+//        this.loc.setAltitude(elevation);
+//    }
+
     public double getElevation() {
         return elevation;
     }
@@ -110,5 +117,17 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         Log.d("Here", "Response recieved from Google Elevation API\n" + response);
         Log.v("Here", response);
 
+        JSONObject elevationResp = null;
+        JSONArray results = null;
+        try {
+            elevationResp = new JSONObject(response);
+
+            results = elevationResp.getJSONArray("results");
+            this.elevation = results.getJSONObject(0).getDouble("elevation");
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
     }
 }
