@@ -21,6 +21,7 @@ import com.senior.arexplorer.Utils.Places.PoI;
 import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
+import androidx.arch.core.util.Function;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
     private boolean isRunning = true;
@@ -126,16 +127,18 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
             p.setColor(Color.parseColor("black"));
             p.setStyle(Paint.Style.STROKE);
-            canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
+            canvas.drawText("CURRENT LOCATION CANNOT BE RETRIEVED!", 5000, 5000, p);
 
             p.setColor(Color.parseColor("red"));
             p.setStyle(Paint.Style.FILL);
             p.setStrokeWidth(7);
-            canvas.drawText("CURRENT LOCATION CANNOT BE RETREIVED!", 5000, 5000, p);
+            canvas.drawText("CURRENT LOCATION CANNOT BE RETRIEVED!", 5000, 5000, p);
         }
         else {
             for (PoI poi : nearby.descendingSet()) {
-                drawNearbyRect(poi, canvas);
+                calcNearbyRect(poi);
+                if(poi.compassRender)
+                    canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
                 //Log.d("rect", "Rect location is " + rect);
             }
         }
@@ -154,19 +157,29 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void drawNearbyRect(PoI poi, Canvas canvas){
+    private void calcNearbyRect(PoI poi){
+        Function<Float, Double> convert360 = i -> (double)((i + 360) % 360);
         Location destLoc = poi.getLocation();
-        double headingTo = curLoc.bearingTo(destLoc);
-        double relativeHeading = (headingTo - heading);
+        double headingTo = convert360.apply(curLoc.bearingTo(destLoc));
+        double relativeHeading = (headingTo - convert360.apply((heading))) % 360;
+
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = (relativeHeading + 180) % 360 - 180;
+
+        Log.d("CamOver",
+                poi.getName() +
+                        "\nBearing : " + curLoc.bearingTo(destLoc) +
+                        "\nHeading : " + heading +
+                        "\nRelativeHeading : " + relativeHeading);
+
 
         double dist = curLoc.distanceTo(destLoc);
 
         //if our heading is within our FoV
-        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance){
-            int newScale = 9000 / fov;
-            int center = (int)(5000 + relativeHeading * newScale);
+        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance && dist > 1){
+            //Why is this magic number here? Why 9000? Was I drunk when I did this?
+            int newScale = 9000 / fov; //I think 9000 equates to 90% of the screen, AKA 5% margin on either side!
+            int center = (int)(5000 + relativeHeading * newScale); //which would make this at the 50% point on the screen + our offset
 
             poi.getCompassRect().set(center - 250, 250 , center + 250, 750);
 
@@ -174,8 +187,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             if(alpha > 255) alpha = 255;
             p.setAlpha(alpha);
 
-            canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
+            poi.compassRender = true;
         }
+        else
+            poi.compassRender = false;
     }
 
     void setFoV(int newFoV){
@@ -237,11 +252,14 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 handled = true;
                 break;
             case MotionEvent.ACTION_UP :
-                if (closest != null && closest == lastTouchedLocation)
+                if (closest != null && closest == lastTouchedLocation) {
                     if (System.currentTimeMillis() - lastTouchTime <= 1000)
                         handled = closest.onShortTouch(getContext());
                     else
                         handled = closest.onLongTouch(getContext());
+
+                    //Log.d("CamOver", "Bearing to " + curLoc.bearingTo(lastTouchedLocation.getLocation()));
+                }
                 lastTouchTime = 0;
                 lastTouchedLocation = null;
                 break;
