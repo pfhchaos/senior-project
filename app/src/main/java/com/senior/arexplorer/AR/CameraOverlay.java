@@ -9,15 +9,19 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
+import com.senior.arexplorer.Utils.Places.Backend;
 import com.senior.arexplorer.Utils.Places.HereListener;
 import com.senior.arexplorer.Utils.Places.PoI;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
@@ -67,32 +71,38 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }};
 
         nearby = new TreeSet<>();
+//        new Timer().schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Backend.getInstance().fetchData();
+//                nearby.addAll(Backend.getInstance().getPoIs());
+//            }
+//        }, 5000);
 
-
-        nearby.add(new PoI(){{
-            //ewu fountain
-            setName("Fountain");
-            setLatitude(47.49133725545527);
-            setLongitude(-117.58288800716402);
-        }});
-        nearby.add(new PoI(){{
-            //pub
-            setName("PUB");
-            setLatitude(47.49218543922342);
-            setLongitude(-117.5838589668274);
-        }});
-        nearby.add(new PoI(){{
-            //CSE
-            setName("CSE");
-            setLatitude(47.4899634586667);
-            setLongitude(-117.58538246154787);
-        }});
-        nearby.add(new PoI(){{
-            //google HQish
-            setName("GooglePlex");
-            setLatitude(37.4225);
-            setLongitude(-122.0845);
-        }});
+//        nearby.add(new PoI(){{
+//            //ewu fountain
+//            setName("Fountain");
+//            setLatitude(47.49133725545527);
+//            setLongitude(-117.58288800716402);
+//        }});
+//        nearby.add(new PoI(){{
+//            //pub
+//            setName("PUB");
+//            setLatitude(47.49218543922342);
+//            setLongitude(-117.5838589668274);
+//        }});
+//        nearby.add(new PoI(){{
+//            //CSE
+//            setName("CSE");
+//            setLatitude(47.4899634586667);
+//            setLongitude(-117.58538246154787);
+//        }});
+//        nearby.add(new PoI(){{
+//            //google HQish
+//            setName("GooglePlex");
+//            setLatitude(37.4225);
+//            setLongitude(-122.0845);
+//        }});
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -158,6 +168,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     private void calcNearbyRect(PoI poi){
+        //brings us from [-180,180] to [0,360], its easier to deal with
         Function<Float, Double> convert360 = i -> (double)((i + 360) % 360);
         Location destLoc = poi.getLocation();
         double headingTo = convert360.apply(curLoc.bearingTo(destLoc));
@@ -178,7 +189,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //if our heading is within our FoV
         if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance && dist > 1){
             //Why is this magic number here? Why 9000? Was I drunk when I did this?
-            int newScale = 9000 / fov; //I think 9000 equates to 90% of the screen, AKA 5% margin on either side!
+            int newScale = 9000 / fov; //I think 9000 equates to 90% of the screen, AKA 5% margin on either side
             int center = (int)(5000 + relativeHeading * newScale); //which would make this at the 50% point on the screen + our offset
 
             poi.getCompassRect().set(center - 250, 250 , center + 250, 750);
@@ -264,6 +275,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 lastTouchedLocation = null;
                 break;
         }
+
         return handled;
     }
 }

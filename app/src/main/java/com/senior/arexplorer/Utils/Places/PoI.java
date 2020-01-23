@@ -128,7 +128,11 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         Location here = Here.getInstance().getLocation();
         if(here == null)
             here = place.getLocation();
-        return (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
+        int retInt = (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
+        if(retInt == 0){
+            retInt = (here.equals(place.getLocation())) ? 0 : 1;
+        }
+        return retInt;
     }
 
     public boolean save() {
