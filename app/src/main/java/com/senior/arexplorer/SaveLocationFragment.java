@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Places.Here;
 
 import java.io.File;
@@ -220,6 +221,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         String userID,locName,locDesc,fileName;
         double locLatitude,locLongitude,locElevation;
         Boolean priv;
+        LocalDB LDB = LocalDB.getInstance();
 
         userID = "test1";       //TODO
 
@@ -235,6 +237,17 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
         saveObj s = new saveObj(userID,locName,locDesc,locLatitude,locLongitude,locElevation,priv);
         if(dbBM != null) s.setBLOB(dbBM);
+
+
+        //if its private save to localDB, otherwise save to public DB
+
+        if(priv) {
+            LDB.insertLocalData(s);
+            Log.i("save was private","insert into local DB");
+        }
+        else{
+            //TODO save to public DB
+        }
 
         try {
             FileOutputStream fos = getContext().openFileOutput(fileName, Context.MODE_PRIVATE);

@@ -32,6 +32,19 @@ public class saveObj implements Serializable {
 
     }
 
+    @Override
+    public String toString(){
+        String result = "";
+        result += "Name:\t\t"+this.locationName+"\n";
+        result += "Description:\t\t"+this.locationDesc+"\n";
+        result += "UserID:\t\t"+this.userID+"\n";
+        result += "Latitude:\t\t"+this.locationLatitude+"\n";
+        result += "Longitude:\t\t"+this.locationLongitude+"\n";
+        result += "Elevation:\t\t"+this.locationElevation+"\n";
+        result += "Private:\t\t"+this.priv+"\n";
+        return result;
+    }
+
 
     public String getUserID() {
         return userID;

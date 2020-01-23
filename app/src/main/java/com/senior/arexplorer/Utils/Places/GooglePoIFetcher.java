@@ -53,15 +53,6 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
         WebRequester.getInstance().getRequestQueue().add(stringRequest);
     }
 
-    @Override
-    public void addHandler(PoIFetcherHandler handler) {
-        this.poIFetcherHandlers.add(handler);
-    }
-
-    @Override
-    public void removeHandler(PoIFetcherHandler handler) {
-        this.poIFetcherHandlers.remove(handler);
-    }
 
     @Override
     public Collection<PoI> getPoIs() {
