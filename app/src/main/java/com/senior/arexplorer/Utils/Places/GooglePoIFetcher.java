@@ -21,20 +21,22 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
 
     private String lastRequest;
     private long lastUpdated;
+    private boolean isReady;
 
-    private static GooglePoIFetcher googlePlaceFetcher;
+    private static PoIFetcher instance;
 
-    public static GooglePoIFetcher getInstance() {
-        if (googlePlaceFetcher == null) {
-            googlePlaceFetcher = new GooglePoIFetcher();
+    public static PoIFetcher getInstance() {
+        if (instance == null) {
+            instance = new GooglePoIFetcher();
         }
-        return googlePlaceFetcher;
+        return instance;
     }
 
     private GooglePoIFetcher() {
         this.poIFetcherHandlers = new ArrayList<>();
 
         poIs = new ArrayList<>();
+        this.isReady = false;
     }
 
     public void fetchData() {
@@ -109,10 +111,16 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
             ex.printStackTrace();
             return;
         }
+        this.isReady = true;
         Log.d("GooglePoIFetcher", results.toString());
     }
 
     public void cleanUp() {
-        GooglePoIFetcher.googlePlaceFetcher = null;
+        GooglePoIFetcher.instance = null;
+    }
+
+    @Override
+    public boolean isReady() {
+        return this.isReady;
     }
 }
