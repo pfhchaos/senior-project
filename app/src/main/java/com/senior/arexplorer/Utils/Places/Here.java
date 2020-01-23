@@ -71,9 +71,9 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         return this.currentLocation.getLongitude();
     }
 
-//    public void setElevation(Double elevation) {
-//        this.loc.setAltitude(elevation);
-//    }
+    public void setElevation(Double elevation) {
+        this.currentLocation.setAltitude(elevation);
+    }
 
     public double getElevation() {
         return elevation;
@@ -99,6 +99,15 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
                 listener.onLocationChanged(this.currentLocation);
             }
 
+            /*
+            if (location.hasAltitude()) {
+                Log.d("Here", "currentLocation has altitude of " + location.getAltitude());
+            }
+            else {
+                Log.d("Here", "currentLocation does not have an altitude");
+            }
+            */
+
             //TODO: google elevation API call
             String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
             StringRequest stringRequest = new StringRequest(request, this, this);
@@ -123,7 +132,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             elevationResp = new JSONObject(response);
 
             results = elevationResp.getJSONArray("results");
-            this.elevation = results.getJSONObject(0).getDouble("elevation");
+            this.setElevation(results.getJSONObject(0).getDouble("elevation"));
         }
         catch (Exception ex) {
             ex.printStackTrace();
