@@ -53,6 +53,11 @@ public class LocalDB {
                    users.put("Password",password);
         localDB.insert("USER",null, users);
     }
+    public void insertType( String type){
+        ContentValues TypeValue = new ContentValues();
+        TypeValue.put("type",type);
+        localDB.insert("TYPE",null, TypeValue);
+    }
 
     public void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
         ContentValues values = new ContentValues();
@@ -70,6 +75,12 @@ public class LocalDB {
         //TODO: different shit here
         //SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  localDB.rawQuery( "select * from USER where _id="+id+"", null );
+        return res;
+    }
+
+    public Cursor getType(String type) {
+
+        Cursor res =  localDB.rawQuery( "select type from USER where type LIKE '%type%'", null );
         return res;
     }
 }

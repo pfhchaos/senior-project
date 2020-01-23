@@ -33,6 +33,9 @@ public class CreateDatabase extends SQLiteOpenHelper {
                 + "longitude TEXT,"
                 + "elevation TEXT,"
                 + "image_resource_id INTEGER);");
+
+        db.execSQL("CREATE TABLE TYPE("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "type TEXT);");
     }
     //do not change header
     @Override
@@ -40,6 +43,7 @@ public class CreateDatabase extends SQLiteOpenHelper {
 
         db.execSQL("DROP TABLE IF EXISTS USER");
         db.execSQL("DROP TABLE IF EXISTS LOCAL_DATA");
+        db.execSQL("DROP TABLE IF EXISTS TYPE");
         onCreate(db);
 
     }
