@@ -19,6 +19,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private String description;
     private Location loc;
     private Rect compassRect;
+    public boolean compassRender = false;
 
     private Collection<String> types;
 
