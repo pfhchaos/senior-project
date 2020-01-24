@@ -18,6 +18,7 @@ public class LocalPoIFetcher extends PoIFetcher {
     private LocalDB LDB;
     private static LocalPoIFetcher LPF;
     private long lastUpdated;
+    private boolean isReady = false;
 
     public static LocalPoIFetcher getInstance(){
         if(LPF == null) LPF = new LocalPoIFetcher();
@@ -38,7 +39,8 @@ public class LocalPoIFetcher extends PoIFetcher {
     }
 
     @Override
-    void fetchData(Activity mActivity) {
+    void fetchData() {
+        isReady = false;
         Cursor c = this.LDB.getAllLocalData();
         while(c.moveToNext()){
             String userName = "testUser";
@@ -60,9 +62,15 @@ public class LocalPoIFetcher extends PoIFetcher {
             this.lastUpdated = System.currentTimeMillis();
             handler.placeFetchComplete();
         }
+        isReady = true;
     }
 
     public void cleanUp(){
         LocalPoIFetcher.LPF = null;
+    }
+
+    @Override
+    public boolean isReady() {
+        return isReady;
     }
 }

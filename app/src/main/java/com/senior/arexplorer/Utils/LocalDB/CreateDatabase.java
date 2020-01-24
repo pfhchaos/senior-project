@@ -34,15 +34,16 @@ public class CreateDatabase extends SQLiteOpenHelper {
                 + "elevation TEXT,"
                 + "image_resource_id INTEGER);");
 
-        //insertUsers(  "Md", "kashem", "kasem@yahoo.com", "secret");
-
-
+        db.execSQL("CREATE TABLE TYPE("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "type TEXT);");
     }
     //do not change header
     @Override
     public void onUpgrade(SQLiteDatabase db,int oldVersion, int newVersion ){
 
         db.execSQL("DROP TABLE IF EXISTS USER");
+        db.execSQL("DROP TABLE IF EXISTS LOCAL_DATA");
+        db.execSQL("DROP TABLE IF EXISTS TYPE");
         onCreate(db);
 
     }

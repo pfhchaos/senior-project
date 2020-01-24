@@ -47,13 +47,18 @@ public class LocalDB {
         }
     }
 
-    private void insertUsers( String fName, String lName, String email, String password){
+    public void insertUsers( String fName, String lName, String email, String password){
                    ContentValues users = new ContentValues();
                    users.put("fName",fName);
                    users.put("lName",lName);
                    users.put("email", email);
                    users.put("Password",password);
         localDB.insert("USER",null, users);
+    }
+    public void insertType( String type){
+        ContentValues TypeValue = new ContentValues();
+        TypeValue.put("type",type);
+        localDB.insert("TYPE",null, TypeValue);
     }
 
     private void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
@@ -79,6 +84,11 @@ public class LocalDB {
         return res;
     }
 
+    public Cursor getType(String type) {
+
+        Cursor res =  localDB.rawQuery( "select type from USER where type LIKE '%type%'", null );
+        return res;
+    }
     public Cursor getAllLocalData(){
         Cursor result = localDB.rawQuery("select * from LOCAL_DATA",null);
         return result;

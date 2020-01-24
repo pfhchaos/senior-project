@@ -1,9 +1,7 @@
 package com.senior.arexplorer.Utils.Places;
 
-import android.app.Activity;
 import android.location.Location;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -21,30 +19,31 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 
-    private Here here;
     private String lastRequest;
     private long lastUpdated;
+    private boolean isReady;
 
-    private static GooglePoIFetcher googlePlaceFetcher;
+    private static PoIFetcher instance;
 
-    public static GooglePoIFetcher getGooglePlaceFetcher(Activity mActivity) {
-        if (googlePlaceFetcher == null) {
-            googlePlaceFetcher = new GooglePoIFetcher();
+    public static PoIFetcher getInstance() {
+        if (instance == null) {
+            instance = new GooglePoIFetcher();
         }
-        return googlePlaceFetcher;
+        return instance;
     }
 
     private GooglePoIFetcher() {
-        this.here = Here.getInstance();
         this.poIFetcherHandlers = new ArrayList<>();
 
         poIs = new ArrayList<>();
+        this.isReady = false;
     }
 
-    public void fetchData(Activity mActivity) {
-        Location here = this.here.getLocation();
-        if (this.here == null) {
-            Toast.makeText(mActivity, "here is null. this should not happen", Toast.LENGTH_SHORT).show();
+    public void fetchData() {
+        Location here = Here.getInstance().getLocation();
+        if (here == null) {
+            Log.e("GooglePoIFetcher","here is null. this should not happen");
+            return; //will try again, don't make null references
         }
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radius);
         StringRequest stringRequest = new StringRequest(request, this, this);
@@ -104,10 +103,16 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
             ex.printStackTrace();
             return;
         }
+        this.isReady = true;
         Log.d("GooglePoIFetcher", results.toString());
     }
 
     public void cleanUp() {
-        GooglePoIFetcher.googlePlaceFetcher = null;
+        GooglePoIFetcher.instance = null;
+    }
+
+    @Override
+    public boolean isReady() {
+        return this.isReady;
     }
 }
