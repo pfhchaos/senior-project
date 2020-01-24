@@ -74,7 +74,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         nearby = new TreeSet<>();
 
         Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
-
+        if(Backend.getInstance().isReady())
+            nearby.addAll(Backend.getInstance().getPoIs());
 //        nearby.add(new PoI(){{
 //            //ewu fountain
 //            setName("Fountain");
@@ -166,13 +167,18 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     private void calcNearbyRect(PoI poi){
         //brings us from [-180,180] to [0,360], its easier to deal with
-        Function<Float, Double> convert360 = i -> (double)((i + 360) % 360);
+//        Function<Float, Double> convert360 = i -> (double)((i + 360) % 360);
+//        Location destLoc = poi.getLocation();
+//        double headingTo = convert360.apply(curLoc.bearingTo(destLoc));
+//        double relativeHeading = (headingTo - convert360.apply((heading))) % 360;
+        Function<Float, Float> mod360 = i -> {
+            float result = i % 360;
+            return result < 0 ? result + 360 : result;};
         Location destLoc = poi.getLocation();
-        double headingTo = convert360.apply(curLoc.bearingTo(destLoc));
-        double relativeHeading = (headingTo - convert360.apply((heading))) % 360;
-
+        float headingTo = curLoc.bearingTo(destLoc);
+        float relativeHeading = headingTo - heading;
         //this next bit just takes us from [0,360] to [-180,180]
-        relativeHeading = (relativeHeading + 180) % 360 - 180;
+        relativeHeading = mod360.apply(relativeHeading + 180) - 180;
 
         Log.d("CamOver",
                 poi.getName() +
