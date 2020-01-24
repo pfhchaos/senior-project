@@ -26,7 +26,6 @@ public class Backend implements HereListener{
         this.sources = new ArrayList<PoIFetcher>();
 
         this.sources.add(GooglePoIFetcher.getInstance());
-        this.fetchData();
     }
 
     public Collection<PoI> getPoIs() {
@@ -73,7 +72,7 @@ public class Backend implements HereListener{
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location.distanceTo(this.lastFetched) > 100) {
+        if (this.lastFetched == null || location.distanceTo(this.lastFetched) > 100) {
             this.fetchData();
         }
     }
