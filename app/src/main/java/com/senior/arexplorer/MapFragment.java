@@ -125,7 +125,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
             }
         }
         moveToLocation(location);
-        backend.fetchData();
     }
 
     private void moveToLocation(Location location) {

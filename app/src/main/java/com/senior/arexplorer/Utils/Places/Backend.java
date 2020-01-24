@@ -1,12 +1,14 @@
 package com.senior.arexplorer.Utils.Places;
 
+import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Backend {
+public class Backend implements HereListener{
     private static Backend instance = null;
+    private Location lastFetched;
 
     private Collection<PoIFetcher> sources;
 
@@ -24,6 +26,7 @@ public class Backend {
         this.sources = new ArrayList<PoIFetcher>();
 
         this.sources.add(GooglePoIFetcher.getInstance());
+        this.fetchData();
     }
 
     public Collection<PoI> getPoIs() {
@@ -34,8 +37,8 @@ public class Backend {
         return ret;
     }
 
-    public void fetchData() {
-        //TODO: is this nessicarry?
+    private void fetchData() {
+        this.lastFetched = Here.getInstance().getLocation();
         for (PoIFetcher source: sources) {
             source.fetchData();
         }
@@ -66,5 +69,12 @@ public class Backend {
             ret &= source.isReady();
         }
         return ret;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (location.distanceTo(this.lastFetched) > 100) {
+            this.fetchData();
+        }
     }
 }
