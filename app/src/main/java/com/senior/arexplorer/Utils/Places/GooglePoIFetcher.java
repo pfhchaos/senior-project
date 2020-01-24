@@ -20,7 +20,6 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
     public final int radius = 1000;
 
     private String lastRequest;
-    private long lastUpdated;
     private boolean isReady;
 
     private static PoIFetcher instance;
@@ -94,7 +93,6 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
             }
             else {
                 for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
-                    this.lastUpdated = System.currentTimeMillis();
                     handler.placeFetchComplete();
                 }
             }

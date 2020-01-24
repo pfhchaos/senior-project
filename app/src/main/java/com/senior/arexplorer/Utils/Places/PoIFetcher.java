@@ -2,6 +2,7 @@ package com.senior.arexplorer.Utils.Places;
 
 import android.app.Activity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class PoIFetcher {
@@ -12,6 +13,10 @@ public abstract class PoIFetcher {
     abstract Collection<PoI> getPoIs();
     abstract void fetchData();
 
+    public PoIFetcher() {
+        this.poIFetcherHandlers = new ArrayList<PoIFetcherHandler>();
+        this.poIs = new ArrayList<PoI>();
+    }
     public void addHandler(PoIFetcherHandler handler) {
         this.poIFetcherHandlers.add(handler);
     }
