@@ -40,6 +40,19 @@ public class LocalPoIFetcher extends PoIFetcher {
 
     @Override
     void fetchData() {
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                fetchDataAsync();
+            }
+        });
+
+        thread.start();
+
+    }
+
+    private synchronized void fetchDataAsync(){
         isReady = false;
         Cursor c = this.LDB.getAllLocalData();
         while(c.moveToNext()){

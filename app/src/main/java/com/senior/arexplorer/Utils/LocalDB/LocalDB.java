@@ -3,6 +3,7 @@ package com.senior.arexplorer.Utils.LocalDB;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -75,6 +76,8 @@ public class LocalDB {
 
     public void insertLocalData(saveObj s){
         this.insertLocalData(s.getLocationName(),s.getLocationDesc(),s.getLocationLatitude()+"",s.getLocationLongitude()+"",s.getLocationElevation()+"",-1);
+        long count = DatabaseUtils.queryNumEntries(localDB,"LOCAL_DATA");
+        Log.i("local db","number of rows:\t\t"+count);
     }
 
     public Cursor getUserData(int id) {
