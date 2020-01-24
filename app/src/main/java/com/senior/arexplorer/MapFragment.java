@@ -24,6 +24,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.CompassAssistant;
@@ -37,7 +38,7 @@ import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
 import java.util.Collection;
 
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
@@ -131,16 +132,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         }
 
         changeHeading(CompassAssistant.getInstance().getLastHeading());
+
+        this.googleMap.setOnMarkerClickListener(this);
     }
 
     private void placeMarkers() {
-        Collection<PoI> googlePoIs = Backend.getInstance().getPoIs();
+        Collection<PoI> pois = Backend.getInstance().getPoIs();
         Location here = Here.getInstance().getLocation();
 
         Log.d("mapFragment","entered callback from place fetcher");
 
-        for (PoI p: googlePoIs) {
-            googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
+        for (PoI poi: pois) {
+            createMarker(poi);
         }
     }
 
@@ -152,6 +155,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         CameraPosition currentPosition = googleMap.getCameraPosition();
         CameraPosition newPosition = new CameraPosition(currentPosition.target, currentPosition.zoom, currentPosition.tilt, userHeading);
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
+    }
+
+    private void createMarker(PoI poi) {
+        MarkerOptions newMarkerOptions = new MarkerOptions();
+        newMarkerOptions.position(poi.getLatLng());
+        newMarkerOptions.title(poi.getName());
+        Marker newMarker = this.googleMap.addMarker(newMarkerOptions);
+        newMarker.setTag(poi);
     }
 
     @Override
@@ -207,6 +218,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onCompassAccuracyChange(int compassStatus) {
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return ((PoI) marker.getTag()).onShortTouch(getContext());
 
     }
 }
