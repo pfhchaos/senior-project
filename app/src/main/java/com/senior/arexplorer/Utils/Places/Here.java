@@ -80,6 +80,9 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         return this.currentLocation.getAltitude();
     }
 
+    public boolean isReady() {
+        return this.isReady;
+    }
     public void cleanUp() {
         Here.instance = null;
     }

@@ -39,11 +39,17 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
     }
 
     public Collection<PoI> getPoIs() {
-        Collection<PoI> ret = new ArrayList<PoI>();
-        for (PoIFetcher source: sources) {
-            ret.addAll(source.getPoIs());
+        if (this.isReady()) {
+            Collection<PoI> ret = new ArrayList<PoI>();
+            for (PoIFetcher source : sources) {
+                ret.addAll(source.getPoIs());
+            }
+            return ret;
         }
-        return ret;
+        else {
+            Log.d("Backend", "attempted to retrieve poi's before sources are ready");
+            return null;
+        }
     }
 
     void fetchData() {

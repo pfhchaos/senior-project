@@ -119,23 +119,39 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         googleMap.getUiSettings().setCompassEnabled(false);
         googleMap.getUiSettings().setAllGesturesEnabled(false);
 
-        while ((location = Here.getInstance().getLocation()) == null) {
-            try {
-                Log.d("map fragment", "location is null. sleeping");
-                Thread.sleep(10);
-            } catch (Exception ex) {
-                Log.e("map fragment", "sleep was interrupted. i blame you");
-            }
+        CameraPosition newPosition = new CameraPosition(new LatLng(0, 0), zoom, tilt, 0);
+        this.googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
+
+        if (Backend.getInstance().isReady()) {
+            placeMarkers();
         }
 
-        CameraPosition newPosition = new CameraPosition(new LatLng(location.getLatitude(), location.getLongitude()), zoom, tilt, 0);
-        this.googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
+        if (Here.getInstance().isReady()) {
+            changeLocation(Here.getInstance().getLocation());
+        }
+
+        changeHeading(CompassAssistant.getInstance().getLastHeading());
     }
 
-    private void moveToLocation(Location location) {
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), zoom);
-        this.googleMap.moveCamera(cameraUpdate);
+    private void placeMarkers() {
+        Collection<PoI> googlePoIs = Backend.getInstance().getPoIs();
+        Location here = Here.getInstance().getLocation();
+
+        Log.d("mapFragment","entered callback from place fetcher");
+
+        for (PoI p: googlePoIs) {
+            googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
+        }
+    }
+
+    private void changeLocation(Location location) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), zoom));
+    }
+
+    private void changeHeading(float userHeading) {
+        CameraPosition currentPosition = googleMap.getCameraPosition();
+        CameraPosition newPosition = new CameraPosition(currentPosition.target, currentPosition.zoom, currentPosition.tilt, userHeading);
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
     }
 
     @Override
@@ -170,28 +186,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void placeFetchComplete() {
-        Collection<PoI> googlePoIs = Backend.getInstance().getPoIs();
-        Location here = Here.getInstance().getLocation();
-
-        Log.d("mapFragment","entered callback from place fetcher");
-
-        for (PoI p: googlePoIs) {
-            googleMap.addMarker(new MarkerOptions().position(p.getLatLng()));
+        if (googleMap != null) {
+            placeMarkers();
         }
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(here.getLatitude(),here.getLongitude()), zoom));
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),location.getLongitude()), zoom));
+        if (googleMap != null) {
+            changeLocation(location);
+        }
     }
 
     @Override
     public void onCompassChanged(float userHeading) {
         if(googleMap != null) {
-            CameraPosition currentPosition = googleMap.getCameraPosition();
-            CameraPosition newPosition = new CameraPosition(currentPosition.target, currentPosition.zoom, currentPosition.tilt, userHeading);
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
+            changeHeading(userHeading);
         }
     }
 
