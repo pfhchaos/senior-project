@@ -125,7 +125,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     @Override
     public void onResponse(String response) {
-        Log.d("Here", "Response recieved from Google Elevation API\n" + response);
+        Log.d("Here", "Response recieved from Google Elevation API");
         Log.v("Here", response);
 
         JSONObject elevationResp = null;
