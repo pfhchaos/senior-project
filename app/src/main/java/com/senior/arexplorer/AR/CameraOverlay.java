@@ -19,6 +19,7 @@ import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.Backend;
 import com.senior.arexplorer.Utils.Places.HereListener;
 import com.senior.arexplorer.Utils.Places.PoI;
+import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,13 +72,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }};
 
         nearby = new TreeSet<>();
-//        new Timer().schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                Backend.getInstance().fetchData();
-//                nearby.addAll(Backend.getInstance().getPoIs());
-//            }
-//        }, 5000);
+
+        Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
 
 //        nearby.add(new PoI(){{
 //            //ewu fountain
@@ -103,6 +99,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 //            setLatitude(37.4225);
 //            setLongitude(-122.0845);
 //        }});
+
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -278,4 +275,5 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         return handled;
     }
+
 }

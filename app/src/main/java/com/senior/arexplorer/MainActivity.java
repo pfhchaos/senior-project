@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("main activity lifecycle","onCreate");
+        Log.v("ActivityLifecycle","onCreate");
         setContentView(R.layout.activity_main);
 
         drawer = findViewById(R.id.drawer_layout);
@@ -150,7 +150,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
        super.onResume();
-        Log.v("main activity lifecycle","onResume");
+        Log.v("ActivityLifecycle","onResume");
+
+        compassAssistant.onStart();
 
        if (!checkPlayServices()) {
            Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT);
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onStart() {
         super.onStart();
-        Log.v("main activity lifecycle","onStart");
+        Log.v("ActivityLifecycle","onStart");
 
         if (this.googleApiClient != null) {
             this.googleApiClient.connect();
@@ -173,8 +175,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onPause() {
         super.onPause();
-        Log.v("main activity lifecycle","onPause");
+        Log.v("ActivityLifecycle","onPause");
         //TODO: pause location updates here
+
+        compassAssistant.onStop();
 
         /*
         if (googleApiClient != null  &&  googleApiClient.isConnected()) {
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
-        Log.v("main activity lifecycle","onSaveInstanceState");
+        Log.v("ActivityLifecycle","onSaveInstanceState");
         //savedInstanceState.putInt("key", value);
         // we have to find what need to save
         //
@@ -195,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onStop() {
-        Log.v("main activity lifecycle","onStop");
+        Log.v("ActivityLifecycle","onStop");
         this.here.cleanUp();
         this.backend.cleanUp();
         this.compassAssistant.cleanUp();
