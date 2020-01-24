@@ -31,6 +31,10 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         this.sources.add(googlePoIFetcher);
         googlePoIFetcher.addHandler(this);
 
+        PoIFetcher localPoIFetcher = LocalPoIFetcher.getInstance();
+        this.sources.add(localPoIFetcher);
+        localPoIFetcher.addHandler(this);
+
         Here.getInstance().addListener(this);
     }
 

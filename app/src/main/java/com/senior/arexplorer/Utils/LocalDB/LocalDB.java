@@ -6,8 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.senior.arexplorer.AR.saveObj;
+
 public class LocalDB {
- private static SQLiteDatabase localDB=null;
+ private static SQLiteDatabase localDB = null;
  private static Context applicationContext = null;
  private static LocalDB instance = null;
 
@@ -59,7 +61,7 @@ public class LocalDB {
         localDB.insert("TYPE",null, TypeValue);
     }
 
-    public void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
+    private void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
         ContentValues values = new ContentValues();
         values.put("name",name);
         values.put("description",description);
@@ -71,7 +73,11 @@ public class LocalDB {
         localDB.insert("LOCAL_DATA",null, values);
     }
 
-    public Cursor getData(int id) {
+    public void insertLocalData(saveObj s){
+        this.insertLocalData(s.getLocationName(),s.getLocationDesc(),s.getLocationLatitude()+"",s.getLocationLongitude()+"",s.getLocationElevation()+"",-1);
+    }
+
+    public Cursor getUserData(int id) {
         //TODO: different shit here
         //SQLiteDatabase db = this.getReadableDatabase();
         Cursor res =  localDB.rawQuery( "select * from USER where _id="+id+"", null );
@@ -83,4 +89,10 @@ public class LocalDB {
         Cursor res =  localDB.rawQuery( "select type from USER where type LIKE '%type%'", null );
         return res;
     }
+    public Cursor getAllLocalData(){
+        Cursor result = localDB.rawQuery("select * from LOCAL_DATA",null);
+        return result;
+    }
+
+    //TODO: function to nuke database
 }
