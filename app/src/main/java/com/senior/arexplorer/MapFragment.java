@@ -22,13 +22,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.Backend;
-import com.senior.arexplorer.Utils.Places.GooglePoI;
-import com.senior.arexplorer.Utils.Places.GooglePoIFetcher;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.Places.HereListener;
@@ -42,9 +41,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     private GoogleMap googleMap;
     private MapView mapView;
-    private Backend backend;
     private float zoom = 18;
-    private float tilt = 30;
+    private float tilt = 60;
 
     @Nullable
     @Override
@@ -73,8 +71,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         if (here == null) {
             Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        this.backend = Backend.getInstance();
-        this.backend.addHandler(this);
+        Backend.getInstance().addHandler(this);
+
+        CompassAssistant.getInstance().addCompassListener(this);
 
         mapView.onStart();
         super.onStart();
@@ -115,7 +114,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Location location = null;
         googleMap = gMap;
         googleMap.setBuildingsEnabled(true);
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
+
         while ((location = Here.getInstance().getLocation()) == null) {
             try {
                 Log.d("map fragment", "location is null. sleeping");
@@ -124,7 +127,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
                 Log.e("map fragment", "sleep was interrupted. i blame you");
             }
         }
-        moveToLocation(location);
+
+        CameraPosition newPosition = new CameraPosition(new LatLng(location.getLatitude(), location.getLongitude()), zoom, tilt, 0);
+        this.googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
     }
 
     private void moveToLocation(Location location) {
@@ -165,7 +170,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void placeFetchComplete() {
-        Collection<PoI> googlePoIs = backend.getPoIs();
+        Collection<PoI> googlePoIs = Backend.getInstance().getPoIs();
         Location here = Here.getInstance().getLocation();
 
         Log.d("mapFragment","entered callback from place fetcher");
@@ -183,7 +188,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onCompassChanged(float userHeading) {
-
+        if(googleMap != null) {
+            CameraPosition currentPosition = googleMap.getCameraPosition();
+            CameraPosition newPosition = new CameraPosition(currentPosition.target, currentPosition.zoom, currentPosition.tilt, userHeading);
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
+        }
     }
 
     @Override

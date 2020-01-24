@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
+class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 

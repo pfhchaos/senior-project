@@ -26,8 +26,14 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         super();
 
         this.sources = new ArrayList<PoIFetcher>();
-        this.sources.add(GooglePoIFetcher.getInstance());
-        this.sources.add(LocalPoIFetcher.getInstance());
+
+        PoIFetcher googlePoIFetcher = GooglePoIFetcher.getInstance();
+        this.sources.add(googlePoIFetcher);
+        googlePoIFetcher.addHandler(this);
+
+        PoIFetcher localPoIFetcher = LocalPoIFetcher.getInstance();
+        this.sources.add(localPoIFetcher);
+        localPoIFetcher.addHandler(this);
 
         Here.getInstance().addListener(this);
     }
@@ -41,6 +47,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
     }
 
     void fetchData() {
+        Log.v("Backend","fetching data from sources");
         this.lastFetched = Here.getInstance().getLocation();
         for (PoIFetcher source: sources) {
             source.fetchData();
@@ -64,6 +71,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.v("Backend", "location changed");
         if (this.lastFetched == null || location.distanceTo(this.lastFetched) > 100) {
             this.fetchData();
         }
@@ -71,15 +79,20 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     @Override
     public void placeFetchComplete() {
+        Log.v("Backend","place fetch complete");
         boolean ready = true;
         for (PoIFetcher source : sources) {
             ready &= source.isReady();
         }
 
         if (ready) {
+            Log.v("Backend","all sources ready");
             for (PoIFetcherHandler handler : this.poIFetcherHandlers) {
                 handler.placeFetchComplete();
             }
+        }
+        else {
+            Log.v("Backend","sources not ready");
         }
     }
 }
