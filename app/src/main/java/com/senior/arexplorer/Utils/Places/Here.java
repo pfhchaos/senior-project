@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -125,7 +127,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     @Override
     public void onResponse(String response) {
-        Log.d("Here", "Response recieved from Google Elevation API\n" + response);
+        Log.d("Here", "Response recieved from Google Elevation API");
         Log.v("Here", response);
 
         JSONObject elevationResp = null;
@@ -140,5 +142,15 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             ex.printStackTrace();
             return;
         }
+    }
+
+
+    @NonNull
+    @Override
+    public String toString() {
+        String result = "Here: "+super.toString()+"\n";
+        result += "currentLocation null?\t\t"+(currentLocation==null);
+        result += "\n# of callbacks listening:\t\t"+callbacks.size()+"\n";
+        return result;
     }
 }

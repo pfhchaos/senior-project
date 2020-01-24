@@ -28,7 +28,7 @@ public class DataBaseFragment extends Fragment implements IFragSettings {
 
         LocalDB.getInstance().insertUsers("m1","lastname","kasem@gmail.com", "secret");
         TextView name = (TextView)view.findViewById(R.id.TextViewName);
-        Cursor cursor = LocalDB.getInstance().getData(2);
+        Cursor cursor = LocalDB.getInstance().getUserData(2);
         if(cursor.moveToFirst()) {
             String st = cursor.getString(2);
 

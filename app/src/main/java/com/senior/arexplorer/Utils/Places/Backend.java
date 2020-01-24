@@ -1,12 +1,14 @@
 package com.senior.arexplorer.Utils.Places;
 
+import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Backend {
+public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandler{
     private static Backend instance = null;
+    private Location lastFetched = null;
 
     private Collection<PoIFetcher> sources;
 
@@ -21,9 +23,19 @@ public class Backend {
     }
 
     private Backend() {
+        super();
+
         this.sources = new ArrayList<PoIFetcher>();
 
-        this.sources.add(GooglePoIFetcher.getInstance());
+        PoIFetcher googlePoIFetcher = GooglePoIFetcher.getInstance();
+        this.sources.add(googlePoIFetcher);
+        googlePoIFetcher.addHandler(this);
+
+        PoIFetcher localPoIFetcher = LocalPoIFetcher.getInstance();
+        this.sources.add(localPoIFetcher);
+        localPoIFetcher.addHandler(this);
+
+        Here.getInstance().addListener(this);
     }
 
     public Collection<PoI> getPoIs() {
@@ -34,22 +46,11 @@ public class Backend {
         return ret;
     }
 
-    public void fetchData() {
-        //TODO: is this nessicarry?
+    void fetchData() {
+        Log.v("Backend","fetching data from sources");
+        this.lastFetched = Here.getInstance().getLocation();
         for (PoIFetcher source: sources) {
             source.fetchData();
-        }
-    }
-
-    public void addHandler(PoIFetcherHandler handler) {
-        for (PoIFetcher source : sources) {
-            source.addHandler(handler);
-        }
-    }
-
-    public void removeHandler(PoIFetcherHandler handler) {
-        for (PoIFetcher source: sources) {
-            source.removeHandler(handler);
         }
     }
 
@@ -66,5 +67,32 @@ public class Backend {
             ret &= source.isReady();
         }
         return ret;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.v("Backend", "location changed");
+        if (this.lastFetched == null || location.distanceTo(this.lastFetched) > 100) {
+            this.fetchData();
+        }
+    }
+
+    @Override
+    public void placeFetchComplete() {
+        Log.v("Backend","place fetch complete");
+        boolean ready = true;
+        for (PoIFetcher source : sources) {
+            ready &= source.isReady();
+        }
+
+        if (ready) {
+            Log.v("Backend","all sources ready");
+            for (PoIFetcherHandler handler : this.poIFetcherHandlers) {
+                handler.placeFetchComplete();
+            }
+        }
+        else {
+            Log.v("Backend","sources not ready");
+        }
     }
 }

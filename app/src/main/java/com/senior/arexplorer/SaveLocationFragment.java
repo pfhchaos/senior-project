@@ -29,6 +29,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Places.Here;
 
 import java.io.File;
@@ -48,6 +49,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
     private Button takePicButton, saveButton;
     private ImageView pictureImageView;
     private Bitmap dbBM;
+    private Here here;
 
     private String curPhotoPath;
 
@@ -189,7 +191,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_save, container, false);
-
+        here = Here.getInstance();
         nameInputTextView = inflate.findViewById(R.id.nameInput);
         descInputTextView = inflate.findViewById(R.id.saveDescription);
         privateSwitch = inflate.findViewById(R.id.privateSwitch);
@@ -220,14 +222,14 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         String userID,locName,locDesc,fileName;
         double locLatitude,locLongitude,locElevation;
         Boolean priv;
-
+        LocalDB LDB = LocalDB.getInstance();
         userID = "test1";       //TODO
 
-        locLatitude = Here.getInstance().getLatitude();
-        locLongitude = Here.getInstance().getLongitude();
-        locElevation = Here.getInstance().getElevation();
+        Log.i("save here:",here.toString());
 
-        fileName = "save_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        locLatitude = here.getLatitude();
+        locLongitude = here.getLongitude();
+        locElevation = here.getElevation();
 
         locName = nameInputTextView.getText().toString();
         locDesc = descInputTextView.getText().toString();
@@ -236,16 +238,15 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         saveObj s = new saveObj(userID,locName,locDesc,locLatitude,locLongitude,locElevation,priv);
         if(dbBM != null) s.setBLOB(dbBM);
 
-        try {
-            FileOutputStream fos = getContext().openFileOutput(fileName, Context.MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(s);
-            Log.i("savePath",getContext().getFileStreamPath(fileName).getAbsolutePath());
-            oos.close();
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("file error","got into file i/o catch");
+
+        //if its private save to localDB, otherwise save to public DB
+
+        if(priv) {
+            LDB.insertLocalData(s);
+            Log.i("save was private","insert into local DB");
+        }
+        else{
+            //TODO save to public DB
         }
 
         switchFrag();

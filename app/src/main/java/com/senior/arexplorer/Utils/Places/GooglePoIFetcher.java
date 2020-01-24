@@ -15,12 +15,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
+class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 
     private String lastRequest;
-    private long lastUpdated;
     private boolean isReady;
 
     private static PoIFetcher instance;
@@ -43,6 +42,7 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
         Location here = Here.getInstance().getLocation();
         if (here == null) {
             Log.e("GooglePoIFetcher","here is null. this should not happen");
+            return; //will try again, don't make null references
         }
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radius);
         StringRequest stringRequest = new StringRequest(request, this, this);
@@ -51,15 +51,6 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
         WebRequester.getInstance().getRequestQueue().add(stringRequest);
     }
 
-    @Override
-    public void addHandler(PoIFetcherHandler handler) {
-        this.poIFetcherHandlers.add(handler);
-    }
-
-    @Override
-    public void removeHandler(PoIFetcherHandler handler) {
-        this.poIFetcherHandlers.remove(handler);
-    }
 
     @Override
     public Collection<PoI> getPoIs() {
@@ -102,7 +93,6 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
             }
             else {
                 for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
-                    this.lastUpdated = System.currentTimeMillis();
                     handler.placeFetchComplete();
                 }
             }

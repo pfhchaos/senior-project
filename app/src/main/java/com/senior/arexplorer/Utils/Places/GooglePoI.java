@@ -57,7 +57,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
     @Override
     public void onResponse(String response) {
-        Log.d("Here", "Response recieved from Google Elevation API\n" + response);
+        Log.d("Here", "Response recieved from Google Elevation API");
         Log.v("Here", response);
 
         JSONObject elevationResp = null;
