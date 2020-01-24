@@ -6,9 +6,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Backend implements HereListener{
+public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandler{
     private static Backend instance = null;
-    private Location lastFetched;
+    private Location lastFetched = null;
 
     private Collection<PoIFetcher> sources;
 
@@ -23,9 +23,12 @@ public class Backend implements HereListener{
     }
 
     private Backend() {
-        this.sources = new ArrayList<PoIFetcher>();
+        super();
 
+        this.sources = new ArrayList<PoIFetcher>();
         this.sources.add(GooglePoIFetcher.getInstance());
+
+        Here.getInstance().addListener(this);
     }
 
     public Collection<PoI> getPoIs() {
@@ -36,22 +39,10 @@ public class Backend implements HereListener{
         return ret;
     }
 
-    private void fetchData() {
+    void fetchData() {
         this.lastFetched = Here.getInstance().getLocation();
         for (PoIFetcher source: sources) {
             source.fetchData();
-        }
-    }
-
-    public void addHandler(PoIFetcherHandler handler) {
-        for (PoIFetcher source : sources) {
-            source.addHandler(handler);
-        }
-    }
-
-    public void removeHandler(PoIFetcherHandler handler) {
-        for (PoIFetcher source: sources) {
-            source.removeHandler(handler);
         }
     }
 
@@ -74,6 +65,20 @@ public class Backend implements HereListener{
     public void onLocationChanged(Location location) {
         if (this.lastFetched == null || location.distanceTo(this.lastFetched) > 100) {
             this.fetchData();
+        }
+    }
+
+    @Override
+    public void placeFetchComplete() {
+        boolean ready = true;
+        for (PoIFetcher source : sources) {
+            ready &= source.isReady();
+        }
+
+        if (ready) {
+            for (PoIFetcherHandler handler : this.poIFetcherHandlers) {
+                handler.placeFetchComplete();
+            }
         }
     }
 }
