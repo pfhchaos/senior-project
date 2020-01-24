@@ -113,7 +113,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Location location = null;
         googleMap = gMap;
         googleMap.setBuildingsEnabled(true);
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(false);
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
+
         while ((location = Here.getInstance().getLocation()) == null) {
             try {
                 Log.d("map fragment", "location is null. sleeping");
