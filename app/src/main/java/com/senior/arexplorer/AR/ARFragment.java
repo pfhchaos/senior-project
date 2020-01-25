@@ -139,14 +139,14 @@ public class ARFragment extends Fragment implements IFragSettings {
           return title;
         };
 
-        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + mOverlay.getFoV() + " degrees")
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 popDialog.setCustomTitle(getTitle.apply("Please Select a Compass Field of View"));
 
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(FOV_MIN, FOV_MAX)
-                        .setProgress(fov - FOV_MIN)
+                        .setProgress(mOverlay.getFoV() - FOV_MIN)
                         .setText("Current Field of View : " + fov)
                         .setListener((progress) -> {
                                 fov = progress + FOV_MIN;
@@ -154,7 +154,7 @@ public class ARFragment extends Fragment implements IFragSettings {
                         });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
-                    i.setTitle("Compass Field of View : " + fov + " degrees");
+                    i.setTitle("Compass Field of View : " + mOverlay.getFoV() + " degrees");
                     mOverlay.setFoV(fov);
                     dialog.dismiss();
                 });

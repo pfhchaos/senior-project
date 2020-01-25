@@ -173,6 +173,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     void setFoV(int newFoV){
         fov = newFoV;
     }
+    int getFoV() { return fov; }
 
     void setDD(int newDrawDistance){
         drawDistance = newDrawDistance;

@@ -107,8 +107,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         else
             return getName();
     }
-
-    @NonNull
+    
     @Override
     public String toString() {
         String ret = "";
