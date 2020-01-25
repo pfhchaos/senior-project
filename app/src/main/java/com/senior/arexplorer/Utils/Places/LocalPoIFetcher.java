@@ -17,7 +17,6 @@ public class LocalPoIFetcher extends PoIFetcher {
     private Here here;
     private LocalDB LDB;
     private static LocalPoIFetcher LPF;
-    private long lastUpdated;
     private boolean isReady = false;
 
     public static LocalPoIFetcher getInstance(){
@@ -72,7 +71,6 @@ public class LocalPoIFetcher extends PoIFetcher {
             poIs.add(new LocalPoI(s));
         }
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
-            this.lastUpdated = System.currentTimeMillis();
             handler.placeFetchComplete();
         }
         isReady = true;

@@ -19,13 +19,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name" />
+        android:hint="Name"
+        android:inputType="textPersonName" />
 
     <Switch
         android:id="@+id/privateSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:checked="true"
         android:ellipsize="none"
         android:scrollbarSize="4dp"
         android:text="Private"
@@ -38,8 +39,8 @@
         android:autoText="true"
         android:ems="10"
         android:gravity="start|top"
-        android:inputType="textMultiLine"
-        android:text="Short description." />
+        android:hint="Short description of location."
+        android:inputType="textMultiLine" />
 
     <LinearLayout
         android:layout_width="match_parent"

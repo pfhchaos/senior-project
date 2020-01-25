@@ -1,6 +1,8 @@
 package com.senior.arexplorer;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -270,7 +272,31 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
     @Override
     public void loadSettings(Menu menu, DrawerLayout drawer) {
+        menu.removeGroup(R.id.settings);
 
+        menu.add(R.id.settings,Menu.NONE,Menu.NONE,"Clear all private locations").setOnMenuItemClickListener((i)->{
+            DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //yes, clear all localDB PoI's
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //no, do not clear, do nothing
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("Are you sure you wish to permanently (yes, forever) delete all of your custom save locations?")
+                    .setPositiveButton("Yes",dcl)
+                    .setNegativeButton("No",dcl)
+                    .show();
+
+            return false;
+        });
     }
 
 }
