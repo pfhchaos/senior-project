@@ -212,7 +212,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         PoI closest = null;
         TreeSet<PoI> touched = new TreeSet<>();
         for (PoI poi : nearby) {
-            if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY())) {
+            if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY()) && poi.compassRender) {
                 touched.add(poi);
                 if(touched.first() == poi)
                     closest = poi;
@@ -229,8 +229,13 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 if (closest != null && closest == lastTouchedLocation) {
                     if (System.currentTimeMillis() - lastTouchTime <= 1000)
                         handled = closest.onShortTouch(getContext());
-                    else
-                        handled = closest.onLongTouch(getContext());
+                    else{
+                        if(touched.size() == 1)
+                            handled = closest.onLongTouch(getContext());
+                        else{
+
+                        }
+                    }
 
                     //Log.d("CamOver", "Bearing to " + curLoc.bearingTo(lastTouchedLocation.getLocation()));
                 }

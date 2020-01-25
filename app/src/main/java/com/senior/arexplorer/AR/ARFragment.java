@@ -49,7 +49,6 @@ public class ARFragment extends Fragment implements IFragSettings {
         mOverlay = new CameraOverlay(view.getContext());
         FrameLayout overlay = view.findViewById(R.id.overlay_view);
         overlay.addView(mOverlay);
-        mOverlay.toggleTimer();
 
 
         Here.getInstance().addListener(mOverlay);
