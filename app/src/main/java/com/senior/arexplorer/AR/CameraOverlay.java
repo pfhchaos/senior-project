@@ -9,17 +9,16 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
-import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.Places.Backend;
-import com.senior.arexplorer.Utils.Places.Here;
-import com.senior.arexplorer.Utils.Places.HereListener;
-import com.senior.arexplorer.Utils.Places.PoI;
+import com.senior.arexplorer.Utils.PoI.Backend;
+import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.PoI.HereListener;
+import com.senior.arexplorer.Utils.PoI.PoI;
 
 import java.util.TreeSet;
 

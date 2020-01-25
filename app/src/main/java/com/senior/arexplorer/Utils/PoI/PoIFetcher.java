@@ -1,6 +1,4 @@
-package com.senior.arexplorer.Utils.Places;
-
-import android.app.Activity;
+package com.senior.arexplorer.Utils.PoI;
 
 import java.util.ArrayList;
 import java.util.Collection;

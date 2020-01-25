@@ -1,8 +1,7 @@
-package com.senior.arexplorer.Utils.Places;
+package com.senior.arexplorer.Utils.PoI;
 
 
 import android.database.Cursor;
-import android.location.Location;
 import android.util.Log;
 
 import com.senior.arexplorer.AR.saveObj;
@@ -11,8 +10,6 @@ import com.senior.arexplorer.Utils.LocalDB.LocalDBListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
 
 public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
 

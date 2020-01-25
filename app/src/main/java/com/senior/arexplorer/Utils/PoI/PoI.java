@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Places;
+package com.senior.arexplorer.Utils.PoI;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import androidx.annotation.NonNull;
 
 public abstract class PoI implements Serializable, Comparable<PoI> {
 
