@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -38,7 +37,7 @@ import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
 import java.util.Collection;
 
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
@@ -134,6 +133,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         changeHeading(CompassAssistant.getInstance().getLastHeading());
 
         this.googleMap.setOnMarkerClickListener(this);
+        this.googleMap.setOnMarkerDragListener(this);
     }
 
     private void placeMarkers() {
@@ -163,6 +163,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         newMarkerOptions.title(poi.getName());
         Marker newMarker = this.googleMap.addMarker(newMarkerOptions);
         newMarker.setTag(poi);
+        newMarker.setDraggable(true);
     }
 
     @Override
@@ -224,6 +225,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public boolean onMarkerClick(Marker marker) {
         return ((PoI) marker.getTag()).onShortTouch(getContext());
+
+    }
+
+    @Override
+    public void onMarkerDragStart(Marker marker) {
+        PoI poi = ((PoI) marker.getTag());
+        marker.remove();
+        poi.onLongTouch(getContext());
+        createMarker(poi);
+        return;
+    }
+
+    @Override
+    public void onMarkerDrag(Marker marker) {
+
+    }
+
+    @Override
+    public void onMarkerDragEnd(Marker marker) {
 
     }
 }
