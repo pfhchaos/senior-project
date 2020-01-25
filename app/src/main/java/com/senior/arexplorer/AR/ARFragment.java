@@ -128,7 +128,7 @@ public class ARFragment extends Fragment implements IFragSettings {
         camView.setTransform(mx);
     }
 
-    public void loadSettings(Menu menu, DrawerLayout drawer){
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer){
         menu.removeGroup(R.id.settings);
         Function<String, TextView> getTitle = (i) -> {
           TextView title = new TextView(drawer.getContext());

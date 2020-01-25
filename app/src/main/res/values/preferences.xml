@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Pref_AR_Compass_FOV">Pref_AR_Compass_FOV</string>
+    <string name="Pref_AR_Compass_Draw_Distance">Pref_AR_Compass_Draw_Distance</string>
+</resources>
