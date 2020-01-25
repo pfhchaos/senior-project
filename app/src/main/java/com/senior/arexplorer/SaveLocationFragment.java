@@ -279,6 +279,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
                     switch (which){
                         case DialogInterface.BUTTON_POSITIVE:
                             //yes, clear all localDB PoI's
+                            LocalDB.getInstance().deleteAllCustomLoc();
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             //no, do not clear, do nothing

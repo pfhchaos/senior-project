@@ -81,6 +81,13 @@ public class LocalDB {
         notifyListeners();
     }
 
+    private void nuke(){
+        if(localDB != null) localDB.delete("LOCAL_DATA",null,null);
+    }
+    public void deleteAllCustomLoc(){
+        nuke();
+    }
+
     public void insertLocalData(saveObj s){
         this.insertLocalData(s.getLocationName(),s.getLocationDesc(),s.getLocationLatitude()+"",s.getLocationLongitude()+"",s.getLocationElevation()+"",-1);
         long count = DatabaseUtils.queryNumEntries(localDB,"LOCAL_DATA");
