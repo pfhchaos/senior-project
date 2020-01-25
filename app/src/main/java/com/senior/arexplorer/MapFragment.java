@@ -167,7 +167,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     }
 
     @Override
-    public void loadSettings(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer) {
         menu.removeGroup(R.id.settings);
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Save Location")

@@ -1,6 +1,7 @@
 package com.senior.arexplorer.AR;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -72,6 +73,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        fov  = new Integer(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -168,6 +172,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     void setFoV(int newFoV){
         fov = newFoV;
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Pref_AR_Compass_FOV","" + fov);
+        editor.commit();
     }
 
     void setDD(int newDrawDistance){

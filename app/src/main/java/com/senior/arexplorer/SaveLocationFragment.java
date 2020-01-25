@@ -266,7 +266,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
 
     @Override
-    public void loadSettings(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer) {
 
     }
 
