@@ -20,10 +20,7 @@ import com.senior.arexplorer.Utils.Places.Backend;
 import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.Places.HereListener;
 import com.senior.arexplorer.Utils.Places.PoI;
-import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
@@ -49,10 +46,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     public CameraOverlay(Context context){
         super(context);
-        init();
-    }
-
-    public void init(){
 
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
@@ -71,7 +64,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
         else
             curLoc = new Location("dummyProvider") {{
-                //ewu fountain
                 setLatitude(0);
                 setLongitude(-0);
             }};
@@ -81,31 +73,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
-//        nearby.add(new PoI(){{
-//            //ewu fountain
-//            setName("Fountain");
-//            setLatitude(47.49133725545527);
-//            setLongitude(-117.58288800716402);
-//        }});
-//        nearby.add(new PoI(){{
-//            //pub
-//            setName("PUB");
-//            setLatitude(47.49218543922342);
-//            setLongitude(-117.5838589668274);
-//        }});
-//        nearby.add(new PoI(){{
-//            //CSE
-//            setName("CSE");
-//            setLatitude(47.4899634586667);
-//            setLongitude(-117.58538246154787);
-//        }});
-//        nearby.add(new PoI(){{
-//            //google HQish
-//            setName("GooglePlex");
-//            setLatitude(37.4225);
-//            setLongitude(-122.0845);
-//        }});
-
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -116,11 +83,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         vectorDrawable.draw(canvas);
         return bitmap;
     }
-
-    public void toggleTimer(){
-        isRunning = !isRunning;
-    }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -153,7 +115,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 calcNearbyRect(poi);
                 if(poi.compassRender)
                     canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
-                //Log.d("rect", "Rect location is " + rect);
             }
         }
     }
@@ -164,8 +125,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         int offset = (int) (fov/2 * scale);
         int mid = width / 2 +  (int) (heading * scale);
 
-        //Log.d("CamOver", "Width : " + width + " Height : " + height);
-
         curCompass.set(mid - offset,0,mid + offset, height);
 
         canvas.drawBitmap(compass, curCompass, rect, null);
@@ -173,16 +132,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     private void calcNearbyRect(PoI poi){
         //brings us from [-180,180] to [0,360], its easier to deal with
-//        Function<Float, Double> convert360 = i -> (double)((i + 360) % 360);
-//        Location destLoc = poi.getLocation();
-//        double headingTo = convert360.apply(curLoc.bearingTo(destLoc));
-//        double relativeHeading = (headingTo - convert360.apply((heading))) % 360;
         Function<Float, Float> mod360 = i -> {
             float result = i % 360;
             return result < 0 ? result + 360 : result;};
         Location destLoc = poi.getLocation();
-        float headingTo = curLoc.bearingTo(destLoc);
-        float relativeHeading = headingTo - heading;
+        float relativeHeading = curLoc.bearingTo(destLoc) - heading;
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = mod360.apply(relativeHeading + 180) - 180;
 
