@@ -3,6 +3,9 @@ package com.senior.arexplorer.Utils.PoI;
 import android.content.Context;
 import android.graphics.Rect;
 import android.location.Location;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -132,10 +135,20 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     }
 
     public boolean onLongTouch(Context context){
-        Toast.makeText(context, "Long touch detected but not yet implemented for this item!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "Long touch detected but not yet implemented for this item!", Toast.LENGTH_SHORT).show();
 
         return true;
     }
+
+    private View getDetailsView(Context context){
+        TextView retView = new TextView(context);
+        retView.setPadding(10,5,10,5);
+        retView.setGravity(Gravity.END);
+        retView.setText(toShortString());
+        retView.setTextSize(18);
+        return retView;
+    }
+
 
     @Override
     public int compareTo(PoI place) {
