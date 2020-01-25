@@ -1,6 +1,7 @@
 package com.senior.arexplorer.AR;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -139,7 +140,10 @@ public class ARFragment extends Fragment implements IFragSettings {
           return title;
         };
 
-        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + mOverlay.getFoV() + " degrees")
+        //todo : This is where we need to find a way to get the FoV preference
+        //fov = Integer.valueOf(drawer.getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).getString("Pref_AR_Compass_FOV", "180"));
+
+        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 popDialog.setCustomTitle(getTitle.apply("Please Select a Compass Field of View"));
