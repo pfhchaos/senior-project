@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Places;
+package com.senior.arexplorer.Utils.PoI;
 import com.senior.arexplorer.AR.saveObj;
 
 

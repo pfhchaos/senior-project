@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Places;
+package com.senior.arexplorer.Utils.PoI;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import androidx.annotation.NonNull;
 
 public abstract class PoI implements Serializable, Comparable<PoI> {
 
@@ -113,18 +112,18 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
 
     public boolean onShortTouch(Context context){
         String toastText;
-        if(Here.getInstance().isReady())
-            toastText = "Cannot get current location\nSo cannot display distance to " + getName();
+        if(!(Here.getInstance().isReady()))
+            toastText = "Cannot get current location\nAs such cannot display distance to " + getName();
         else{
             float dist = Here.getInstance().getLocation().distanceTo(getLocation());
             toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
         }
-        Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
         return true;
     }
 
     public boolean onLongTouch(Context context){
-        Toast.makeText(context, "Long touch detected!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Long touch detected but not yet implemented for this item!", Toast.LENGTH_SHORT).show();
 
         return true;
     }
