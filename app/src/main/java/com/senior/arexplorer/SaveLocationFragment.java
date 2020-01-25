@@ -269,7 +269,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
 
     @Override
-    public void loadSettingsUI(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
 
         menu.add(R.id.settings,Menu.NONE,Menu.NONE,"Clear all private locations").setOnMenuItemClickListener((i)->{
