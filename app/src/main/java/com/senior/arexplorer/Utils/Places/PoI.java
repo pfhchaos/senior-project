@@ -100,6 +100,17 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
 
     public Rect getCompassRect(){ return compassRect; }
 
+    public String toShortString() {
+        if(Here.getInstance().isReady()){
+            float dist = Here.getInstance().getLocation().distanceTo(getLocation());
+            return getName() + " : " + new DecimalFormat("#.00").format(dist) + " m";
+        }
+        else
+            return getName();
+    }
+
+    @NonNull
+    @Override
     public String toString() {
         String ret = "";
         ret += "name: " + this.name + "\n";
@@ -116,8 +127,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         if(!(Here.getInstance().isReady()))
             toastText = "Cannot get current location\nAs such cannot display distance to " + getName();
         else{
-            float dist = Here.getInstance().getLocation().distanceTo(getLocation());
-            toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
+            toastText = toShortString();
         }
         Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
         return true;
