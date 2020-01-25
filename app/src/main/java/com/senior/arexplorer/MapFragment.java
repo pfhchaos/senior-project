@@ -1,6 +1,7 @@
 package com.senior.arexplorer;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
@@ -167,7 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     }
 
     @Override
-    public void loadSettingsUI(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Save Location")

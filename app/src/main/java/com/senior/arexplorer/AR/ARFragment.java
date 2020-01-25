@@ -129,7 +129,7 @@ public class ARFragment extends Fragment implements IFragSettings {
         camView.setTransform(mx);
     }
 
-    public void loadSettingsUI(Menu menu, DrawerLayout drawer){
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context){
         menu.removeGroup(R.id.settings);
         Function<String, TextView> getTitle = (i) -> {
           TextView title = new TextView(drawer.getContext());
@@ -141,7 +141,7 @@ public class ARFragment extends Fragment implements IFragSettings {
         };
 
         //todo : This is where we need to find a way to get the FoV preference
-        //fov = Integer.valueOf(drawer.getContext().getSharedPreferences("settings", Context.MODE_PRIVATE).getString("Pref_AR_Compass_FOV", "180"));
+        fov = Integer.valueOf(context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("Pref_AR_Compass_FOV", "180"));
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
             .setOnMenuItemClickListener((i) -> {
