@@ -112,8 +112,13 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     }
 
     public boolean onShortTouch(Context context){
-        float dist = Here.getInstance().getLocation().distanceTo(getLocation());
-        String toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
+        String toastText;
+        if(Here.getInstance().isReady())
+            toastText = "Cannot get current location\nSo cannot display distance to " + getName();
+        else{
+            float dist = Here.getInstance().getLocation().distanceTo(getLocation());
+            toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
+        }
         Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
         return true;
     }

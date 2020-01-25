@@ -17,6 +17,7 @@ import android.view.View;
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Places.Backend;
+import com.senior.arexplorer.Utils.Places.Here;
 import com.senior.arexplorer.Utils.Places.HereListener;
 import com.senior.arexplorer.Utils.Places.PoI;
 import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
@@ -65,11 +66,15 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         scale = (float) compass.getWidth() / 720;
 
-        curLoc = new Location("dummyProvider") {{
-            //ewu fountain
-            setLatitude(47.49133725545527);
-            setLongitude(-117.58288800716402);
-        }};
+        if(Here.getInstance().isReady()) {
+            curLoc = Here.getInstance().getLocation();
+        }
+        else
+            curLoc = new Location("dummyProvider") {{
+                //ewu fountain
+                setLatitude(0);
+                setLongitude(-0);
+            }};
 
         nearby = new TreeSet<>();
 
@@ -135,6 +140,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
             p.setColor(Color.parseColor("black"));
             p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(10);
             canvas.drawText("CURRENT LOCATION CANNOT BE RETRIEVED!", 5000, 5000, p);
 
             p.setColor(Color.parseColor("red"));
