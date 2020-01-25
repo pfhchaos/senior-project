@@ -9,10 +9,15 @@ import android.util.Log;
 
 import com.senior.arexplorer.AR.saveObj;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class LocalDB {
  private static SQLiteDatabase localDB = null;
  private static Context applicationContext = null;
  private static LocalDB instance = null;
+
+ private Collection<LocalDBListener> callbacks;
 
  public static void init(Context context) {
      Log.d("LocalDB", "LocalDB is initialized.");
@@ -46,6 +51,7 @@ public class LocalDB {
         if (localDB == null) {
             Log.e("LocalDB", "failed to get writable database");
         }
+        this.callbacks = new ArrayList<LocalDBListener>();
     }
 
     public void insertUsers( String fName, String lName, String email, String password){
@@ -72,12 +78,21 @@ public class LocalDB {
         values.put("image_resource_id",image_resource_id);
 
         localDB.insert("LOCAL_DATA",null, values);
+        notifyListeners();
+    }
+
+    private void nuke(){
+        if(localDB != null) localDB.delete("LOCAL_DATA",null,null);
+    }
+    public void deleteAllCustomLoc(){
+        nuke();
     }
 
     public void insertLocalData(saveObj s){
         this.insertLocalData(s.getLocationName(),s.getLocationDesc(),s.getLocationLatitude()+"",s.getLocationLongitude()+"",s.getLocationElevation()+"",-1);
         long count = DatabaseUtils.queryNumEntries(localDB,"LOCAL_DATA");
         Log.i("local db","number of rows:\t\t"+count);
+        notifyListeners();
     }
 
     public Cursor getUserData(int id) {
@@ -97,5 +112,17 @@ public class LocalDB {
         return result;
     }
 
+    private void notifyListeners() {
+        for (LocalDBListener listener : this.callbacks) {
+            listener.onUpdate();
+        }
+    }
+    public void addListener(LocalDBListener listener) {
+        this.callbacks.add(listener);
+    }
+
+    public void removeListener(LocalDBListener listener) {
+        this.callbacks.remove(listener);
+    }
     //TODO: function to nuke database
 }

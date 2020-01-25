@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,8 +33,8 @@ import com.senior.arexplorer.AR.ARFragment;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
-import com.senior.arexplorer.Utils.Places.Backend;
-import com.senior.arexplorer.Utils.Places.Here;
+import com.senior.arexplorer.Utils.PoI.Backend;
+import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.WebRequester;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {

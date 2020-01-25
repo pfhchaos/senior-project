@@ -17,7 +17,7 @@ import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.SeekBarWithText;
-import com.senior.arexplorer.Utils.Places.Here;
+import com.senior.arexplorer.Utils.PoI.Here;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

@@ -1,8 +1,7 @@
-package com.senior.arexplorer.Utils.Places;
+package com.senior.arexplorer.Utils.PoI;
 
 import android.util.Log;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;

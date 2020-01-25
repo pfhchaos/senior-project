@@ -1,23 +1,21 @@
-package com.senior.arexplorer.Utils.Places;
+package com.senior.arexplorer.Utils.PoI;
 
 
-import android.app.Activity;
 import android.database.Cursor;
-import android.location.Location;
 import android.util.Log;
 
 import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.LocalDB.LocalDBListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LocalPoIFetcher extends PoIFetcher {
+public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
 
     private Here here;
     private LocalDB LDB;
     private static LocalPoIFetcher LPF;
-    private long lastUpdated;
     private boolean isReady = false;
 
     public static LocalPoIFetcher getInstance(){
@@ -30,6 +28,8 @@ public class LocalPoIFetcher extends PoIFetcher {
         this.LDB = LocalDB.getInstance();
         this.poIFetcherHandlers = new ArrayList<>();
         this.poIs = new ArrayList<>();
+
+        LocalDB.getInstance().addListener(this);
     }
 
     @Override
@@ -72,7 +72,6 @@ public class LocalPoIFetcher extends PoIFetcher {
             poIs.add(new LocalPoI(s));
         }
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
-            this.lastUpdated = System.currentTimeMillis();
             handler.placeFetchComplete();
         }
         isReady = true;
@@ -85,5 +84,10 @@ public class LocalPoIFetcher extends PoIFetcher {
     @Override
     public boolean isReady() {
         return isReady;
+    }
+
+    @Override
+    public void onUpdate() {
+        this.fetchData();
     }
 }

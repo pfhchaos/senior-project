@@ -27,12 +27,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.Places.Backend;
-import com.senior.arexplorer.Utils.Places.Here;
+import com.senior.arexplorer.Utils.PoI.Backend;
+import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.Places.HereListener;
-import com.senior.arexplorer.Utils.Places.PoI;
-import com.senior.arexplorer.Utils.Places.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.PoI.HereListener;
+import com.senior.arexplorer.Utils.PoI.PoI;
+import com.senior.arexplorer.Utils.PoI.PoIFetcherHandler;
 
 import java.util.Collection;
 
