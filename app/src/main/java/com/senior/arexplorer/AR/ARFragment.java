@@ -2,6 +2,7 @@ package com.senior.arexplorer.AR;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -36,7 +37,7 @@ public class ARFragment extends Fragment implements IFragSettings {
     private TextureView camView;
     private final int FOV_MIN = 45, FOV_MAX = 360; //in degrees
     private final int DD_MIN = 100, DD_MAX = 10000; //in meters
-    private int fov = 180, drawDistance = 1000;
+    private int drawDistance = 1000;
 
 
     @Nullable
@@ -140,8 +141,8 @@ public class ARFragment extends Fragment implements IFragSettings {
           return title;
         };
 
-        //todo : This is where we need to find a way to get the FoV preference
-        fov = Integer.valueOf(context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("Pref_AR_Compass_FOV", "180"));
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        int fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
             .setOnMenuItemClickListener((i) -> {
@@ -151,15 +152,14 @@ public class ARFragment extends Fragment implements IFragSettings {
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(FOV_MIN, FOV_MAX)
                         .setProgress(mOverlay.getFoV() - FOV_MIN)
-                        .setText("Current Field of View : " + fov)
+                        .setText("Current Field of View : " + mOverlay.getFoV())
                         .setListener((progress) -> {
-                                fov = progress + FOV_MIN;
-                                popView.setText("Current Field of View : " + fov);
+                                mOverlay.setFoV(progress + FOV_MIN);
+                                popView.setText("Current Field of View : " + mOverlay.getFoV());
                         });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
                     i.setTitle("Compass Field of View : " + mOverlay.getFoV() + " degrees");
-                    mOverlay.setFoV(fov);
                     dialog.dismiss();
                 });
 

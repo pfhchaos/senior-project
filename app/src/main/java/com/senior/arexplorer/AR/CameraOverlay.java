@@ -80,7 +80,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             nearby.addAll(Backend.getInstance().getPoIs());
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        fov  = new Integer(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
+        fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -148,11 +148,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = mod360.apply(relativeHeading + 180) - 180;
 
-        Log.d("CamOver",
-                poi.getName() +
-                        "\nBearing : " + curLoc.bearingTo(destLoc) +
-                        "\nHeading : " + heading +
-                        "\nRelativeHeading : " + relativeHeading);
+//        Log.d("CamOver",
+//                poi.getName() +
+//                        "\nBearing : " + curLoc.bearingTo(destLoc) +
+//                        "\nHeading : " + heading +
+//                        "\nRelativeHeading : " + relativeHeading);
 
 
         double dist = curLoc.distanceTo(destLoc);
