@@ -30,7 +30,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     private boolean isReady;
 
     private Here() {
-        Log.d("location manager", "here is instantiated.");
+        Log.v("location manager", "here is instantiated.");
         this.callbacks = new ArrayList<HereListener>();
         this.isReady = false;
     }
@@ -105,16 +105,6 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
                 listener.onLocationChanged(this.currentLocation);
             }
 
-            /*
-            if (location.hasAltitude()) {
-                Log.d("Here", "currentLocation has altitude of " + location.getAltitude());
-            }
-            else {
-                Log.d("Here", "currentLocation does not have an altitude");
-            }
-            */
-
-            //TODO: google elevation API call
             String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
             StringRequest stringRequest = new StringRequest(request, this, this);
             WebRequester.getInstance().getRequestQueue().add(stringRequest);
@@ -130,7 +120,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     @Override
     public void onResponse(String response) {
-        Log.d("Here", "Response recieved from Google Elevation API");
+        Log.v("Here", "Response recieved from Google Elevation API");
         Log.v("Here", response);
 
         JSONObject elevationResp = null;
