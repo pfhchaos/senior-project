@@ -76,7 +76,9 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
-        this.poIs = newPoIs;
+        synchronized (this.poIs) {
+            this.poIs = newPoIs;
+        }
         isReady = true;
     }
 
