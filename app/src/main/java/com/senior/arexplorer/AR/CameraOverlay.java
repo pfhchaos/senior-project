@@ -25,6 +25,7 @@ import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.PoI.HereListener;
 import com.senior.arexplorer.Utils.PoI.PoI;
+import com.senior.arexplorer.Utils.PopupBox;
 
 import java.util.TreeSet;
 
@@ -79,7 +80,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             nearby.addAll(Backend.getInstance().getPoIs());
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        fov  = new Integer(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
+        fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -147,11 +148,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = mod360.apply(relativeHeading + 180) - 180;
 
-        Log.d("CamOver",
-                poi.getName() +
-                        "\nBearing : " + curLoc.bearingTo(destLoc) +
-                        "\nHeading : " + heading +
-                        "\nRelativeHeading : " + relativeHeading);
+//        Log.d("CamOver",
+//                poi.getName() +
+//                        "\nBearing : " + curLoc.bearingTo(destLoc) +
+//                        "\nHeading : " + heading +
+//                        "\nRelativeHeading : " + relativeHeading);
 
 
         double dist = curLoc.distanceTo(destLoc);
@@ -245,19 +246,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                         if(touched.size() == 1)
                             handled = closest.onLongTouch(getContext());
                         else{
-                            Function<String, TextView> getTitle = (i) -> {
-                                TextView title = new TextView(getContext());
-                                title.setText(i);
-                                title.setPadding(10, 10, 10, 10);
-                                title.setGravity(Gravity.CENTER);
-                                title.setTextSize(20);
-                                return title;
-                            };
-
-                            AlertDialog.Builder popDialog = new AlertDialog.Builder(getContext());
-                            popDialog.setCustomTitle(getTitle.apply("Which would you like to view?"));
-
-                            AlertDialog dialog = popDialog.create();
+                            PopupBox popup = new PopupBox(getContext(), "Which would you like to view?");
 
                             LinearLayout popView = new LinearLayout(getContext());
                             popView.setOrientation(LinearLayout.VERTICAL);
@@ -269,17 +258,13 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                                 poiView.setTextSize(18);
                                 poiView.setOnClickListener( (i) -> {
                                     poi.onLongTouch(getContext());
-                                    dialog.dismiss();
+                                    popup.dismiss();
                                 });
                                 popView.addView(poiView);
                             }
 
-//                            popDialog.setPositiveButton("OK", (dialog, which) -> {
-//                                dialog.dismiss();
-//                            });
-
-                            dialog.setView(popView);
-                            dialog.show();
+                            popup.setView(popView);
+                            popup.show();
                         }
                     }
 

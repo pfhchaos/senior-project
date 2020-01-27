@@ -32,7 +32,7 @@ public class SettingsFragment extends Fragment implements IFragSettings {
      * The return boolean is just saying you handled the onclick.
      * If you return false the MainActivity will close the drawer, otherwise you will need to close it as shown below.
      */
-    public void loadSettingsUI(Menu menu, DrawerLayout drawer){
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context){
         menu.removeGroup(R.id.settings);
 
         MenuItem item = menu.add(R.id.settings, Menu.NONE, Menu.NONE, "This is a test?");
