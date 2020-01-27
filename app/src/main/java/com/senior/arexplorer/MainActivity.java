@@ -20,8 +20,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-//import com.amazonaws.mobile.config.AWSConfiguration;
-//import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -36,6 +36,10 @@ import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.WebRequester;
+
+
+//import com.amazonaws.mobile.config.AWSConfiguration;
+//import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     private static final int PERMISSION_REQUEST_LOCATION = 1;
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Backend backend;
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
-    //private AWSAppSyncClient mAWSAppSyncClient;
+    private AWSAppSyncClient mAWSAppSyncClient;
 
 
 
@@ -89,39 +93,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /**************************************************************
          * aws code start
          */
-        /*
         mAWSAppSyncClient = AWSAppSyncClient.builder()
                 .context(getApplicationContext())
                 .awsConfiguration(new AWSConfiguration(getApplicationContext()))
+                // If you are using complex objects (S3) then uncomment
+                //.s3ObjectManager(new S3ObjectManagerImplementation(new AmazonS3Client(AWSMobileClient.getInstance())))
                 .build();
 
-        try{
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        }catch(Exception e){
-            Log.d("MainActivity","error jdbc driver");
-        }
-        Connection connection=null;
-        TextView sample;
-        try{
-            connection = DriverManager.getConnection("jdbc:mysql://ardatabase-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/arExplorer","admin","SecretPass");
-            Statement statement = connection.createStatement();
 
-           // sample = (TextView) findViewById(R.id.sample);
-            ResultSet resultset = statement.executeQuery("select * from USERS");
-          //  ResultSet resultset = statement.executeQuery("INSERT INTO USERS (id, fName, lName, email, password) VALUES (1,'md', 'kashem', 'kasem@yahoo.com','secret')");
-            Log.d("MainActivity"," called try ");
-            while(resultset.next()){
-               // System.out.println("Solution"+resultset.getString(1).toString());
-               // txtLat.append(resultset.getString(1));
-                Log.d("MainActivity","resultset");
 
-            }
-        }catch(Exception e){
-           // sample = (TextView) findViewById(R.id.sample);
-            Log.d("MainActivity","resultset on catch error");
-          //  sample.append(e.toString());
-        }
-        */
 
         /**************************************************************
          * aws code end
@@ -393,9 +373,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /*
     aws code start
      */
+    /*
+    public void runMutation(){
+        CreateTodoInput createTodoInput = CreateTodoInput.builder().
+                name("Use AppSync").
+                description("Realtime and Offline").
+                build();
 
-
-
+        mAWSAppSyncClient.mutate(CreateTodoMutation.builder().input(createTodoInput).build())
+                .enqueue(mutationCallback);
+    }*/
     /*****************
      * aws code end
      * ******************
