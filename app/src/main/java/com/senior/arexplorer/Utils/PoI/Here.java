@@ -17,21 +17,30 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String> {
 
     public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
+    public final int smoothNumLocations = 5;
 
     private static Here instance = null;
     private static Context applicationContext;
 
     private Collection<HereListener> callbacks;
+    private Queue<Location> prevLocations;
     private Location currentLocation;
     private boolean isReady;
 
     private Here() {
         Log.v("location manager", "here is instantiated.");
+        this.currentLocation = new Location("dummy");
+        this.currentLocation.setLatitude(0);
+        this.currentLocation.setLongitude(0);
+        
         this.callbacks = new ArrayList<HereListener>();
+        this.prevLocations = new LinkedList<Location>();
         this.isReady = false;
     }
 
@@ -100,7 +109,28 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            this.currentLocation = location;
+            this.prevLocations.add(location);
+            while (this.prevLocations.size() > this.smoothNumLocations) {
+                this.prevLocations.remove();
+            }
+
+            Location newLocation = new Location("dummy");
+            Double lat = 0.0;
+            Double lon = 0.0;
+            for (Location loc : prevLocations) {
+                lat += loc.getLatitude();
+                lon += loc.getLongitude();
+            }
+            lat /= prevLocations.size();
+            lon /= prevLocations.size();
+
+            newLocation.setLatitude(lat);
+            newLocation.setLongitude(lon);
+
+            synchronized (this.currentLocation) {
+                this.currentLocation = newLocation;
+            }
+
             for (HereListener listener: callbacks) {
                 listener.onLocationChanged(this.currentLocation);
             }
