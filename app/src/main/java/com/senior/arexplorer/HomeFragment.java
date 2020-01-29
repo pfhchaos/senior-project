@@ -1,5 +1,6 @@
 package com.senior.arexplorer;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +23,7 @@ public class HomeFragment extends Fragment implements IFragSettings {
     }
 
     @Override
-    public void loadSettings(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
 
     }
 }

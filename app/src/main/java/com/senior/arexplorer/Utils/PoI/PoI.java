@@ -3,9 +3,13 @@ package com.senior.arexplorer.Utils.PoI;
 import android.content.Context;
 import android.graphics.Rect;
 import android.location.Location;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.senior.arexplorer.Utils.PopupBox;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -99,6 +103,16 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
 
     public Rect getCompassRect(){ return compassRect; }
 
+    public String toShortString() {
+        if(Here.getInstance().isReady()){
+            float dist = Here.getInstance().getLocation().distanceTo(getLocation());
+            return getName() + " : " + new DecimalFormat("#.00").format(dist) + " m";
+        }
+        else
+            return getName();
+    }
+
+    @Override
     public String toString() {
         String ret = "";
         ret += "name: " + this.name + "\n";
@@ -115,18 +129,29 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         if(!(Here.getInstance().isReady()))
             toastText = "Cannot get current location\nAs such cannot display distance to " + getName();
         else{
-            float dist = Here.getInstance().getLocation().distanceTo(getLocation());
-            toastText = getName() + " is " + new DecimalFormat("#.##").format(dist) + "m away.";
+            toastText = toShortString();
         }
         Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
         return true;
     }
 
     public boolean onLongTouch(Context context){
-        Toast.makeText(context, "Long touch detected but not yet implemented for this item!", Toast.LENGTH_SHORT).show();
-
+        //Toast.makeText(context, "Long touch detected but not yet implemented for this item!", Toast.LENGTH_SHORT).show();
+        PopupBox popup = new PopupBox(context, getName());
+        popup.setView(getDetailsView(context));
+        popup.show();
         return true;
     }
+
+    private View getDetailsView(Context context){
+        TextView retView = new TextView(context);
+        retView.setPadding(10,5,10,5);
+        retView.setGravity(Gravity.CENTER);
+        retView.setText(toShortString());
+        retView.setTextSize(18);
+        return retView;
+    }
+
 
     @Override
     public int compareTo(PoI place) {

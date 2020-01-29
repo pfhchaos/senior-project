@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         if(tempFrag != null){
-            tempFrag.loadSettings(menu, drawer);
+            tempFrag.loadSettingsUI(menu, drawer, this);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, (Fragment)tempFrag).commit();
         }
         drawer.closeDrawer(GravityCompat.START);

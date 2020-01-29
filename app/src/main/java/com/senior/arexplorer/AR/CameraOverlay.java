@@ -1,6 +1,8 @@
 package com.senior.arexplorer.AR;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,15 +12,20 @@ import android.graphics.Rect;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.senior.arexplorer.R;
+
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.PoI.HereListener;
 import com.senior.arexplorer.Utils.PoI.PoI;
+import com.senior.arexplorer.Utils.PopupBox;
 
 import java.util.TreeSet;
 
@@ -26,7 +33,6 @@ import androidx.appcompat.widget.AppCompatDrawableManager;
 import androidx.arch.core.util.Function;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
-    private boolean isRunning = true;
     private Paint p = new Paint();
     private Rect rect = new Rect(), curCompass = new Rect();
     private Bitmap compass, compassMarker;
@@ -72,6 +78,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
     private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
@@ -139,11 +148,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = mod360.apply(relativeHeading + 180) - 180;
 
-        Log.d("CamOver",
-                poi.getName() +
-                        "\nBearing : " + curLoc.bearingTo(destLoc) +
-                        "\nHeading : " + heading +
-                        "\nRelativeHeading : " + relativeHeading);
+//        Log.d("CamOver",
+//                poi.getName() +
+//                        "\nBearing : " + curLoc.bearingTo(destLoc) +
+//                        "\nHeading : " + heading +
+//                        "\nRelativeHeading : " + relativeHeading);
 
 
         double dist = curLoc.distanceTo(destLoc);
@@ -168,7 +177,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     void setFoV(int newFoV){
         fov = newFoV;
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Pref_AR_Compass_FOV","" + fov);
+        editor.commit();
     }
+    int getFoV() { return fov; }
 
     void setDD(int newDrawDistance){
         drawDistance = newDrawDistance;
@@ -232,7 +246,25 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                         if(touched.size() == 1)
                             handled = closest.onLongTouch(getContext());
                         else{
+                            PopupBox popup = new PopupBox(getContext(), "Which would you like to view?");
 
+                            LinearLayout popView = new LinearLayout(getContext());
+                            popView.setOrientation(LinearLayout.VERTICAL);
+                            for(PoI poi : touched){
+                                TextView poiView = new TextView(getContext());
+                                poiView.setPadding(10,5,10,5);
+                                poiView.setGravity(Gravity.END);
+                                poiView.setText(poi.toShortString());
+                                poiView.setTextSize(18);
+                                poiView.setOnClickListener( (i) -> {
+                                    poi.onLongTouch(getContext());
+                                    popup.dismiss();
+                                });
+                                popView.addView(poiView);
+                            }
+
+                            popup.setView(popView);
+                            popup.show();
                         }
                     }
 

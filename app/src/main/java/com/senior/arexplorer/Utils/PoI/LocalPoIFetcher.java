@@ -72,7 +72,9 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
             Log.i("fetched saveObj",s.toString());
             newPoIs.add(new LocalPoI(s));
         }
-        this.poIs = newPoIs;
+        synchronized (this.poIs) {
+            this.poIs = newPoIs;
+        }
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }

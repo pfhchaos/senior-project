@@ -1,6 +1,8 @@
 package com.senior.arexplorer.AR;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -35,7 +37,7 @@ public class ARFragment extends Fragment implements IFragSettings {
     private TextureView camView;
     private final int FOV_MIN = 45, FOV_MAX = 360; //in degrees
     private final int DD_MIN = 100, DD_MAX = 10000; //in meters
-    private int fov = 180, drawDistance = 1000;
+    private int drawDistance = 1000;
 
 
     @Nullable
@@ -49,7 +51,6 @@ public class ARFragment extends Fragment implements IFragSettings {
         mOverlay = new CameraOverlay(view.getContext());
         FrameLayout overlay = view.findViewById(R.id.overlay_view);
         overlay.addView(mOverlay);
-
 
         Here.getInstance().addListener(mOverlay);
         CompassAssistant.getInstance(view.getContext()).addCompassListener(mOverlay);
@@ -129,7 +130,7 @@ public class ARFragment extends Fragment implements IFragSettings {
         camView.setTransform(mx);
     }
 
-    public void loadSettings(Menu menu, DrawerLayout drawer){
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context){
         menu.removeGroup(R.id.settings);
         Function<String, TextView> getTitle = (i) -> {
           TextView title = new TextView(drawer.getContext());
@@ -140,6 +141,9 @@ public class ARFragment extends Fragment implements IFragSettings {
           return title;
         };
 
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        int fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
+
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
             .setOnMenuItemClickListener((i) -> {
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
@@ -147,16 +151,15 @@ public class ARFragment extends Fragment implements IFragSettings {
 
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(FOV_MIN, FOV_MAX)
-                        .setProgress(fov - FOV_MIN)
-                        .setText("Current Field of View : " + fov)
+                        .setProgress(mOverlay.getFoV() - FOV_MIN)
+                        .setText("Current Field of View : " + mOverlay.getFoV())
                         .setListener((progress) -> {
-                                fov = progress + FOV_MIN;
-                                popView.setText("Current Field of View : " + fov);
+                                mOverlay.setFoV(progress + FOV_MIN);
+                                popView.setText("Current Field of View : " + mOverlay.getFoV());
                         });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
-                    i.setTitle("Compass Field of View : " + fov + " degrees");
-                    mOverlay.setFoV(fov);
+                    i.setTitle("Compass Field of View : " + mOverlay.getFoV() + " degrees");
                     dialog.dismiss();
                 });
 

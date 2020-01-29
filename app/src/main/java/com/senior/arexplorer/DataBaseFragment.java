@@ -1,6 +1,7 @@
 package com.senior.arexplorer;
 
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ public class DataBaseFragment extends Fragment implements IFragSettings {
     }
 
     @Override
-    public void loadSettings(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
 
     }
 

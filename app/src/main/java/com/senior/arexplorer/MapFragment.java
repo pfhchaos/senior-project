@@ -1,6 +1,7 @@
 package com.senior.arexplorer;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
@@ -73,7 +74,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         }
         Backend.getInstance().addHandler(this);
 
-        CompassAssistant.getInstance().addCompassListener(this);
+        CompassAssistant.getInstance(getContext()).addCompassListener(this);
 
         mapView.onStart();
         super.onStart();
@@ -111,7 +112,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onMapReady(GoogleMap gMap) {
-        Location location = null;
         googleMap = gMap;
         googleMap.setBuildingsEnabled(true);
 
@@ -138,7 +138,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     private void placeMarkers() {
         Collection<PoI> pois = Backend.getInstance().getPoIs();
-        Location here = Here.getInstance().getLocation();
 
         Log.d("mapFragment","entered callback from place fetcher");
 
@@ -167,7 +166,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     }
 
     @Override
-    public void loadSettings(Menu menu, DrawerLayout drawer) {
+    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Save Location")
@@ -205,6 +204,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.v("MapFragment", "onLocationChanged");
         if (googleMap != null) {
             changeLocation(location);
         }
@@ -212,6 +212,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onCompassChanged(float userHeading) {
+        Log.v("MapFragment", "onCompassChanged");
         if(googleMap != null) {
             changeHeading(userHeading);
         }
