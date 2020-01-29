@@ -20,7 +20,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.amazonaws.mobile.config.AWSConfiguration;
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -30,13 +29,13 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
+import com.senior.arexplorer.AWS.CloudDB;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.WebRequester;
-
 
 //import com.amazonaws.mobile.config.AWSConfiguration;
 //import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public Cursor cursor;
     //SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
     private LocalDB localDB;
+    private CloudDB cloudDB;
 
     private Here here;
     private GoogleApiClient googleApiClient;
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /**************************************************************
          * aws code start
          */
+        /*
         mAWSAppSyncClient = AWSAppSyncClient.builder()
                 .context(getApplicationContext())
                 .awsConfiguration(new AWSConfiguration(getApplicationContext()))
@@ -101,18 +102,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
 
 
-
+*/
 
         /**************************************************************
          * aws code end
          */
 
-        // LoadData(); //create database and load
-
-       // loadPlace();
 
         LocalDB.init(this);
         this.localDB = LocalDB.getInstance();
+
+        // for cloudDB
+        CloudDB.init(this);
+        this.cloudDB=CloudDB.getInstance();
 
         Here.init(this);
         this.here = Here.getInstance();
@@ -125,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.webRequester = WebRequester.getInstance();
         compassAssistant.onStart();
     } // onCreate end
+
 
     @Override
     public void onResume() {
@@ -267,70 +270,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    //database methods
-    /*
-    private void LoadData(){
-        // for database
 
-        try{
-            SQLiteDatabase db =databaseHelper.getReadableDatabase();
-            Cursor cursor = db.query("USER",
-                    new String[]{"fName", "lName","email", "Password"},
-                    "_id = ?",null,null,null,null);
-
-            // move to the first record in the cursor
-            if(cursor.moveToFirst()){
-                String fNameText = cursor.getString(0);
-                String lNameText = cursor.getString(1);
-                String emailText = cursor.getString(2);
-                String passwordText = cursor.getString(3);
-                /*
-                //display data
-                TextView fName =(TextView)findViewById(R.id.textViewFname);
-                fName.setText(fNameText);
-                TextView lName =(TextView)findViewById(R.id.textViewLname);
-                lName.setText(lNameText);
-                TextView email =(TextView)findViewById(R.id.textViewEmail);
-                email.setText(emailText);
-                TextView pass =(TextView)findViewById(R.id.textViewPassword);
-                pass.setText(passwordText);
-                */
-          //  }
-/*
-            cursor.close();
-        }catch(SQLiteException e){
-            Toast toast = Toast.makeText(this, "Database unavailable",Toast.LENGTH_SHORT);
-            toast.show();
-
-        }
-
-        //database end
-
-    }
-    */
-/*
-    public void loadPlace() {
-
-        // SQLiteOpenHelper starbuzzDatabaseHelper = new StarbuzzDatabaseHelper(this);
-        ListView listUser = (ListView) findViewById(R.id.list_users);
-        try {
-            db = databaseHelper.getReadableDatabase();
-            cursor = db.query("USER",
-                    new String[]{"_id", "lName"},
-                    null, null, null, null, null);
-            SimpleCursorAdapter listAdapter = new SimpleCursorAdapter(this,
-                    android.R.layout.simple_list_item_1,
-                    cursor,
-                    new String[]{"lName"},
-                    new int[]{android.R.id.text1},
-                    0);
-            listUser.setAdapter(listAdapter);
-        } catch (SQLiteException e) {
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-    }
-*/
     //google location services
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
@@ -370,23 +310,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return "From Activity";
     }
 
-    /*
-    aws code start
-     */
-    /*
-    public void runMutation(){
-        CreateTodoInput createTodoInput = CreateTodoInput.builder().
-                name("Use AppSync").
-                description("Realtime and Offline").
-                build();
 
-        mAWSAppSyncClient.mutate(CreateTodoMutation.builder().input(createTodoInput).build())
-                .enqueue(mutationCallback);
-    }*/
-    /*****************
-     * aws code end
-     * ******************
-     */
 
     @Override
     public void onConnectionSuspended(int i) {
