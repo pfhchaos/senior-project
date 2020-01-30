@@ -74,7 +74,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         }
         Backend.getInstance().addHandler(this);
 
-        CompassAssistant.getInstance().addCompassListener(this);
+        CompassAssistant.getInstance(getContext()).addCompassListener(this);
 
         mapView.onStart();
         super.onStart();
