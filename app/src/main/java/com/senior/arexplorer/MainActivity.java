@@ -29,7 +29,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
-import com.senior.arexplorer.AWS.CloudDB;
+import com.senior.arexplorer.Utils.AWS.CloudDB;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;

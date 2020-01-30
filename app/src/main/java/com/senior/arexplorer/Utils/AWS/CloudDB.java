@@ -1,4 +1,4 @@
-package com.senior.arexplorer.AWS;
+package com.senior.arexplorer.Utils.AWS;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -8,11 +8,9 @@ import android.widget.Toast;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
-
+import java.util.Collection;
 
 public class CloudDB {
-
-
     private static Context applicationContext = null;
     private static CloudDB instance = null;
 
@@ -20,6 +18,7 @@ public class CloudDB {
     private static final String user = "masteruser";
     private static final String pass = "Bangladesh88";
     public  String query;
+    private Collection<CloudDBListener> callbacks;
 
     public static void init(Context context) {
         Log.d("CloudDB", "CloudDB is initialized.");
@@ -50,6 +49,21 @@ public class CloudDB {
     private CloudDB(){
 
 
+    }
+
+
+
+    private void notifyListeners() {
+        for (CloudDBListener listener : this.callbacks) {
+            listener.onUpdate();
+        }
+    }
+    public void addListener(CloudDBListener listener) {
+        this.callbacks.add(listener);
+    }
+
+    public void removeListener(CloudDBListener listener) {
+        this.callbacks.remove(listener);
     }
 
 /*
@@ -106,5 +120,4 @@ public class CloudDB {
         }
     }
 
-//************************* for test end
 }
