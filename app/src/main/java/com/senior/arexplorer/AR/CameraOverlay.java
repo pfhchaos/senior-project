@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -155,10 +156,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 //                        "\nRelativeHeading : " + relativeHeading);
 
 
-        double dist = curLoc.distanceTo(destLoc);
+        double dist = poi.getDistanceTo();
 
         //if our heading is within our FoV
-        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance && dist > 1){
+        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance && dist >= 10){
             //Why is this magic number here? Why 9000? Was I drunk when I did this?
             int newScale = 9000 / fov; //I think 9000 equates to 90% of the screen, AKA 5% margin on either side
             int center = (int)(5000 + relativeHeading * newScale); //which would make this at the 50% point on the screen + our offset

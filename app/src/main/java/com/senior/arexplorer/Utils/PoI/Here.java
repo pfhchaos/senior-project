@@ -37,7 +37,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     public static Here getInstance() {
         if (Here.applicationContext == null) {
-            Log.e("Here", "Attempted to instantionate without initalizing!");
+            Log.e("Here", "Attempted to instantianate without initializing!");
             return null;
         }
         if (Here.instance == null) Here.getInstanceSynced();
