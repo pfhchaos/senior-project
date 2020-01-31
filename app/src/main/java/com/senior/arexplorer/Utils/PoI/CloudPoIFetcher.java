@@ -40,8 +40,8 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
     }
 
     private synchronized void fetchDataAsync(){
-       /* isReady = false;
-        Cursor c = this.CDB.getAllLocalData();
+        isReady = false;
+       /* Cursor c = this.CDB.getAllLocalData();
         ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
         while(c.moveToNext()){
@@ -59,16 +59,16 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
             saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
             Log.i("fetched saveObj",s.toString());
             newPoIs.add(new LocalPoI(s));
-        }
+        }*/
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
         synchronized (this.poIs) {
-            this.poIs = newPoIs;
+            this.poIs = CloudDB.getInstance().getLocalData();
         }
         isReady = true;
 
-        */
+
     }
 
 
