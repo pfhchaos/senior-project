@@ -17,21 +17,30 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String> {
 
     public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
+    public final int smoothNumLocations = 5;
 
     private static Here instance = null;
     private static Context applicationContext;
 
     private Collection<HereListener> callbacks;
+    private Queue<Location> prevLocations;
     private Location currentLocation;
     private boolean isReady;
 
     private Here() {
-        Log.d("location manager", "here is instantiated.");
+        Log.v("location manager", "here is instantiated.");
+        this.currentLocation = new Location("dummy");
+        this.currentLocation.setLatitude(0);
+        this.currentLocation.setLongitude(0);
+        
         this.callbacks = new ArrayList<HereListener>();
+        this.prevLocations = new LinkedList<Location>();
         this.isReady = false;
     }
 
@@ -100,21 +109,32 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
-            this.currentLocation = location;
+            this.prevLocations.add(location);
+            while (this.prevLocations.size() > this.smoothNumLocations) {
+                this.prevLocations.remove();
+            }
+
+            Location newLocation = new Location("dummy");
+            Double lat = 0.0;
+            Double lon = 0.0;
+            for (Location loc : prevLocations) {
+                lat += loc.getLatitude();
+                lon += loc.getLongitude();
+            }
+            lat /= prevLocations.size();
+            lon /= prevLocations.size();
+
+            newLocation.setLatitude(lat);
+            newLocation.setLongitude(lon);
+
+            synchronized (this.currentLocation) {
+                this.currentLocation = newLocation;
+            }
+
             for (HereListener listener: callbacks) {
                 listener.onLocationChanged(this.currentLocation);
             }
 
-            /*
-            if (location.hasAltitude()) {
-                Log.d("Here", "currentLocation has altitude of " + location.getAltitude());
-            }
-            else {
-                Log.d("Here", "currentLocation does not have an altitude");
-            }
-            */
-
-            //TODO: google elevation API call
             String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
             StringRequest stringRequest = new StringRequest(request, this, this);
             WebRequester.getInstance().getRequestQueue().add(stringRequest);
@@ -130,7 +150,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     @Override
     public void onResponse(String response) {
-        Log.d("Here", "Response recieved from Google Elevation API");
+        Log.v("Here", "Response recieved from Google Elevation API");
         Log.v("Here", response);
 
         JSONObject elevationResp = null;

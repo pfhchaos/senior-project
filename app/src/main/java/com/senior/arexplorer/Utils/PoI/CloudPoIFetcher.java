@@ -1,61 +1,49 @@
 package com.senior.arexplorer.Utils.PoI;
 
-
-import android.database.Cursor;
-import android.util.Log;
-
-import com.senior.arexplorer.AR.saveObj;
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
-import com.senior.arexplorer.Utils.LocalDB.LocalDBListener;
+import com.senior.arexplorer.Utils.AWS.CloudDB;
+import com.senior.arexplorer.Utils.AWS.CloudDBListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
+public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
+
 
     private Here here;
-    private LocalDB LDB;
-    private static LocalPoIFetcher LPF;
+    private CloudDB CDB;
+    private static CloudPoIFetcher CPF;
     private boolean isReady = false;
 
-    public static LocalPoIFetcher getInstance(){
-        if(LPF == null) LPF = new LocalPoIFetcher();
-        return LPF;
-    }
-
-    private LocalPoIFetcher(){
-        this.here = Here.getInstance();
-        this.LDB = LocalDB.getInstance();
-        this.poIFetcherHandlers = new ArrayList<>();
-        this.poIs = new ArrayList<>();
-
-        LocalDB.getInstance().addListener(this);
+    public static CloudPoIFetcher getInstance(){
+        if(CPF == null) CPF = new CloudPoIFetcher();
+        return CPF;
     }
 
     @Override
     Collection<PoI> getPoIs() {
-        // sexy
         return this.poIs;
     }
 
     @Override
     void fetchData() {
+        Thread thread = new Thread(new Runnable(){
 
-        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 fetchDataAsync();
             }
-        });
 
+        });
         thread.start();
+
 
     }
 
     private synchronized void fetchDataAsync(){
         isReady = false;
-        Cursor c = this.LDB.getAllLocalData();
+       /* Cursor c = this.CDB.getAllLocalData();
         ArrayList<PoI> newPoIs = new ArrayList<PoI>();
+
         while(c.moveToNext()){
             String userName = "testUser";
             String locName,locDesc;
@@ -71,18 +59,32 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
             saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
             Log.i("fetched saveObj",s.toString());
             newPoIs.add(new LocalPoI(s));
-        }
-        synchronized (this.poIs) {
-            this.poIs = newPoIs;
-        }
+        }*/
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
+        synchronized (this.poIs) {
+            this.poIs = CloudDB.getInstance().getLocalData();
+        }
         isReady = true;
+
+
     }
 
-    public void cleanUp(){
-        LocalPoIFetcher.LPF = null;
+
+
+    private CloudPoIFetcher(){
+        this.here = Here.getInstance();
+        this.CDB = CloudDB.getInstance();
+        this.poIFetcherHandlers = new ArrayList<>();
+        this.poIs = new ArrayList<>();
+
+        CloudDB.getInstance().addListener(this);
+    }
+
+    @Override
+    public void cleanUp() {
+        CloudPoIFetcher.CPF = null;
     }
 
     @Override
@@ -92,6 +94,6 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
 
     @Override
     public void onUpdate() {
-        this.fetchData();
+            this.fetchData();
     }
 }

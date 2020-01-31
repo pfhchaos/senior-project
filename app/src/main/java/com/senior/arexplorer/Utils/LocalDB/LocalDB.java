@@ -82,7 +82,10 @@ public class LocalDB {
     }
 
     private void nuke(){
-        if(localDB != null) localDB.delete("LOCAL_DATA",null,null);
+        if(localDB != null) {
+            localDB.delete("LOCAL_DATA",null,null);
+            notifyListeners();
+        }
     }
     public void deleteAllCustomLoc(){
         nuke();
