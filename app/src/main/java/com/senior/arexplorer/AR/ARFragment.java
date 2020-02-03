@@ -62,7 +62,11 @@ public class ARFragment extends Fragment implements IFragSettings {
     public void onDestroy() {
         super.onDestroy();
         Here.getInstance().removeListener(mOverlay);
-        CompassAssistant.getInstance().removeCompassListener(mOverlay);
+        //this does not seem like the correct solution to the current crash
+        CompassAssistant compassAssistant = CompassAssistant.getInstance();
+        if (compassAssistant != null) {
+            compassAssistant.removeCompassListener(mOverlay);
+        }
     }
 
     @Override

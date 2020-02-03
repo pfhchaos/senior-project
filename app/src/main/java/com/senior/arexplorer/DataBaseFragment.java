@@ -4,6 +4,7 @@ package com.senior.arexplorer;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -15,10 +16,12 @@ import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.senior.arexplorer.AWS.CloudDB;
+import com.senior.arexplorer.Utils.AWS.CloudDB;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.PoI.PoI;
 
+import java.util.ArrayList;
 
 
 public class DataBaseFragment extends Fragment implements IFragSettings {
@@ -38,7 +41,12 @@ public class DataBaseFragment extends Fragment implements IFragSettings {
             name.setText(st);
             cursor.close();
         }
-        CloudDB.getInstance().ExecurQuery("select * from TYPE");   //INSERT INTO TYPE ( type) VALUES ( 'type4' );
+        CloudDB.getInstance().ExecurQuery("SELECT * FROM TYPE");   //INSERT INTO TYPE ( type) VALUES ( 'type4' );
+      ArrayList<PoI> arr= CloudDB.getInstance().getLocalData();
+        int s = arr.size();
+        System.out.println("************************ ::: "+s);
+        Log.d("datafrag : ", arr.get(0).getName());
+
         return view;
 
     }

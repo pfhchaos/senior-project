@@ -21,6 +21,7 @@ class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Res
 
     private String lastRequest;
     private boolean isReady;
+    private ArrayList<PoI> newPoIs;
 
     private static PoIFetcher instance;
 
@@ -48,6 +49,8 @@ class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Res
         StringRequest stringRequest = new StringRequest(request, this, this);
         this.lastRequest = request;
 
+        this.newPoIs = new ArrayList<PoI>();
+
         WebRequester.getInstance().getRequestQueue().add(stringRequest);
     }
 
@@ -68,8 +71,6 @@ class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Res
         JSONObject googleResp = null;
         String next_page_token = null;
         JSONArray results = null;
-
-        ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
         Log.d("GooglePoIFetcher", "Response recieved from Google Places API");
         Log.d("GooglePoIFetcher", response);

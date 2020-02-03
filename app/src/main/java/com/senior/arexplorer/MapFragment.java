@@ -62,32 +62,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         }
         mapView.getMapAsync(this);
 
+        Here.getInstance().addListener(this);
+        Backend.getInstance().addHandler(this);
+        CompassAssistant.getInstance(getContext()).addCompassListener(this);
+
         return v;
     }
 
     @Override
     public void onStart() {
-        Here here = Here.getInstance();
-        here.addListener(this);
-        if (here == null) {
-            Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
-        }
-        Backend.getInstance().addHandler(this);
-
-        CompassAssistant.getInstance(getContext()).addCompassListener(this);
-
+        Log.d("MapFragment", "onStart");
         mapView.onStart();
         super.onStart();
     }
 
     @Override
     public void onResume() {
+        Log.d("MapFragment", "onResume");
         mapView.onResume();
         super.onResume();
     }
 
     @Override
     public void onPause() {
+        Log.d("MapFragment", "onPause");
         mapView.onPause();
         super.onPause();
     }
@@ -95,12 +93,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onStop() {
         mapView.onStop();
+        Log.d("MapFragment", "onStop");
         super.onStop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Here.getInstance().removeListener(this);
+        Backend.getInstance().removeHandler(this);
+        CompassAssistant.getInstance(getContext()).removeCompassListener(this);
         mapView.onDestroy();
     }
 
@@ -221,7 +223,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onCompassAccuracyChange(int compassStatus) {
-
+        Log.v("MapFragment", "onCompassAccuracyChanged");
     }
 
     @Override
