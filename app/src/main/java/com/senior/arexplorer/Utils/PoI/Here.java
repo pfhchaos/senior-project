@@ -38,7 +38,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         this.currentLocation = new Location("dummy");
         this.currentLocation.setLatitude(0);
         this.currentLocation.setLongitude(0);
-        
+
         this.callbacks = new ArrayList<HereListener>();
         this.prevLocations = new LinkedList<Location>();
         this.isReady = false;
