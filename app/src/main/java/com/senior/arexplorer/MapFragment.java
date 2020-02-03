@@ -72,9 +72,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         if (here == null) {
             Toast.makeText(getActivity(), "here is null. this should not happen", Toast.LENGTH_SHORT).show();
         }
-        Backend.getInstance().addHandler(this);
-
-        CompassAssistant.getInstance(getContext()).addCompassListener(this);
 
         mapView.onStart();
         super.onStart();
@@ -83,12 +80,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onResume() {
         mapView.onResume();
+        Here.getInstance().removeListener(this);
+        Backend.getInstance().addHandler(this);
+        CompassAssistant.getInstance(getContext()).addCompassListener(this);
         super.onResume();
     }
 
     @Override
     public void onPause() {
         mapView.onPause();
+        Here.getInstance().removeListener(this);
+        Backend.getInstance().removeHandler(this);
+        CompassAssistant.getInstance(getContext()).removeCompassListener(this);
         super.onPause();
     }
 
