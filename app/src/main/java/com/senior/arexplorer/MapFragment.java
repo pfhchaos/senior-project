@@ -118,7 +118,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         googleMap.setBuildingsEnabled(true);
 
         googleMap.getUiSettings().setZoomControlsEnabled(false);
-        googleMap.getUiSettings().setCompassEnabled(false);
+        googleMap.getUiSettings().setCompassEnabled(true);
         googleMap.getUiSettings().setAllGesturesEnabled(false);
 
         CameraPosition newPosition = new CameraPosition(new LatLng(0, 0), zoom, tilt, 0);
