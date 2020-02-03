@@ -68,14 +68,14 @@ public class LocalDB {
         localDB.insert("TYPE",null, TypeValue);
     }
 
-    private void insertLocalData( String name, String description, String latitude, String longitude, String elevation, int image_resource_id){
+    private void insertLocalData( String name, String description, String latitude, String longitude, String elevation, byte[] image){
         ContentValues values = new ContentValues();
         values.put("name",name);
         values.put("description",description);
         values.put("latitude", latitude);
         values.put("longitude",longitude);
         values.put("elevation",elevation);
-        values.put("image_resource_id",image_resource_id);
+        values.put("image",image);
 
         localDB.insert("LOCAL_DATA",null, values);
         notifyListeners();
@@ -92,7 +92,7 @@ public class LocalDB {
     }
 
     public void insertLocalData(saveObj s){
-        this.insertLocalData(s.getLocationName(),s.getLocationDesc(),s.getLocationLatitude()+"",s.getLocationLongitude()+"",s.getLocationElevation()+"",-1);
+        this.insertLocalData(s.getLocationName(),s.getLocationDesc(),s.getLocationLatitude()+"",s.getLocationLongitude()+"",s.getLocationElevation()+"",s.getBlob());
         long count = DatabaseUtils.queryNumEntries(localDB,"LOCAL_DATA");
         Log.i("local db","number of rows:\t\t"+count);
         notifyListeners();
@@ -127,5 +127,6 @@ public class LocalDB {
     public void removeListener(LocalDBListener listener) {
         this.callbacks.remove(listener);
     }
-    //TODO: function to nuke database
+
+
 }

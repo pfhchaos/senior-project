@@ -34,8 +34,11 @@ import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.PoI.Here;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -87,8 +90,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.i("onActivityRequest", "requestCode: "+requestCode+"\t resultCode: "+resultCode+"\t Intent: "+data);
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
-            //pictureImageView.setImageBitmap(imageBitmap);
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             setPic();
         }
     }
@@ -96,7 +98,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
     private void setPic() {
         Log.i("setPic", "you're in setPic method!");
 
-        int targetW,targetH,photoW,photoH,scaleFactor;
+        int targetW,targetH,photoW,photoH,scaleFactor,currQual = 0;
         //get dimensions of view
         targetW = pictureImageView.getWidth();
         targetH = pictureImageView.getHeight();
@@ -122,7 +124,16 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
 
         Bitmap bm = BitmapFactory.decodeFile(curPhotoPath,bmOptions);
-        Log.i("h&w","photoW: "+bm.getWidth()+" \tphotoH: "+bm.getHeight());
+        Log.v("Before compression: ","photoW: "+bm.getWidth()+" \tphotoH: "+bm.getHeight()+"\tphoto size: "+bm.getAllocationByteCount()+" Bytes");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        boolean succ;
+
+        succ = bm.compress(Bitmap.CompressFormat.JPEG, currQual, out);
+        Log.v("Comp stream length"," "+out.toByteArray().length);
+        Bitmap compBM = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
+
+        Log.v("Compression? "+succ,"photoW: "+compBM.getWidth()+" \tphotoH: "+compBM.getHeight()+"\tphoto size: "+compBM.getAllocationByteCount()+" Bytes");
 
         ExifInterface exif = null;
         try {
@@ -135,9 +146,10 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
         Log.i("orientation","ori: "+orientation);
 
-        Bitmap rotBM = rotateBitmap(bm,orientation);
+        Bitmap rotBM = rotateBitmap(compBM,orientation);
         dbBM = rotBM;
-        pictureImageView.setImageBitmap(rotBM);
+
+        pictureImageView.setImageBitmap(dbBM);
 
     }
 

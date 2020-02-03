@@ -32,7 +32,7 @@ public class CreateDatabase extends SQLiteOpenHelper {
                 + "latitude TEXT,"
                 + "longitude TEXT,"
                 + "elevation TEXT,"
-                + "image_resource_id INTEGER);");
+                + "image BLOB);");
 
         db.execSQL("CREATE TABLE TYPE("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "type TEXT);");
