@@ -1,10 +1,21 @@
 package com.senior.arexplorer.Utils.PoI;
 
+import android.content.Context;
+import android.telecom.Call;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.JsonObject;
+import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -12,9 +23,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.HashMap;
+
+import androidx.arch.core.util.Function;
 
 public class GooglePoI extends PoI implements Serializable, Response.ErrorListener, Response.Listener<String>{
-    public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
+    private final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
+    private final String placeDetailsAPIurl = "https://maps.googleapis.com/maps/api/place/details/json";
+    private final String KEY = "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4";
+    private String placeID;
+    JSONArray details = null;
 
     public GooglePoI(JSONObject poi) {
         super();
@@ -26,6 +44,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
             super.setLatitude(location.getDouble("lat"));
             super.setLongitude(location.getDouble("lng"));
             JSONArray types = poi.getJSONArray("types");
+            this.placeID = poi.getString("place_id");
 
             for (int j = 0; j < types.length(); j++) {
                 super.addType(types.getString(j));
@@ -43,7 +62,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
     private void fetchElevation() {
         //TODO: google elevation API call
-        String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", this.getLatitude(),this.getLongitude());
+        String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, KEY, this.getLatitude(),this.getLongitude());
         StringRequest stringRequest = new StringRequest(request, this, this);
         WebRequester.getInstance().getRequestQueue().add(stringRequest);
     }
@@ -59,8 +78,8 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         Log.d("Here", "Response recieved from Google Elevation API");
         Log.v("Here", response);
 
-        JSONObject elevationResp = null;
-        JSONArray results = null;
+        JSONObject elevationResp;
+        JSONArray results;
         try {
             elevationResp = new JSONObject(response);
 
@@ -69,7 +88,69 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         }
         catch (Exception ex) {
             ex.printStackTrace();
-            return;
         }
+    }
+
+    @Override
+    public boolean onLongTouch(Context context){
+        if(details == null){
+            String request = String.format("%s?key=%s&placeid=%s", placeDetailsAPIurl, KEY, this.placeID);
+            StringRequest stringRequest = new StringRequest(request,
+                    (response) -> {
+                        JSONObject detailsResp;
+                        try {
+                            detailsResp = new JSONObject(response);
+                            details = detailsResp.getJSONArray("result");
+
+                            PopupBox popup = new PopupBox(context, getName());
+                            popup.setView(getDetailsView(context));
+                            popup.show();
+
+                        } catch (JSONException ex) {
+                            ex.printStackTrace();
+                        }
+                    },
+                    (error) -> Log.e("GooglePoI", "No response from Google Place Detail API!\n" + error));
+            WebRequester.getInstance().getRequestQueue().add(stringRequest);
+
+            Toast.makeText(context, "Details are not yet available, fetching now...", Toast.LENGTH_LONG).show();
+        }
+        else{
+            PopupBox popup = new PopupBox(context, getName());
+            popup.setView(getDetailsView(context));
+            popup.show();
+        }
+        return true;
+    }
+
+    @Override
+    View getDetailsView(Context context){
+        HashMap<String, Integer> detailsMap = new HashMap<String, Integer>(){{
+            put("address", 1);
+            put("number", 2);
+            put("hoursArray", 9);
+            put("googleURL", 17);
+            put("site", 20);
+        }};
+
+        ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        Function<String, TextView> getTextView = (stringIn) -> {
+              TextView textView = new TextView(context);
+              textView.setLayoutParams(params);
+              textView.setPadding(10,5,10,5);
+              textView.setGravity(Gravity.CENTER);
+              textView.setTextSize(18);
+              textView.setText(stringIn);
+          return textView;
+        };
+
+        LinearLayout retView = new LinearLayout(context);
+        retView.setOrientation(LinearLayout.VERTICAL);
+        retView.setLayoutParams(params);
+        retView.setGravity(Gravity.CENTER_VERTICAL);
+
+        retView.addView(getTextView.apply(getDistanceTo() + "m away"));
+
+        return retView;
     }
 }

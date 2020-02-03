@@ -146,7 +146,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return true;
     }
 
-    private View getDetailsView(Context context){
+    View getDetailsView(Context context){
         TextView retView = new TextView(context);
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);
