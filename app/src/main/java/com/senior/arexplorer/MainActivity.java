@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("ActivityLifecycle","onCreate");
+        Log.d("ActivityLifecycle","onCreate");
         setContentView(R.layout.activity_main);
 
         drawer = findViewById(R.id.drawer_layout);
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
        super.onResume();
-        Log.v("ActivityLifecycle","onResume");
+        Log.d("ActivityLifecycle","onResume");
 
         compassAssistant.onStart();
 
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onStart() {
         super.onStart();
-        Log.v("ActivityLifecycle","onStart");
+        Log.d("ActivityLifecycle","onStart");
 
         if (this.googleApiClient != null) {
             this.googleApiClient.connect();
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onPause() {
         super.onPause();
-        Log.v("ActivityLifecycle","onPause");
+        Log.d("ActivityLifecycle","onPause");
         //TODO: pause location updates here
 
         compassAssistant.onStop();
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
-        Log.v("ActivityLifecycle","onSaveInstanceState");
+        Log.d("ActivityLifecycle","onSaveInstanceState");
         //savedInstanceState.putInt("key", value);
         // we have to find what need to save
         //
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onStop() {
-        Log.v("ActivityLifecycle","onStop");
+        Log.d("ActivityLifecycle","onStop");
         this.here.cleanUp();
         this.backend.cleanUp();
         this.compassAssistant.cleanUp();
@@ -292,9 +292,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.v("googleApiClient", "Connection to Google Location Services connected!");
+        Log.d("googleApiClient", "Connection to Google Location Services connected!");
         Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        Log.v("googleApiClient","current location is " + location);
+        Log.d("googleApiClient","current location is " + location);
 
 
 
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         locationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
         locationRequest.setFastestInterval(LOCATION_FASTEST_INTERVAL);
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, (LocationListener)here, null);
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, Here.getInstance(), null);
     }
 
     public String getName(){
@@ -314,11 +314,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.v("googleApiClient", "Connection to Google Location Services suspended!");
+        Log.d("googleApiClient", "Connection to Google Location Services suspended!");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.v("googleApiClient", "Connection to Google Location Services failed!");
+        Log.d("googleApiClient", "Connection to Google Location Services failed!");
     }
 }

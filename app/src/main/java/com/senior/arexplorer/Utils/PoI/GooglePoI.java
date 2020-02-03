@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import androidx.arch.core.util.Function;
@@ -32,7 +33,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
     private final String placeDetailsAPIurl = "https://maps.googleapis.com/maps/api/place/details/json";
     private final String KEY = "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4";
     private String placeID;
-    JSONArray details = null;
+    private JSONObject details = null;
 
     public GooglePoI(JSONObject poi) {
         super();
@@ -45,6 +46,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
             super.setLongitude(location.getDouble("lng"));
             JSONArray types = poi.getJSONArray("types");
             this.placeID = poi.getString("place_id");
+            Log.d("GooglePoI", "PlaceID : " + placeID);
 
             for (int j = 0; j < types.length(); j++) {
                 super.addType(types.getString(j));
@@ -95,19 +97,21 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
     public boolean onLongTouch(Context context){
         if(details == null){
             String request = String.format("%s?key=%s&placeid=%s", placeDetailsAPIurl, KEY, this.placeID);
+            Log.d("PlacesRequest", "Sending following getRequest : " + request);
             StringRequest stringRequest = new StringRequest(request,
                     (response) -> {
                         JSONObject detailsResp;
                         try {
                             detailsResp = new JSONObject(response);
-                            details = detailsResp.getJSONArray("result");
+                            details = detailsResp.getJSONObject("result");
+                            Log.d("PlacesRequest", details.toString());
 
                             PopupBox popup = new PopupBox(context, getName());
                             popup.setView(getDetailsView(context));
                             popup.show();
 
                         } catch (JSONException ex) {
-                            ex.printStackTrace();
+                            Log.d("PlacesRequest", ex.toString());
                         }
                     },
                     (error) -> Log.e("GooglePoI", "No response from Google Place Detail API!\n" + error));
@@ -125,13 +129,6 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
     @Override
     View getDetailsView(Context context){
-        HashMap<String, Integer> detailsMap = new HashMap<String, Integer>(){{
-            put("address", 1);
-            put("number", 2);
-            put("hoursArray", 9);
-            put("googleURL", 17);
-            put("site", 20);
-        }};
 
         ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         Function<String, TextView> getTextView = (stringIn) -> {
@@ -149,7 +146,30 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         retView.setLayoutParams(params);
         retView.setGravity(Gravity.CENTER_VERTICAL);
 
-        retView.addView(getTextView.apply(getDistanceTo() + "m away"));
+        try{
+            TextView tempView;
+            tempView = getTextView.apply(details.getString("formatted_phone_number"));
+            retView.addView(tempView);
+
+            tempView = getTextView.apply(details.getString("formatted_address"));
+            retView.addView(tempView);
+
+            retView.addView(getTextView.apply(new DecimalFormat("#.00").format(getDistanceTo()) + "m away."));
+
+
+
+            tempView = getTextView.apply(details.getString("website"));
+            retView.addView(tempView);
+
+            tempView = getTextView.apply(details.getString("url"));
+            tempView.setTextSize(1);
+            tempView.setOnClickListener((i) ->
+                Toast.makeText(context, "I'm contractually obligated to include this by google, fuck off.", Toast.LENGTH_LONG).show());
+            retView.addView(tempView);
+
+        } catch(JSONException ex){
+            Log.d("GooglePoI", ex.toString());
+        }
 
         return retView;
     }

@@ -75,9 +75,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         boolean ret = false;
         for (PoIFetcher source : sources) {
             ret |= source.isReady();
-            Log.d("Backend", source.getClass().getSimpleName() + " : " + source.isReady()+"");
         }
-        Log.d("Backend", ret+"");
         return ret;
     }
 

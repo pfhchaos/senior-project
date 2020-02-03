@@ -276,10 +276,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 break;
         }
 
-        if(Backend.getInstance().isReady())
-            nearby.addAll(Backend.getInstance().getPoIs());
-        Log.d("PoI", nearby.size()+"");
-
         return handled;
     }
 
