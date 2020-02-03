@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
 import android.util.Log;
@@ -57,10 +58,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
 
-        VectorDrawableCompat drawable = (VectorDrawableCompat) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
+        Drawable drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
         compass = getBitmap(drawable);
 
-        drawable = (VectorDrawableCompat) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
+        drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
         compassMarker = getBitmap(drawable);
 
         scale = (float) compass.getWidth() / 720;
@@ -84,12 +85,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
-    private static Bitmap getBitmap(VectorDrawableCompat vectorDrawable) {
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+    private static Bitmap getBitmap(Drawable drawable) {
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        vectorDrawable.draw(canvas);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
         return bitmap;
     }
 
