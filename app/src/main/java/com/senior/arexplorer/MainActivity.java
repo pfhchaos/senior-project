@@ -90,25 +90,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
 
-        /**************************************************************
-         * aws code start
-         */
-        /*
-        mAWSAppSyncClient = AWSAppSyncClient.builder()
-                .context(getApplicationContext())
-                .awsConfiguration(new AWSConfiguration(getApplicationContext()))
-                // If you are using complex objects (S3) then uncomment
-                //.s3ObjectManager(new S3ObjectManagerImplementation(new AmazonS3Client(AWSMobileClient.getInstance())))
-                .build();
-
-
-*/
-
-        /**************************************************************
-         * aws code end
-         */
-
-
         LocalDB.init(this);
         this.localDB = LocalDB.getInstance();
 

@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 import androidx.arch.core.util.Function;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
     private Paint p = new Paint();
@@ -56,10 +57,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
 
-        VectorDrawable drawable = (VectorDrawable) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
+        VectorDrawableCompat drawable = (VectorDrawableCompat) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
         compass = getBitmap(drawable);
 
-        drawable = (VectorDrawable) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
+        drawable = (VectorDrawableCompat) AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
         compassMarker = getBitmap(drawable);
 
         scale = (float) compass.getWidth() / 720;
@@ -83,7 +84,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
-    private static Bitmap getBitmap(VectorDrawable vectorDrawable) {
+    private static Bitmap getBitmap(VectorDrawableCompat vectorDrawable) {
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
                 vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
