@@ -15,6 +15,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.gson.JsonObject;
+import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -24,6 +25,7 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import androidx.arch.core.util.Function;
@@ -156,7 +158,23 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
             retView.addView(getTextView.apply(new DecimalFormat("#.00").format(getDistanceTo()) + "m away."));
 
+            String openNow = details.getJSONObject("opening_hours").getString("open_now");
+            openNow = Boolean.parseBoolean(openNow) ? "Currently Open" : "Currently Closed";
+            retView.addView(getTextView.apply(openNow));
 
+            /*
+             * AngryRant.start();
+             * FOR SOME GODAWFUL REASON THERES INCON-FUCKING-SISTENCIES IN THE WAY JAVA HANDLES DAYS OF THE WEEK AND THE WAY GOOGLE DOES
+             * JAVA DECIDED THAT THE WEEK STARTS ON SUNDAY, THATS FINE BUT FOR SOME FUCKING REASON ITS NOT FUCKING ZERO INDEXED. SUNDAY IS 1!
+             * MEANWHILE GOOGLE IS AT LEAST CORRECTLY ZERO INDEXED BUT THEY HAVE THE BRIGHT IDEA TO START THE WEEK ON MONDAY BECAUSE FUCK CONSISTENCY
+             * THIS IS MY STUPID FUCKING SOLUTION TO GET THIS SHIT TO LINE UP CORRECTLY, MINUS 2 MOD 7. BUT WAIT THERES MORE!
+             * JAVA DOESNT CORRECTLY DEFINE THE MODULUS FUNCTION, THEY DONT HANDLE NEGATIVES AND JUST DO INTEGER DIVISION
+             * SO THAT MEANS THAT I HAVE TO HAVE A CUSTOM DEFINED FUCKING MOD FUNCTION
+             * AngryRant.end();
+             */
+            int dayOfWeek = CommonMethods.xMody(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2, 7);
+            JSONArray hoursArray = details.getJSONObject("opening_hours").getJSONArray("weekday_text");
+            retView.addView(getTextView.apply(hoursArray.getString(dayOfWeek)));
 
             tempView = getTextView.apply(details.getString("website"));
             retView.addView(tempView);

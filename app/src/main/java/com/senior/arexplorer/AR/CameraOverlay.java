@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.senior.arexplorer.R;
 
+import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
@@ -142,14 +143,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     private void calcNearbyRect(PoI poi){
-        //brings us from [-180,180] to [0,360], its easier to deal with
-        Function<Float, Float> mod360 = i -> {
-            float result = i % 360;
-            return result < 0 ? result + 360 : result;};
         Location destLoc = poi.getLocation();
         float relativeHeading = curLoc.bearingTo(destLoc) - heading;
         //this next bit just takes us from [0,360] to [-180,180]
-        relativeHeading = mod360.apply(relativeHeading + 180) - 180;
+        relativeHeading = CommonMethods.xMody((relativeHeading + 180), 360) - 180;
 
 //        Log.d("CamOver",
 //                poi.getName() +
