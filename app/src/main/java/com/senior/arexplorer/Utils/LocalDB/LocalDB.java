@@ -37,7 +37,9 @@ public class LocalDB {
 
     private static synchronized LocalDB getInstanceSynced() {
      Log.d("LocalDB", "LocalDB is instanciated.");
+
      if (LocalDB.instance == null) LocalDB.instance = new LocalDB();
+
      return LocalDB.instance;
     }
     //private getInstanceSynced

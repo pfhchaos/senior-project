@@ -72,6 +72,8 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
             locElev = new Double(c.getString(c.getColumnIndex("elevation")));
 
             saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
+            s.setBLOB(c.getBlob(c.getColumnIndex("image")));
+
             Log.i("fetched saveObj",s.toString());
             newPoIs.add(new LocalPoI(s));
         }

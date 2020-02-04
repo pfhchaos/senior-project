@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
@@ -29,8 +30,10 @@ public class LocalPoI extends PoI {
         setElevation(s.getLocationElevation());
         setLatitude(s.getLocationLatitude());
         setLongitude(s.getLocationLongitude());
-        if(s.getBlob() != null)
+        if(s.getBlob() != null) {
             this.img = new BitmapDrawable(blobToBitmap(s.getBlob()));
+            Log.v("LocalPoI","getBlob was not null");
+        }
     }
 
     private Bitmap blobToBitmap(byte[] blobToConvert){
@@ -54,7 +57,7 @@ public class LocalPoI extends PoI {
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);
         retView.setText(toShortString());
-        retView.setCompoundDrawablesWithIntrinsicBounds(img,null,null,null);
+        retView.setCompoundDrawablesWithIntrinsicBounds(null,img,null,null);
         retView.setTextSize(18);
         return retView;
     }

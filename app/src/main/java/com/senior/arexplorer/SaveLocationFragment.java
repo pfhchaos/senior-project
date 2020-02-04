@@ -54,6 +54,10 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
     private Bitmap dbBM;
     private Here here;
 
+    private String userID,locName,locDesc,fileName;
+    private double locLatitude=0,locLongitude=0,locElevation=0;
+    private Boolean priv;
+
     private String curPhotoPath;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -88,17 +92,17 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        Log.i("onActivityRequest", "requestCode: "+requestCode+"\t resultCode: "+resultCode+"\t Intent: "+data);
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("onActivityRequest", "requestCode: " + requestCode + "\t resultCode: " + resultCode + "\t Intent: " + data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             setPic();
         }
     }
 
-    private void setPic() {
+    private void setPic(){
         Log.i("setPic", "you're in setPic method!");
 
-        int targetW,targetH,photoW,photoH,scaleFactor,currQual = 0;
+        int targetW,targetH,photoW,photoH,scaleFactor,currQual = 20;
         //get dimensions of view
         targetW = pictureImageView.getWidth();
         targetH = pictureImageView.getHeight();
@@ -112,10 +116,11 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
         //determine scale
         scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+        Log.v("scale factor"," "+scaleFactor);
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inSampleSize =  16; //magic number
         bmOptions.inPurgeable = true;
 
         //Rotation matrix
@@ -126,16 +131,8 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         Bitmap bm = BitmapFactory.decodeFile(curPhotoPath,bmOptions);
         Log.v("Before compression: ","photoW: "+bm.getWidth()+" \tphotoH: "+bm.getHeight()+"\tphoto size: "+bm.getAllocationByteCount()+" Bytes");
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        boolean succ;
 
-        succ = bm.compress(Bitmap.CompressFormat.JPEG, currQual, out);
-        Log.v("Comp stream length"," "+out.toByteArray().length);
-        Bitmap compBM = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
-
-        Log.v("Compression? "+succ,"photoW: "+compBM.getWidth()+" \tphotoH: "+compBM.getHeight()+"\tphoto size: "+compBM.getAllocationByteCount()+" Bytes");
-
-        ExifInterface exif = null;
+          ExifInterface exif = null;
         try {
             exif = new ExifInterface(curPhotoPath);
         } catch (IOException e) {
@@ -146,7 +143,7 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
         Log.i("orientation","ori: "+orientation);
 
-        Bitmap rotBM = rotateBitmap(compBM,orientation);
+        Bitmap rotBM = SaveLocationFragment.rotateBitmap(bm,orientation);
         dbBM = rotBM;
 
         pictureImageView.setImageBitmap(dbBM);
@@ -226,22 +223,21 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
             }
         });
         pictureImageView = inflate.findViewById(R.id.pictureView);
+
+        locLatitude = here.getLatitude();
+        locLongitude = here.getLongitude();
+        locElevation = here.getElevation();
+
         return inflate;
     }
 
 
     private void saveData() {
-        String userID,locName,locDesc,fileName;
-        double locLatitude,locLongitude,locElevation;
-        Boolean priv;
         LocalDB LDB = LocalDB.getInstance();
         userID = "test1";       //TODO
 
         Log.i("save here:",here.toString());
 
-        locLatitude = here.getLatitude();
-        locLongitude = here.getLongitude();
-        locElevation = here.getElevation();
 
         locName = nameInputTextView.getText().toString();
         locDesc = descInputTextView.getText().toString();

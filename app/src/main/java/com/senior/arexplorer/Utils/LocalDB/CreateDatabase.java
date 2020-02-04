@@ -7,7 +7,7 @@ import android.util.Log;
 public class CreateDatabase extends SQLiteOpenHelper {
 
  private static final String DB_NAME ="ARdatabase";
- private static final int DB_VERSION = 1;
+ private static final int DB_VERSION = 2;
 
     public CreateDatabase(Context context){
         //check that context has been initalized
