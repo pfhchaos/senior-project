@@ -32,6 +32,10 @@ public class saveObj implements Serializable {
 
     }
 
+    public void setBLOB(byte[] array){
+        this.blob = array;
+    }
+
     @Override
     public String toString(){
         String result = "";

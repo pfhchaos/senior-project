@@ -149,6 +149,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     }
 
     private void changeLocation(Location location) {
+        Log.v("changeLocation","loc changed to "+location.toString());
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), zoom));
     }
 
@@ -214,7 +215,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onCompassChanged(float userHeading) {
-        Log.v("MapFragment", "onCompassChanged");
+        //Log.v("MapFragment", "onCompassChanged");
         if(googleMap != null) {
             changeHeading(userHeading);
         }

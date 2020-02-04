@@ -7,7 +7,7 @@ import android.util.Log;
 public class CreateDatabase extends SQLiteOpenHelper {
 
  private static final String DB_NAME ="ARdatabase";
- private static final int DB_VERSION = 1;
+ private static final int DB_VERSION = 2;
 
     public CreateDatabase(Context context){
         //check that context has been initalized
@@ -32,7 +32,7 @@ public class CreateDatabase extends SQLiteOpenHelper {
                 + "latitude TEXT,"
                 + "longitude TEXT,"
                 + "elevation TEXT,"
-                + "image_resource_id INTEGER);");
+                + "image BLOB);");
 
         db.execSQL("CREATE TABLE TYPE("+"_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "type TEXT);");
