@@ -54,8 +54,11 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
 
     private synchronized void fetchDataAsync(){
         isReady = false;
+
         Cursor c = this.LDB.getAllLocalData();
+
         ArrayList<PoI> newPoIs = new ArrayList<PoI>();
+
         while(c.moveToNext()){
             String userName = "testUser";
             String locName,locDesc;
@@ -69,15 +72,22 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
             locElev = new Double(c.getString(c.getColumnIndex("elevation")));
 
             saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
+            s.setBLOB(c.getBlob(c.getColumnIndex("image")));
+
             Log.i("fetched saveObj",s.toString());
             newPoIs.add(new LocalPoI(s));
         }
+
+        c.close();
+
         synchronized (this.poIs) {
             this.poIs = newPoIs;
         }
+
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
+
         isReady = true;
     }
 

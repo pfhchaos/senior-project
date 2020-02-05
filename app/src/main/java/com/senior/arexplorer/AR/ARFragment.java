@@ -77,7 +77,6 @@ public class ARFragment extends Fragment implements IFragSettings {
         super.onResume();
     }
 
-
     private void startCamera(){
         PreviewConfig config = new PreviewConfig.Builder().build();
         Preview preview = new Preview(config);

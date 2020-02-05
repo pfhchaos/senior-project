@@ -16,6 +16,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import androidx.annotation.NonNull;
+
 public abstract class PoI implements Serializable, Comparable<PoI> {
 
     private String name;
@@ -24,6 +26,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private double elevation;
     private Rect compassRect;
     public boolean compassRender = false;
+    public boolean focused = false;
 
     private Collection<String> types;
 
@@ -105,8 +108,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
 
     public String toShortString() {
         if(Here.getInstance().isReady()){
-            float dist = Here.getInstance().getLocation().distanceTo(getLocation());
-            return getName() + " : " + new DecimalFormat("#.00").format(dist) + " m";
+            return getName() + " : " + new DecimalFormat("#.00").format(getDistanceTo()) + " m";
         }
         else
             return getName();
@@ -120,6 +122,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         ret += "latitude: " + loc.getLatitude() + "\n";
         ret += "longitude: " + loc.getLongitude() + "\n";
         ret += "elevation: " + loc.getAltitude() + "\n";
+        ret += "distance to : " + getDistanceTo();
 
         return ret;
     }
@@ -143,22 +146,26 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return true;
     }
 
-    private View getDetailsView(Context context){
+    View getDetailsView(Context context){
         TextView retView = new TextView(context);
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);
-        retView.setText(toShortString());
+        String dataString = getDistanceTo() + "m away";
+        retView.setText(dataString);
         retView.setTextSize(18);
         return retView;
     }
 
+    public float getDistanceTo(){
+        return Here.getInstance().getLocation().distanceTo(getLocation());
+    }
 
     @Override
-    public int compareTo(PoI place) {
+    public int compareTo(@NonNull PoI place) {
         Location here = Here.getInstance().getLocation();
         if(here == null)
             here = place.getLocation();
-        int retInt = (int) (here.distanceTo(getLocation()) - here.distanceTo(place.getLocation()));
+        int retInt = (int) (getDistanceTo() - place.getDistanceTo());
         if(retInt == 0){
             retInt = (here.equals(place.getLocation())) ? 0 : 1;
         }

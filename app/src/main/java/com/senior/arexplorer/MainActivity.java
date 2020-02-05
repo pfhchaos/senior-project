@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
        if (!checkPlayServices()) {
            Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT);
        }
+
     }
 
     @Override
@@ -174,6 +175,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CompassAssistant.getInstance().cleanUp();
         CompassAssistant.getInstance(this).onStop();
         super.onStop();
+    }
+
+    @Override
+    public void onRestart(){
+        Log.v("ActivityLifecycle","onRestart");
+        super.onRestart();
     }
 
     //permission methods
