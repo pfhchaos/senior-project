@@ -35,6 +35,7 @@ import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
 //import com.amazonaws.mobile.config.AWSConfiguration;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
     private AWSAppSyncClient mAWSAppSyncClient;
+    private Settings settings;
 
 
 
@@ -101,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.here = Here.getInstance();
         this.backend = Backend.getInstance();
 
+        Settings.init(this);
+        this.settings = Settings.getInstance();
+
         this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
         this.compassAssistant = CompassAssistant.getInstance(this);
@@ -126,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onStart() {
         super.onStart();
         Log.d("ActivityLifecycle","onStart");
+        CompassAssistant.getInstance(this).onStart();
 
         if (this.googleApiClient != null) {
             this.googleApiClient.connect();
@@ -163,9 +169,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onStop() {
         Log.d("ActivityLifecycle","onStop");
-        this.here.cleanUp();
-        this.backend.cleanUp();
-        this.compassAssistant.cleanUp();
+        Here.getInstance().cleanUp();
+        Backend.getInstance().cleanUp();
+        CompassAssistant.getInstance().cleanUp();
+        CompassAssistant.getInstance(this).onStop();
         super.onStop();
     }
 

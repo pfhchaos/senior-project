@@ -2,7 +2,6 @@ package com.senior.arexplorer.AR;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -20,6 +19,7 @@ import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.SeekBarWithText;
 import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,8 +37,6 @@ public class ARFragment extends Fragment implements IFragSettings {
     private TextureView camView;
     private final int FOV_MIN = 45, FOV_MAX = 360; //in degrees
     private final int DD_MIN = 100, DD_MAX = 10000; //in meters
-    private int drawDistance = 1000;
-
 
     @Nullable
     @Override
@@ -72,13 +70,11 @@ public class ARFragment extends Fragment implements IFragSettings {
     @Override
     public void onPause(){
         super.onPause();
-        CompassAssistant.getInstance(getActivity()).onStop();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        CompassAssistant.getInstance(getActivity()).onStart();
     }
 
 
@@ -145,8 +141,7 @@ public class ARFragment extends Fragment implements IFragSettings {
           return title;
         };
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        int fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
+        int fov  = Settings.getInstance().getCompassFOV();
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Compass Field of View : " + fov + " degrees")
             .setOnMenuItemClickListener((i) -> {
@@ -155,15 +150,15 @@ public class ARFragment extends Fragment implements IFragSettings {
 
                 SeekBarWithText popView = new SeekBarWithText(getContext());
                 popView.setMinMax(FOV_MIN, FOV_MAX)
-                        .setProgress(mOverlay.getFoV() - FOV_MIN)
-                        .setText("Current Field of View : " + mOverlay.getFoV())
+                        .setProgress(Settings.getInstance().getCompassFOV() - FOV_MIN)
+                        .setText("Current Field of View : " + Settings.getInstance().getCompassFOV())
                         .setListener((progress) -> {
-                                mOverlay.setFoV(progress + FOV_MIN);
-                                popView.setText("Current Field of View : " + mOverlay.getFoV());
+                                Settings.getInstance().setCompassFOV(progress + FOV_MIN);
+                                popView.setText("Current Field of View : " + Settings.getInstance().getCompassFOV());
                         });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
-                    i.setTitle("Compass Field of View : " + mOverlay.getFoV() + " degrees");
+                    i.setTitle("Compass Field of View : " + Settings.getInstance().getCompassFOV() + " degrees");
                     dialog.dismiss();
                 });
 
@@ -172,11 +167,14 @@ public class ARFragment extends Fragment implements IFragSettings {
                 return false;
             });
 
-        Supplier<String> formatDistance = () ->
-                ((drawDistance >= 1000) ?  ((float)drawDistance/1000) + " km" : drawDistance + " meters");
+        Supplier<String> formatDistance = () -> {
+            int drawDistance = Settings.getInstance().getDrawDistance();
+            return ((drawDistance >= 1000) ? ((float) drawDistance / 1000) + " km" : drawDistance + " meters");
+        };
 
         menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Draw Distance : " + formatDistance.get() )
             .setOnMenuItemClickListener((i) -> {
+                int drawDistance = Settings.getInstance().getDrawDistance();
                 AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
                 popDialog.setCustomTitle(getTitle.apply("Please Select a Draw Distance"));
 
@@ -189,13 +187,13 @@ public class ARFragment extends Fragment implements IFragSettings {
                         .setProgress((drawDistance - DD_MIN) / 100)
                         .setText("Current Draw Distance : " + formatDistance.get())
                         .setListener((progress) -> {
-                            drawDistance = (progress * 100) + DD_MIN;
+                            Settings.getInstance().setDrawDistance((progress * 100) + DD_MIN);
                             popView.setText("Current Draw Distance : " + formatDistance.get());
                         });
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
                     i.setTitle("Draw Distance : " + formatDistance.get());
-                    mOverlay.setDD(drawDistance);
+                    Settings.getInstance().setDrawDistance(drawDistance);
                     dialog.dismiss();
                 });
 

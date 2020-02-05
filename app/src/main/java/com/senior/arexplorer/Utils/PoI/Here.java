@@ -68,7 +68,13 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             Here.applicationContext = context.getApplicationContext();
         }
         else {
-            Log.e("Here","Attempted to initialize Here twice!");
+            if (Here.applicationContext == context.getApplicationContext()) {
+                Log.d("Here", "Here initalized twice, same context proceding");
+            }
+            else {
+                Log.e("Here", "Attempted to initialize Here twice!");
+                throw new Error("Shit and die!");
+            }
         }
     }
 
