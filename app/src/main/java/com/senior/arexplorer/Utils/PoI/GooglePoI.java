@@ -1,6 +1,8 @@
 package com.senior.arexplorer.Utils.PoI;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.telecom.Call;
 import android.util.Log;
 import android.view.Gravity;
@@ -140,10 +142,20 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
         try{
             TextView tempView;
-            tempView = PopupBox.getTextView(details.getString("formatted_phone_number"), context);
+            String phoneNum = details.getString("formatted_phone_number");
+            tempView = PopupBox.getTextView(phoneNum, context);
+            tempView.setOnClickListener(i ->
+                    context.startActivity(new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNum, null))));
             retView.addView(tempView);
 
-            tempView = PopupBox.getTextView(details.getString("formatted_address"), context);
+            String address = details.getString("formatted_address");
+            tempView = PopupBox.getTextView(address, context);
+            tempView.setOnClickListener(i -> {
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + address);
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                context.startActivity(mapIntent);
+            });
             retView.addView(tempView);
 
             retView.addView(PopupBox.getTextView(new DecimalFormat("#.00").format(getDistanceTo()) + "m away.", context));
@@ -166,7 +178,9 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
             JSONArray hoursArray = details.getJSONObject("opening_hours").getJSONArray("weekday_text");
             retView.addView(PopupBox.getTextView(hoursArray.getString(dayOfWeek), context));
 
-            tempView = PopupBox.getTextView(details.getString("website"), context);
+            String website = details.getString("website");
+            tempView = PopupBox.getTextView(website, context);
+            tempView.setOnClickListener(i -> context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(website))));
             retView.addView(tempView);
 
             tempView = PopupBox.getTextView(details.getString("url"), context);
