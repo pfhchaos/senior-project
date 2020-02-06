@@ -37,7 +37,6 @@ import com.senior.arexplorer.Utils.PoI.PoIFetcherHandler;
 
 import java.util.Collection;
 
-
 public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSettings, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
 
     private GoogleMap googleMap;
@@ -48,6 +47,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d("MapFragment", "onCreateView");
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
         // Gets the MapView from the XML layout and creates it

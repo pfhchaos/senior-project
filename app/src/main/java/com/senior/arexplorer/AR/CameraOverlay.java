@@ -1,8 +1,6 @@
 package com.senior.arexplorer.AR;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,9 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.VectorDrawable;
 import android.location.Location;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,12 +25,12 @@ import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.PoI.HereListener;
 import com.senior.arexplorer.Utils.PoI.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
+import com.senior.arexplorer.Utils.Settings;
 
 import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 import androidx.arch.core.util.Function;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
     private Paint p = new Paint();
@@ -42,8 +38,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private Bitmap compass, compassMarker;
     private float heading = 0;
     private float scale;
-    private int fov = 180;
-    private int drawDistance = 1000;
     private float sx = (float) getWidth() / 10000;
     private float sy = (float) getHeight() / 10000;
     private float previousCompassBearing = -1f;
@@ -82,9 +76,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
-
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        fov  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
     }
 
     private static Bitmap getBitmap(Drawable drawable) {
@@ -134,6 +125,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private void drawCompass(Canvas canvas){
         int height = compass.getHeight();
         int width = compass.getWidth();
+        int fov = Settings.getInstance().getCompassFOV();
         int offset = (int) (fov/2 * scale);
         int mid = width / 2 +  (int) (heading * scale);
 
@@ -143,6 +135,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     private void calcNearbyRect(PoI poi){
+        int fov = Settings.getInstance().getCompassFOV();
+        int drawDistance = Settings.getInstance().getDrawDistance();
+        //brings us from [-180,180] to [0,360], its easier to deal with
+        Function<Float, Float> mod360 = i -> {
+            float result = i % 360;
+            return result < 0 ? result + 360 : result;};
         Location destLoc = poi.getLocation();
         float relativeHeading = curLoc.bearingTo(destLoc) - heading;
         //this next bit just takes us from [0,360] to [-180,180]
@@ -173,19 +171,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
         else
             poi.compassRender = false;
-    }
-
-    void setFoV(int newFoV){
-        fov = newFoV;
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("Pref_AR_Compass_FOV","" + fov);
-        editor.commit();
-    }
-    int getFoV() { return fov; }
-
-    void setDD(int newDrawDistance){
-        drawDistance = newDrawDistance;
     }
 
     @Override
