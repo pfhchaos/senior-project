@@ -192,7 +192,6 @@ public class ARFragment extends Fragment implements IFragSettings {
 
                 popDialog.setPositiveButton("OK", (dialog, which) -> {
                     i.setTitle("Draw Distance : " + formatDistance.get());
-                    Settings.getInstance().setDrawDistance(drawDistance);
                     dialog.dismiss();
                 });
 
