@@ -147,13 +147,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     }
 
     View getDetailsView(Context context){
-        TextView retView = new TextView(context);
-        retView.setPadding(10,5,10,5);
-        retView.setGravity(Gravity.CENTER);
-        String dataString = getDistanceTo() + "m away";
-        retView.setText(dataString);
-        retView.setTextSize(18);
-        return retView;
+        return PopupBox.getTextView(getDistanceTo() + "m away", context);
     }
 
     public float getDistanceTo(){

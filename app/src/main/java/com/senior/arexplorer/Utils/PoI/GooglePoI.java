@@ -132,35 +132,25 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
     @Override
     View getDetailsView(Context context){
 
-        ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        Function<String, TextView> getTextView = (stringIn) -> {
-              TextView textView = new TextView(context);
-              textView.setLayoutParams(params);
-              textView.setPadding(10,5,10,5);
-              textView.setGravity(Gravity.CENTER);
-              textView.setTextSize(18);
-              textView.setText(stringIn);
-          return textView;
-        };
 
         LinearLayout retView = new LinearLayout(context);
         retView.setOrientation(LinearLayout.VERTICAL);
-        retView.setLayoutParams(params);
+        retView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         retView.setGravity(Gravity.CENTER_VERTICAL);
 
         try{
             TextView tempView;
-            tempView = getTextView.apply(details.getString("formatted_phone_number"));
+            tempView = PopupBox.getTextView(details.getString("formatted_phone_number"), context);
             retView.addView(tempView);
 
-            tempView = getTextView.apply(details.getString("formatted_address"));
+            tempView = PopupBox.getTextView(details.getString("formatted_address"), context);
             retView.addView(tempView);
 
-            retView.addView(getTextView.apply(new DecimalFormat("#.00").format(getDistanceTo()) + "m away."));
+            retView.addView(PopupBox.getTextView(new DecimalFormat("#.00").format(getDistanceTo()) + "m away.", context));
 
             String openNow = details.getJSONObject("opening_hours").getString("open_now");
             openNow = Boolean.parseBoolean(openNow) ? "Currently Open" : "Currently Closed";
-            retView.addView(getTextView.apply(openNow));
+            retView.addView(PopupBox.getTextView(openNow, context));
 
             /*
              * AngryRant.start();
@@ -174,12 +164,12 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
              */
             int dayOfWeek = CommonMethods.xMody(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2, 7);
             JSONArray hoursArray = details.getJSONObject("opening_hours").getJSONArray("weekday_text");
-            retView.addView(getTextView.apply(hoursArray.getString(dayOfWeek)));
+            retView.addView(PopupBox.getTextView(hoursArray.getString(dayOfWeek), context));
 
-            tempView = getTextView.apply(details.getString("website"));
+            tempView = PopupBox.getTextView(details.getString("website"), context);
             retView.addView(tempView);
 
-            tempView = getTextView.apply(details.getString("url"));
+            tempView = PopupBox.getTextView(details.getString("url"), context);
             tempView.setTextSize(1);
             tempView.setOnClickListener((i) ->
                 Toast.makeText(context, "I'm contractually obligated to include this by google, fuck off.", Toast.LENGTH_LONG).show());
