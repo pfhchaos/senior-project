@@ -102,6 +102,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("MapFragment", "onDestroy");
         Here.getInstance().removeListener(this);
         Backend.getInstance().removeHandler(this);
         CompassAssistant.getInstance(getContext()).removeCompassListener(this);
@@ -110,12 +111,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onLowMemory() {
+        Log.d("MapFragment", "onLowMemory");
         super.onLowMemory();
         mapView.onLowMemory();
     }
 
     @Override
     public void onMapReady(GoogleMap gMap) {
+        Log.d("MapFragment", "onMapReady");
         googleMap = gMap;
         googleMap.setBuildingsEnabled(true);
 
@@ -154,11 +157,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Log.v("changeLocation","loc changed to "+location.toString());
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), zoom));
 
-        if (this.youAreHere != null) this.youAreHere.remove();
-        MarkerOptions newMarkerOptions = new MarkerOptions();
-        newMarkerOptions.position(Here.getInstance().getLatLng());
-        newMarkerOptions.title("You Are Here.");
-        this.youAreHere = this.googleMap.addMarker(newMarkerOptions);
+        createYouAreHereMarker();
     }
 
     private void changeHeading(float userHeading) {
@@ -174,6 +173,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Marker newMarker = this.googleMap.addMarker(newMarkerOptions);
         newMarker.setTag(poi);
         newMarker.setDraggable(true);
+    }
+
+    private void createYouAreHereMarker() {
+        if (this.youAreHere != null) this.youAreHere.remove();
+        MarkerOptions newMarkerOptions = new MarkerOptions();
+        newMarkerOptions.position(Here.getInstance().getLatLng());
+        newMarkerOptions.title("You Are Here.");
+        this.youAreHere = this.googleMap.addMarker(newMarkerOptions);
     }
 
     @Override

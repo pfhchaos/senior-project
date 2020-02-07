@@ -1,18 +1,24 @@
 package com.senior.arexplorer.Utils.PoI;
 
+import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.AWS.CloudDB;
 import com.senior.arexplorer.Utils.AWS.CloudDBListener;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
 
-
-    private Here here;
-    private CloudDB CDB;
     private static CloudPoIFetcher CPF;
     private boolean isReady = false;
+
+    private static final String url = "jdbc:mysql://database-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/ar_schema";
+    private static final String user = "masteruser";
+    private static final String pass = "Bangladesh88";
 
     public static CloudPoIFetcher getInstance(){
         if(CPF == null) CPF = new CloudPoIFetcher();
@@ -35,47 +41,45 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
 
         });
         thread.start();
-
-
     }
 
     private synchronized void fetchDataAsync(){
-        isReady = false;
-       /* Cursor c = this.CDB.getAllLocalData();
         ArrayList<PoI> newPoIs = new ArrayList<PoI>();
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection con = DriverManager.getConnection(url, user, pass);
+            String result = "Database Connection Successful\n";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select * from LOCAL_DATA");
 
-        while(c.moveToNext()){
-            String userName = "testUser";
-            String locName,locDesc;
-            Double locLat,locLong,locElev;
-            Boolean priv = false;
+            while (rs.next()) {
+                String userName = "testUser";
+                String locName,locDesc;
+                Double locLat,locLong,locElev;
+                Boolean priv = false;
+                locName= rs.getString(2).toString();
+                locDesc = rs.getString(3).toString();
+                locLat = rs.getDouble(4);
+                locLong = rs.getDouble(5);
+                locElev = rs.getDouble(6);
+                saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
+                newPoIs.add(new CloudPoI(s));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            locName = c.getString(c.getColumnIndex("name"));
-            locDesc = c.getString(c.getColumnIndex("description"));
-            locLat = new Double(c.getString(c.getColumnIndex("latitude")));
-            locLong = new Double(c.getString(c.getColumnIndex("longitude")));
-            locElev = new Double(c.getString(c.getColumnIndex("elevation")));
-
-            saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
-            Log.i("fetched saveObj",s.toString());
-            newPoIs.add(new LocalPoI(s));
-        }*/
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
         synchronized (this.poIs) {
-            this.poIs = CloudDB.getInstance().getLocalData();
+            this.poIs = newPoIs;
         }
         isReady = true;
-
-
     }
 
-
-
     private CloudPoIFetcher(){
-        this.here = Here.getInstance();
-        this.CDB = CloudDB.getInstance();
+        super();
         this.poIFetcherHandlers = new ArrayList<>();
         this.poIs = new ArrayList<>();
 

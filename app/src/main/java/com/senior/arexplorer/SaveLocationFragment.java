@@ -24,21 +24,19 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.core.content.FileProvider;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.senior.arexplorer.AR.saveObj;
+import com.senior.arexplorer.Utils.AWS.CloudDB;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.PoI.Here;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -234,6 +232,8 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
     private void saveData() {
         LocalDB LDB = LocalDB.getInstance();
+        CloudDB CDB = CloudDB.getInstance();
+
         userID = "test1";       //TODO
 
         Log.i("save here:",here.toString());
@@ -255,6 +255,10 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         }
         else{
             //TODO save to public DB
+           // CDB.insertCloudData(s);
+            CDB.ExecurQuery(s);
+
+            Log.d("save was public","insert into cloud");
         }
 
         switchFrag();
