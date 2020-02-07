@@ -194,6 +194,11 @@ public class ARFragment extends Fragment implements IFragSettings {
                     i.setTitle("Draw Distance : " + formatDistance.get());
                     dialog.dismiss();
                 });
+                popDialog.setOnCancelListener((dialog) -> {
+                    Settings.getInstance().setDrawDistance(drawDistance);
+                    i.setTitle("Draw Distance : " + drawDistance);
+                    dialog.dismiss();
+                });
 
             popDialog.setView(popView);
             popDialog.create();

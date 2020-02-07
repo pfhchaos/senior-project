@@ -8,4 +8,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="This is where I would put my settings. IF I HAD ANY!" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10"
+        android:progress="3" />
 </LinearLayout>
