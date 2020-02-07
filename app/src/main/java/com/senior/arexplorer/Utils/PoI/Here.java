@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -87,6 +88,10 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     }
     public double getLongitude() {
         return this.currentLocation.getLongitude();
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(this.currentLocation.getLatitude(), this.currentLocation.getLongitude());
     }
 
     public void setElevation(Double elevation) {
