@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Backend.AWS;
+package com.senior.arexplorer.Utils.Backend.CloudPoI.AWS;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -6,7 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.senior.arexplorer.Utils.Backend.saveObj;
-import com.senior.arexplorer.Utils.Backend.LocalPoI;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalPoI;
 import com.senior.arexplorer.Utils.Backend.PoI;
 
 import java.io.ByteArrayInputStream;

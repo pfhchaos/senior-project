@@ -1,6 +1,9 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.CloudPoI;
 
-public class CloudPoI extends PoI{
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.saveObj;
+
+public class CloudPoI extends PoI {
 
     public CloudPoI(saveObj s){
         super();

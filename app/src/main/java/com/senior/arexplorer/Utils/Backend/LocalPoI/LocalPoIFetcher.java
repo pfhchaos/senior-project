@@ -1,11 +1,16 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.LocalPoI;
 
 
 import android.database.Cursor;
 import android.util.Log;
 
-import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDB;
-import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDBListener;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDBListener;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcher;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.Backend.saveObj;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,13 +38,13 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     }
 
     @Override
-    Collection<PoI> getPoIs() {
+    public Collection<PoI> getPoIs() {
         // sexy
         return this.poIs;
     }
 
     @Override
-    void fetchData() {
+    public void fetchData() {
 
         Thread thread = new Thread(new Runnable() {
             @Override

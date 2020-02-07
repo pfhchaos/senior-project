@@ -24,7 +24,7 @@ import com.senior.arexplorer.AR.ARFragment;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.Backend.Backend;
-import com.senior.arexplorer.Utils.Backend.Here;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 

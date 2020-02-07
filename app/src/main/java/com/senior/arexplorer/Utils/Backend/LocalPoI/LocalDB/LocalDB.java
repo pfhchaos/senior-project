@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Backend.LocalDB;
+package com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB;
 
 import android.content.ContentValues;
 import android.content.Context;

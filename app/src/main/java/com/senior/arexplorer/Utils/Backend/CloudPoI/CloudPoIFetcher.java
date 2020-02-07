@@ -1,7 +1,11 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.CloudPoI;
 
-import com.senior.arexplorer.Utils.Backend.AWS.CloudDB;
-import com.senior.arexplorer.Utils.Backend.AWS.CloudDBListener;
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcher;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.Backend.saveObj;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,12 +29,12 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
     }
 
     @Override
-    Collection<PoI> getPoIs() {
+    public Collection<PoI> getPoIs() {
         return this.poIs;
     }
 
     @Override
-    void fetchData() {
+    public void fetchData() {
         Thread thread = new Thread(new Runnable(){
 
             @Override

@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.GooglePoI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
@@ -126,7 +127,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
     }
 
     @Override
-    View getDetailsView(Context context){
+    public View getDetailsView(Context context){
 
 
         LinearLayout retView = new LinearLayout(context);

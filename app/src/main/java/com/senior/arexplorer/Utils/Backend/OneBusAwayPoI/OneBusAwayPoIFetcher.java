@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.OneBusAwayPoI;
 
 import android.location.Location;
 import android.util.Log;
@@ -6,6 +6,10 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcher;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -76,12 +80,12 @@ public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorLi
     }
 
     @Override
-    Collection<PoI> getPoIs() {
+    public Collection<PoI> getPoIs() {
         return this.poIs;
     }
 
     @Override
-    void fetchData() {
+    public void fetchData() {
         Location hereNow = Here.getInstance().getLocation();
         if(hereNow == null){
             Log.e("OneBusAwayPoIFetcher","here is null. this should not happen");

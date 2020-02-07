@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.OneBusAwayPoI;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,6 +10,8 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -127,7 +129,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
     }
 
     @Override
-    View getDetailsView(Context context){
+    public View getDetailsView(Context context){
         TextView retView = new TextView(context);
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);

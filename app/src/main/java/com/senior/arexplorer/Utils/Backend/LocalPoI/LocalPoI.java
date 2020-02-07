@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.Backend;
+package com.senior.arexplorer.Utils.Backend.LocalPoI;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +9,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.saveObj;
 import com.senior.arexplorer.Utils.PopupBox;
 
 
@@ -45,7 +47,7 @@ public class LocalPoI extends PoI {
     }
 
     @Override
-    View getDetailsView(Context context){
+    public View getDetailsView(Context context){
         TextView retView = new TextView(context);
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);

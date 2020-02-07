@@ -28,9 +28,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
-import com.senior.arexplorer.Utils.Backend.Here;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.Backend.HereListener;
+import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 

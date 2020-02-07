@@ -4,7 +4,12 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
-import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.GooglePoI.GooglePoIFetcher;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.Here.HereListener;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalPoIFetcher;
+import com.senior.arexplorer.Utils.Backend.OneBusAwayPoI.OneBusAwayPoIFetcher;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.ArrayList;
@@ -99,7 +104,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         }
     }
 
-    void fetchData() {
+    public void fetchData() {
         Log.v("Backend","fetching data from sources");
         this.lastFetched = Here.getInstance().getLocation();
         for (PoIFetcher source: sources) {

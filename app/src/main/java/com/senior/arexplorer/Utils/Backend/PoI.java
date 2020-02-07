@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.PopupBox;
 
 import java.io.Serializable;
@@ -144,7 +145,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return true;
     }
 
-    View getDetailsView(Context context){
+    public View getDetailsView(Context context){
         return PopupBox.getTextView(getDistanceTo() + "m away", context);
     }
 
