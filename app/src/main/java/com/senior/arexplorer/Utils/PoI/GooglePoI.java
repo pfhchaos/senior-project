@@ -2,6 +2,7 @@ package com.senior.arexplorer.Utils.PoI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.telecom.Call;
 import android.util.Log;
@@ -140,6 +141,11 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         retView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         retView.setGravity(Gravity.CENTER_VERTICAL);
 
+        View horizontalDivider = new View(context);
+        horizontalDivider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1));
+        horizontalDivider.setBackgroundColor(Color.DKGRAY);
+        retView.addView(horizontalDivider);
+
         try{
             TextView tempView;
             String phoneNum = details.getString("formatted_phone_number");
@@ -157,6 +163,11 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
                 context.startActivity(mapIntent);
             });
             retView.addView(tempView);
+
+            horizontalDivider = new View(context);
+            horizontalDivider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1));
+            horizontalDivider.setBackgroundColor(Color.DKGRAY);
+            retView.addView(horizontalDivider);
 
             retView.addView(PopupBox.getTextView(new DecimalFormat("#.00").format(getDistanceTo()) + "m away.", context));
 
