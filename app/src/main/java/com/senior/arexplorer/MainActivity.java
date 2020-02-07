@@ -27,6 +27,7 @@ import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
+import com.senior.arexplorer.Utils.IconProvider;
 
 //import com.amazonaws.mobile.config.AWSConfiguration;
 //import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private WebRequester webRequester;
     private AWSAppSyncClient mAWSAppSyncClient;
     private Settings settings;
+    private IconProvider iconProvider;
 
     //lifecycle methods
     @Override
@@ -221,5 +223,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         this.compassAssistant = CompassAssistant.getInstance(this);
         compassAssistant.onStart();
+
+        IconProvider.init(this);
+        this.iconProvider = IconProvider.getInstance();
     }
 }

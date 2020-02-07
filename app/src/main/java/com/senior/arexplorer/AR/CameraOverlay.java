@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -20,6 +19,7 @@ import com.senior.arexplorer.R;
 
 import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.PoI.HereListener;
@@ -55,10 +55,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setAlpha(1f);
 
         Drawable drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
-        compass = getBitmap(drawable);
+        compass = CommonMethods.getBitmapFromDrawable(drawable);
 
-        drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
-        compassMarker = getBitmap(drawable);
+//        drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
+//        compassMarker = CommonMethods.getBitmapFromDrawable(drawable);
+        compassMarker = IconProvider.getInstance().getRound();
 
         scale = (float) compass.getWidth() / 720;
 
@@ -76,15 +77,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
-    }
-
-    private static Bitmap getBitmap(Drawable drawable) {
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
     }
 
     @Override
