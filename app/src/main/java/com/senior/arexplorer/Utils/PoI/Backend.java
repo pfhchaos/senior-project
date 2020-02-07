@@ -81,6 +81,8 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         else {
             Log.d("Backend","OneBusAway backend is disabled, skipping");
         }
+
+        fetchData();
     }
 
     public Collection<PoI> getPoIs() {
@@ -131,12 +133,8 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
     @Override
     public void placeFetchComplete() {
         Log.v("Backend","place fetch complete");
-        boolean ready = true;
-        for (PoIFetcher source : sources) {
-            ready &= source.isReady();
-        }
 
-        if (ready) {
+        if (isReady()) {
             Log.v("Backend","all sources ready");
             for (PoIFetcherHandler handler : this.poIFetcherHandlers) {
                 handler.placeFetchComplete();

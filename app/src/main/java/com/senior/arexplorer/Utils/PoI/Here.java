@@ -2,14 +2,21 @@ package com.senior.arexplorer.Utils.PoI;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -21,10 +28,13 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String> {
+public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String>, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
     public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
     public final int smoothNumLocations = 5;
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+    private static final long LOCATION_UPDATE_INTERVAL = 5000;
+    private static final long LOCATION_FASTEST_INTERVAL = 5000;
 
     private static Here instance = null;
     private static Context applicationContext;
@@ -32,6 +42,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     private Collection<HereListener> callbacks;
     private Queue<Location> prevLocations;
     private Location currentLocation;
+    private GoogleApiClient googleApiClient;
     private boolean isReady;
 
     private Here() {
@@ -43,6 +54,19 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         this.callbacks = new ArrayList<HereListener>();
         this.prevLocations = new LinkedList<Location>();
         this.isReady = false;
+
+        if (!checkPlayServices()) {
+            Log.e("Here ","You need to install Google Play Services to use the App properly");
+        }
+
+        this.googleApiClient = new GoogleApiClient.Builder(applicationContext).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+
+        if (this.googleApiClient != null) {
+            this.googleApiClient.connect();
+        }
+        else {
+            Log.e("googleApiClient", "googleApiClient is null!");
+        }
     }
 
     public static Here getInstance() {
@@ -178,7 +202,6 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         }
     }
 
-
     @NonNull
     @Override
     public String toString() {
@@ -187,4 +210,51 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
         result += "\n# of callbacks listening:\t\t"+callbacks.size()+"\n";
         return result;
     }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.d("googleApiClient", "Connection to Google Location Services connected!");
+        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        Log.d("googleApiClient","current location is " + location);
+
+
+
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
+        locationRequest.setFastestInterval(LOCATION_FASTEST_INTERVAL);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, Here.getInstance(), null);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d("googleApiClient", "Connection to Google Location Services suspended!");
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("googleApiClient", "Connection to Google Location Services failed!");
+    }
+
+    //google location services
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this.applicationContext);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                //TODO: print useful debugging info
+                //apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
+            } else {
+                //finish();
+
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
 }

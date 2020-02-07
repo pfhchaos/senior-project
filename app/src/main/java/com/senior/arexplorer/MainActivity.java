@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -12,7 +11,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,18 +19,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
-import com.senior.arexplorer.Utils.AWS.CloudDB;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.PoI.Backend;
 import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.Settings;
@@ -41,27 +31,20 @@ import com.senior.arexplorer.Utils.WebRequester;
 //import com.amazonaws.mobile.config.AWSConfiguration;
 //import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final int PERMISSION_REQUEST_LOCATION = 1;
     private static final int PERMISSION_REQUEST_CAMERA = 10;
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-    private static final long LOCATION_UPDATE_INTERVAL = 5000;
-    private static final long LOCATION_FASTEST_INTERVAL = 5000;
 
     DrawerLayout drawer;
     public SQLiteDatabase db;
     private Cursor favoritesCursor;
     public Cursor cursor;
-    //SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
 
-    private GoogleApiClient googleApiClient;
     private Backend backend;
     private CompassAssistant compassAssistant;
     private WebRequester webRequester;
     private AWSAppSyncClient mAWSAppSyncClient;
     private Settings settings;
-
-
 
     //lifecycle methods
     @Override
@@ -89,35 +72,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
 
-        initSingletons();
     } // onCreate end
-
 
     @Override
     public void onResume() {
        super.onResume();
-        Log.d("ActivityLifecycle","onResume");
-
-        compassAssistant.onStart();
-
-       if (!checkPlayServices()) {
-           Toast.makeText(this, "You need to install Google Play Services to use the App properly", Toast.LENGTH_SHORT);
-       }
-
+       Log.d("ActivityLifecycle","onResume");
     }
 
     @Override
     public void onStart() {
         super.onStart();
         Log.d("ActivityLifecycle","onStart");
-        CompassAssistant.getInstance(this).onStart();
-
-        if (this.googleApiClient != null) {
-            this.googleApiClient.connect();
-        }
-        else {
-            Log.e("googleApiClient", "googleApiClient is null!");
-        }
+        initSingletons();
+        CompassAssistant.getInstance().onStart();
     }
 
     @Override
@@ -125,15 +93,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
         Log.d("ActivityLifecycle","onPause");
         //TODO: pause location updates here
-
-        compassAssistant.onStop();
-
-        /*
-        if (googleApiClient != null  &&  googleApiClient.isConnected()) {
-          LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-          googleApiClient.disconnect();
-        }
-         */
     }
 
     @Override
@@ -151,8 +110,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Here.getInstance().cleanUp();
         Backend.getInstance().cleanUp();
         //TODO: this seems wrong
+        CompassAssistant.getInstance().onStop();
         CompassAssistant.getInstance().cleanUp();
-        CompassAssistant.getInstance(this).onStop();
         super.onStop();
     }
 
@@ -244,56 +203,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-
-    //google location services
-    private boolean checkPlayServices() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
-            } else {
-                //finish();
-
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        Log.d("googleApiClient", "Connection to Google Location Services connected!");
-        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        Log.d("googleApiClient","current location is " + location);
-
-
-
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(LOCATION_UPDATE_INTERVAL);
-        locationRequest.setFastestInterval(LOCATION_FASTEST_INTERVAL);
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, Here.getInstance(), null);
-    }
-
     public String getName(){
         return "From Activity";
-    }
-
-
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d("googleApiClient", "Connection to Google Location Services suspended!");
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("googleApiClient", "Connection to Google Location Services failed!");
     }
 
     private void initSingletons() {
@@ -307,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Backend.init(this);
         this.backend = Backend.getInstance();
 
-        this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
 
         this.compassAssistant = CompassAssistant.getInstance(this);
         compassAssistant.onStart();
