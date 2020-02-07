@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend.GooglePoI;
 
 import android.location.Location;
 import android.util.Log;
@@ -6,6 +6,10 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcher;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -15,7 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
+public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 
@@ -39,6 +43,7 @@ class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Res
         this.isReady = false;
     }
 
+    @Override
     public void fetchData() {
         Location here = Here.getInstance().getLocation();
         if (here == null) {

@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +27,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.PoI.Backend;
-import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.Backend.Backend;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.PoI.HereListener;
-import com.senior.arexplorer.Utils.PoI.PoI;
-import com.senior.arexplorer.Utils.PoI.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.Backend.Here.HereListener;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 
 import java.util.Collection;
 

@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend;
 
 public interface PoIFetcherHandler {
     void placeFetchComplete();

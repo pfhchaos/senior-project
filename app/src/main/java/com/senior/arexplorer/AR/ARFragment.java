@@ -17,8 +17,8 @@ import android.widget.TextView;
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.SeekBarWithText;
-import com.senior.arexplorer.Utils.PoI.Here;
 import com.senior.arexplorer.Utils.Settings;
 
 import androidx.annotation.NonNull;

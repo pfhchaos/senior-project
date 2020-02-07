@@ -1,12 +1,16 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend.LocalPoI;
 
 
 import android.database.Cursor;
 import android.util.Log;
 
-import com.senior.arexplorer.AR.saveObj;
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
-import com.senior.arexplorer.Utils.LocalDB.LocalDBListener;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDBListener;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcher;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.Backend.saveObj;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +28,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     }
 
     private LocalPoIFetcher(){
+        Log.d("LocalPoIFetcher", "LocalPoIFetcher is instanciated");
         this.here = Here.getInstance();
         this.LDB = LocalDB.getInstance();
         this.poIFetcherHandlers = new ArrayList<>();
@@ -33,13 +38,13 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     }
 
     @Override
-    Collection<PoI> getPoIs() {
+    public Collection<PoI> getPoIs() {
         // sexy
         return this.poIs;
     }
 
     @Override
-    void fetchData() {
+    public void fetchData() {
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -75,6 +80,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
             s.setBLOB(c.getBlob(c.getColumnIndex("image")));
 
             Log.i("fetched saveObj",s.toString());
+            Log.d("LocalPoIFetcher", s.toString());
             newPoIs.add(new LocalPoI(s));
         }
 
@@ -92,6 +98,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     }
 
     public void cleanUp(){
+        Log.d("LocalPoIFetcher", "LocalPoIFetcher is cleaned up");
         LocalPoIFetcher.LPF = null;
     }
 

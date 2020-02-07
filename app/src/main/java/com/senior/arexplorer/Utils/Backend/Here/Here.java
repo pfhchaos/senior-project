@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend.Here;
 
 import android.content.Context;
 import android.location.Location;
@@ -46,7 +46,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     private boolean isReady;
 
     private Here() {
-        Log.v("location manager", "here is instantiated.");
+        Log.v("Here", "Here is instantiated.");
         this.currentLocation = new Location("dummy");
         this.currentLocation.setLatitude(0);
         this.currentLocation.setLongitude(0);
@@ -65,7 +65,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             this.googleApiClient.connect();
         }
         else {
-            Log.e("googleApiClient", "googleApiClient is null!");
+            Log.e("Here", "googleApiClient is null!");
         }
     }
 
@@ -88,7 +88,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     }
 
     public static synchronized void init(Context context) {
-        Log.d("location manager", "here is initialized.");
+        Log.d("Here", "here is initialized.");
         if (Here.applicationContext == null) {
             Here.applicationContext = context.getApplicationContext();
         }
@@ -213,11 +213,9 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.d("googleApiClient", "Connection to Google Location Services connected!");
+        Log.d("Here", "Connection to Google Location Services connected!");
         Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-        Log.d("googleApiClient","current location is " + location);
-
-
+        Log.d("Here","current location is " + location);
 
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -248,13 +246,9 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
                 //apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST);
             } else {
                 //finish();
-
             }
-
             return false;
         }
-
         return true;
     }
-
 }

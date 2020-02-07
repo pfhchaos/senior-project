@@ -23,8 +23,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.PoI.Backend;
-import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.Backend.Backend;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 import com.senior.arexplorer.Utils.IconProvider;
@@ -219,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Backend.init(this);
         this.backend = Backend.getInstance();
-
 
         this.compassAssistant = CompassAssistant.getInstance(this);
         compassAssistant.onStart();

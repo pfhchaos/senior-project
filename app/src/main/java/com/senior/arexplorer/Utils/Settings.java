@@ -47,9 +47,9 @@ public class Settings {
         return Settings.instance;
     }
 
-    private static synchronized Settings getInstanceSynced() {
+    private static synchronized void getInstanceSynced() {
         if (Settings.instance == null) Settings.instance = new Settings();
-        return Settings.instance;
+        return;
     }
 
     private Settings() {
