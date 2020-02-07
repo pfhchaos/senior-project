@@ -154,11 +154,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Log.v("changeLocation","loc changed to "+location.toString());
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), zoom));
 
-        if (this.youAreHere != null) this.youAreHere.remove();
-        MarkerOptions newMarkerOptions = new MarkerOptions();
-        newMarkerOptions.position(Here.getInstance().getLatLng());
-        newMarkerOptions.title("You Are Here.");
-        this.youAreHere = this.googleMap.addMarker(newMarkerOptions);
+        createYouAreHereMarker();
     }
 
     private void changeHeading(float userHeading) {
@@ -174,6 +170,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Marker newMarker = this.googleMap.addMarker(newMarkerOptions);
         newMarker.setTag(poi);
         newMarker.setDraggable(true);
+    }
+
+    private void createYouAreHereMarker() {
+        if (this.youAreHere != null) this.youAreHere.remove();
+        MarkerOptions newMarkerOptions = new MarkerOptions();
+        newMarkerOptions.position(Here.getInstance().getLatLng());
+        newMarkerOptions.title("You Are Here.");
+        this.youAreHere = this.googleMap.addMarker(newMarkerOptions);
     }
 
     @Override

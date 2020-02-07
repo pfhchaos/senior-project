@@ -53,10 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Cursor favoritesCursor;
     public Cursor cursor;
     //SQLiteOpenHelper databaseHelper = new CreateDatabase(this);
-    private LocalDB localDB;
-    private CloudDB cloudDB;
 
-    private Here here;
     private GoogleApiClient googleApiClient;
     private Backend backend;
     private CompassAssistant compassAssistant;
@@ -92,26 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
 
-        LocalDB.init(this);
-        this.localDB = LocalDB.getInstance();
-
-        // for cloudDB
-        CloudDB.init(this);
-        this.cloudDB=CloudDB.getInstance();
-
-        Here.init(this);
-        this.here = Here.getInstance();
-        this.backend = Backend.getInstance();
-
-        Settings.init(this);
-        this.settings = Settings.getInstance();
-
-        this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
-
-        this.compassAssistant = CompassAssistant.getInstance(this);
-        WebRequester.init(getApplicationContext());
-        this.webRequester = WebRequester.getInstance();
-        compassAssistant.onStart();
+        initSingletons();
     } // onCreate end
 
 
@@ -172,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("ActivityLifecycle","onStop");
         Here.getInstance().cleanUp();
         Backend.getInstance().cleanUp();
+        //TODO: this seems wrong
         CompassAssistant.getInstance().cleanUp();
         CompassAssistant.getInstance(this).onStop();
         super.onStop();
@@ -315,5 +294,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d("googleApiClient", "Connection to Google Location Services failed!");
+    }
+
+    private void initSingletons() {
+
+        Settings.init(this);
+        this.settings = Settings.getInstance();
+
+        WebRequester.init(getApplicationContext());
+        this.webRequester = WebRequester.getInstance();
+
+        Backend.init(this);
+        this.backend = Backend.getInstance();
+
+        this.googleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this).addOnConnectionFailedListener(this).build();
+
+        this.compassAssistant = CompassAssistant.getInstance(this);
+        compassAssistant.onStart();
     }
 }
