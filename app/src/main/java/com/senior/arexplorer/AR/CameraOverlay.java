@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -20,10 +19,10 @@ import com.senior.arexplorer.R;
 
 import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.PoI.Backend;
-import com.senior.arexplorer.Utils.PoI.Here;
-import com.senior.arexplorer.Utils.PoI.HereListener;
-import com.senior.arexplorer.Utils.PoI.PoI;
+import com.senior.arexplorer.Utils.Backend.Backend;
+import com.senior.arexplorer.Utils.Backend.Here;
+import com.senior.arexplorer.Utils.Backend.HereListener;
+import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 

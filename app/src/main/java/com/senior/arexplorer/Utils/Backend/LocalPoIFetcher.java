@@ -1,12 +1,11 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend;
 
 
 import android.database.Cursor;
 import android.util.Log;
 
-import com.senior.arexplorer.AR.saveObj;
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
-import com.senior.arexplorer.Utils.LocalDB.LocalDBListener;
+import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDBListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +23,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     }
 
     private LocalPoIFetcher(){
+        Log.d("LocalPoIFetcher", "LocalPoIFetcher is instanciated");
         this.here = Here.getInstance();
         this.LDB = LocalDB.getInstance();
         this.poIFetcherHandlers = new ArrayList<>();
@@ -75,6 +75,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
             s.setBLOB(c.getBlob(c.getColumnIndex("image")));
 
             Log.i("fetched saveObj",s.toString());
+            Log.d("LocalPoIFetcher", s.toString());
             newPoIs.add(new LocalPoI(s));
         }
 
@@ -92,6 +93,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     }
 
     public void cleanUp(){
+        Log.d("LocalPoIFetcher", "LocalPoIFetcher is cleaned up");
         LocalPoIFetcher.LPF = null;
     }
 

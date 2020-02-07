@@ -16,7 +16,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDB;
 
 
 public class DataBaseFragment extends Fragment implements IFragSettings {

@@ -1,10 +1,10 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend;
 
 import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.ArrayList;

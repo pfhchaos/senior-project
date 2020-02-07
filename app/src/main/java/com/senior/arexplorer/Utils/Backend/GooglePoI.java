@@ -1,23 +1,19 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.telecom.Call;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.google.gson.JsonObject;
 import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
@@ -29,9 +25,6 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.HashMap;
-
-import androidx.arch.core.util.Function;
 
 public class GooglePoI extends PoI implements Serializable, Response.ErrorListener, Response.Listener<String>{
     private final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
