@@ -1,16 +1,22 @@
-package com.senior.arexplorer.Utils.AWS;
+package com.senior.arexplorer.Utils.Backend.CloudPoI.AWS;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.senior.arexplorer.AR.saveObj;
+import com.senior.arexplorer.Utils.Backend.saveObj;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalPoI;
+import com.senior.arexplorer.Utils.Backend.PoI;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class CloudDB {
@@ -23,7 +29,7 @@ public class CloudDB {
     public  String query;
     private Collection<CloudDBListener> callbacks;
 
-   // ArrayList<PoI> newPoIs = new ArrayList<PoI>();
+    ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
     public static void init(Context context) {
         Log.d("CloudDB", "CloudDB is initialized.");
@@ -47,14 +53,13 @@ public class CloudDB {
     private static synchronized CloudDB getInstanceSynced() {
         Log.d("CloudDB", "CloudDB is instanciated.");
         if (CloudDB.instance == null) CloudDB.instance = new CloudDB();
-        CloudDB.instance = new CloudDB();
         return CloudDB.instance;
     }
     //private getInstanceSynced
 
     private CloudDB(){
-       // ForLocalDataTable localData = new ForLocalDataTable();
-       // localData.execute("");
+         ForLocalDataTable localData = new ForLocalDataTable();
+          localData.execute("");
 
     }
     private void notifyListeners() {
@@ -70,25 +75,27 @@ public class CloudDB {
         this.callbacks.remove(listener);
     }
 
+    /*
+     * the ExecurQuery(String command) function can be used to execute any mysql query
+     *  and accessible from any fragment
+     * */
 
     public void ExecurQuery( saveObj s){
-       // this.query=command;
+        // this.query=command;
         ConnectMySql connectMySql = new ConnectMySql(s);
         connectMySql.execute("");
     }
-    /*
     public ArrayList getLocalData(){
 
 
         return newPoIs;
     }
-*/
+
     public void insertCloudData(saveObj s) {
         this.ExecurQuery(s);
     }
 
     // for local data
-    /*
     private class ForLocalDataTable extends AsyncTask<String, Void, String> {
         String res = "";
         // Method that returns the first word
@@ -111,29 +118,22 @@ public class CloudDB {
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection con = DriverManager.getConnection(url, user, pass);
                 String result = "Database Connection Successful\n";
-               // Statement st = con.createStatement();
-               // ResultSet rs = st.executeQuery("select * from LOCALDATA");
-               // ResultSetMetaData rsmd = rs.getMetaData();
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                ResultSet rs    = statement.executeQuery("select * from LOCALDATA");
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery("select * from LOCAL_DATA");
+                ResultSetMetaData rsmd = rs.getMetaData();
                 while (rs.next()) {
                     // result += rs.getString(2).toString() + "\n";
                     String userName = "testUser";
                     String locName,locDesc;
                     Double locLat,locLong,locElev;
                     Boolean priv = false;
-                    locName= rs.getString(rs.findColumn("name"));
-
-                    locDesc = rs.getString(rs.findColumn("description"));
-                    locLat = rs.getDouble(rs.findColumn("latitude"));
-                    locLong = rs.getDouble(rs.findColumn("longitude"));
-                    locElev = rs.getDouble(rs.findColumn("elevation"));
+                    locName= rs.getString(2).toString();
+                    locDesc = rs.getString(3).toString();
+                    locLat = rs.getDouble(4);
+                    locLong = rs.getDouble(5);
+                    locElev = rs.getDouble(6);
                     saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
-                    Blob blob = rs.getBlob(rs.findColumn("image"));
-                    byte[] theBytes = blob.getBytes(1L, (int)blob.length());
-                    s.setBLOB( theBytes);
                     newPoIs.add(new LocalPoI(s));
-                    System.out.println("locName "+locName+" arr size "+newPoIs.size());
                     // Log.d("check3 : ", rs.getString("type"));
                 }
 
@@ -151,15 +151,15 @@ public class CloudDB {
             Log.d("Result : ", result);
         }
     }
-*/
+
     private class ConnectMySql extends AsyncTask<String, Void, String> {
         String res = "";
         String data="";
         saveObj s;
-       public ConnectMySql(saveObj s){
+        public ConnectMySql(saveObj s){
 
-           this.s=s;
-          }
+            this.s=s;
+        }
 
         // Method that returns the first word
 
@@ -181,7 +181,7 @@ public class CloudDB {
                 // System.out.println("Databaseection success");
 
                 String result = "Database Connection Successful\n";
-               // Statement st = con.createStatement();
+                // Statement st = con.createStatement();
                 PreparedStatement statement = con.prepareStatement("INSERT INTO LOCALDATA (name, description, latitude, longitude, elevation,image) VALUES (?, ?, ?, ?, ?,?)"); //
 
 
@@ -196,7 +196,7 @@ public class CloudDB {
 
                 statement.execute();
 
-                  //  st.execute(query);
+                //  st.execute(query);
 
 
                 res = result;
