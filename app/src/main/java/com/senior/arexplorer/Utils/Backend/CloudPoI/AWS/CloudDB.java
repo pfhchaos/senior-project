@@ -138,6 +138,7 @@ public class CloudDB {
                 }
 
                 res = result;
+                con.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 res = e.toString();
@@ -200,6 +201,7 @@ public class CloudDB {
 
 
                 res = result;
+                con.close();
             } catch (Exception e) {
                 e.printStackTrace();
                 res = e.toString();
