@@ -1,13 +1,9 @@
 package com.senior.arexplorer.Utils.PoI;
 
-import com.senior.arexplorer.AR.saveObj;
 import com.senior.arexplorer.Utils.AWS.CloudDB;
 import com.senior.arexplorer.Utils.AWS.CloudDBListener;
+import com.senior.arexplorer.Utils.AWS.ForLocalDataTable;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -44,39 +40,17 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
     }
 
     private synchronized void fetchDataAsync(){
-        ArrayList<PoI> newPoIs = new ArrayList<PoI>();
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection(url, user, pass);
-            String result = "Database Connection Successful\n";
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("select * from LOCAL_DATA");
-
-            while (rs.next()) {
-                String userName = "testUser";
-                String locName,locDesc;
-                Double locLat,locLong,locElev;
-                Boolean priv = false;
-                locName= rs.getString(2).toString();
-                locDesc = rs.getString(3).toString();
-                locLat = rs.getDouble(4);
-                locLong = rs.getDouble(5);
-                locElev = rs.getDouble(6);
-                saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
-                newPoIs.add(new CloudPoI(s));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
         synchronized (this.poIs) {
-            this.poIs = newPoIs;
+            ForLocalDataTable db = new ForLocalDataTable();
+            this.poIs = db.getLocalData();
         }
         isReady = true;
     }
+
 
     private CloudPoIFetcher(){
         super();
