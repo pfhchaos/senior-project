@@ -58,8 +58,8 @@ public class CloudDB {
     //private getInstanceSynced
 
     private CloudDB(){
-         ForLocalDataTable localData = new ForLocalDataTable();
-          localData.execute("");
+        ForLocalDataTable localData = new ForLocalDataTable();
+        localData.execute("");
 
     }
     private void notifyListeners() {
