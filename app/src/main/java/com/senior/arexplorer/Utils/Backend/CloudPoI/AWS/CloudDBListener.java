@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.AWS;
+package com.senior.arexplorer.Utils.Backend.CloudPoI.AWS;
 
 public interface CloudDBListener {
     abstract void onUpdate();

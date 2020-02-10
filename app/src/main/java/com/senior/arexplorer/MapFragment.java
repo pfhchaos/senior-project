@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +27,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.PoI.Backend;
-import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.Backend.Backend;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.PoI.HereListener;
-import com.senior.arexplorer.Utils.PoI.PoI;
-import com.senior.arexplorer.Utils.PoI.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.Backend.Here.HereListener;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 
 import java.util.Collection;
 
@@ -102,6 +101,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d("MapFragment", "onDestroy");
         Here.getInstance().removeListener(this);
         Backend.getInstance().removeHandler(this);
         CompassAssistant.getInstance(getContext()).removeCompassListener(this);
@@ -110,12 +110,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
 
     @Override
     public void onLowMemory() {
+        Log.d("MapFragment", "onLowMemory");
         super.onLowMemory();
         mapView.onLowMemory();
     }
 
     @Override
     public void onMapReady(GoogleMap gMap) {
+        Log.d("MapFragment", "onMapReady");
         googleMap = gMap;
         googleMap.setBuildingsEnabled(true);
 
@@ -154,11 +156,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Log.v("changeLocation","loc changed to "+location.toString());
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), zoom));
 
-        if (this.youAreHere != null) this.youAreHere.remove();
-        MarkerOptions newMarkerOptions = new MarkerOptions();
-        newMarkerOptions.position(Here.getInstance().getLatLng());
-        newMarkerOptions.title("You Are Here.");
-        this.youAreHere = this.googleMap.addMarker(newMarkerOptions);
+        createYouAreHereMarker();
     }
 
     private void changeHeading(float userHeading) {
@@ -174,6 +172,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         Marker newMarker = this.googleMap.addMarker(newMarkerOptions);
         newMarker.setTag(poi);
         newMarker.setDraggable(true);
+    }
+
+    private void createYouAreHereMarker() {
+        if (this.youAreHere != null) this.youAreHere.remove();
+        MarkerOptions newMarkerOptions = new MarkerOptions();
+        newMarkerOptions.position(Here.getInstance().getLatLng());
+        newMarkerOptions.title("You Are Here.");
+        this.youAreHere = this.googleMap.addMarker(newMarkerOptions);
     }
 
     @Override

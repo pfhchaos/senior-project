@@ -1,4 +1,4 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,8 +9,8 @@ public abstract class PoIFetcher {
     protected Collection<PoI> poIs;
     protected boolean isReady;
 
-    abstract Collection<PoI> getPoIs();
-    abstract void fetchData();
+    abstract public Collection<PoI> getPoIs();
+    abstract public void fetchData();
 
     public PoIFetcher() {
         this.poIFetcherHandlers = new ArrayList<PoIFetcherHandler>();

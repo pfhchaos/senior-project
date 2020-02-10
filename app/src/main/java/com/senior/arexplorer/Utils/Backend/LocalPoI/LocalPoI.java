@@ -1,9 +1,7 @@
-package com.senior.arexplorer.Utils.PoI;
+package com.senior.arexplorer.Utils.Backend.LocalPoI;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -11,11 +9,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.senior.arexplorer.AR.saveObj;
-import com.senior.arexplorer.R;
+import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.Backend.saveObj;
 import com.senior.arexplorer.Utils.PopupBox;
 
 
@@ -52,7 +47,7 @@ public class LocalPoI extends PoI {
     }
 
     @Override
-    View getDetailsView(Context context){
+    public View getDetailsView(Context context){
         TextView retView = new TextView(context);
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);

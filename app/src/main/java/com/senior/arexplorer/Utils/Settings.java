@@ -47,9 +47,9 @@ public class Settings {
         return Settings.instance;
     }
 
-    private static synchronized Settings getInstanceSynced() {
+    private static synchronized void getInstanceSynced() {
         if (Settings.instance == null) Settings.instance = new Settings();
-        return Settings.instance;
+        return;
     }
 
     private Settings() {
@@ -58,6 +58,14 @@ public class Settings {
         this.compassFOV  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_FOV","180"));
         this.drawDistance  = Integer.valueOf(sharedPreferences.getString("Pref_AR_Compass_DrawDistance","1000"));
 
+        this.showBuildings  = Boolean.valueOf(sharedPreferences.getString("Pref_Map_Show_Buildings","true"));
+
+        this.useGoogleBackend  = Boolean.valueOf(sharedPreferences.getString("Pref_Backend_Use_Google","true"));
+        this.useLocalBackend  = Boolean.valueOf(sharedPreferences.getString("Pref_Backend_Use_Local","true"));
+        this.useOneBusAwayBackend  = Boolean.valueOf(sharedPreferences.getString("Pref_Backend_Use_One_Bus_Away","true"));
+        this.useCloudBackend  = Boolean.valueOf(sharedPreferences.getString("Pref_Backend_Use_Cloud","true"));
+
+        this.startInARView  = Boolean.valueOf(sharedPreferences.getString("Pref_Start_In_AR_View","true"));
     }
 
     public int getDrawDistance() {
@@ -89,7 +97,7 @@ public class Settings {
     }
 
     public void setUseGoogleBackend(boolean useGoogleBackend) {
-        this.set("useGoogleBackend", new Boolean(useGoogleBackend), "Pref_Backend_Use_Google_Backend");
+        this.set("useGoogleBackend", new Boolean(useGoogleBackend), "Pref_Backend_Use_Google");
     }
 
     public boolean getUseLocalBackend() {
@@ -97,7 +105,7 @@ public class Settings {
     }
 
     public void setUseLocalBackend(boolean useLocalBackend) {
-        this.set("useLocalBackend", new Boolean(useLocalBackend), "Pref_Backend_Use_Local_Backend");
+        this.set("useLocalBackend", new Boolean(useLocalBackend), "Pref_Backend_Use_Local");
     }
 
     public boolean getUseOneBusAwayBackend() {
@@ -105,7 +113,7 @@ public class Settings {
     }
 
     public void setUseOneBusAwayBackend(boolean useOneBusAwayBackend) {
-        this.set("useOneBusAwayBackend", new Boolean(useOneBusAwayBackend), "Pref_Backend_Use_One_Bus_Away_Backend");
+        this.set("useOneBusAwayBackend", new Boolean(useOneBusAwayBackend), "Pref_Backend_Use_One_Bus_Away");
     }
 
     public boolean getUseCloudBackend() {
@@ -113,7 +121,7 @@ public class Settings {
     }
 
     public void setCloudBackend(boolean useCloudBackend) {
-        this.set("useCloudBackend", new Boolean(useCloudBackend), "Pref_Backend_Cloud_Backend");
+        this.set("useCloudBackend", new Boolean(useCloudBackend), "Pref_Backend_Cloud");
     }
 
     public boolean getStartInARView() {

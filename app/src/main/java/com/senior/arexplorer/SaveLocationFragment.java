@@ -29,11 +29,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.senior.arexplorer.AR.saveObj;
-import com.senior.arexplorer.Utils.AWS.CloudDB;
+import com.senior.arexplorer.Utils.Backend.saveObj;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.LocalDB.LocalDB;
-import com.senior.arexplorer.Utils.PoI.Here;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 
 import java.io.File;
 import java.io.IOException;
@@ -240,25 +239,29 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
 
 
         locName = nameInputTextView.getText().toString();
-        locDesc = descInputTextView.getText().toString();
-        priv = privateSwitch.isChecked();
-
-        saveObj s = new saveObj(userID,locName,locDesc,locLatitude,locLongitude,locElevation,priv);
-        if(dbBM != null) s.setBLOB(dbBM);
-
-
-        //if its private save to localDB, otherwise save to public DB
-
-        if(priv) {
-            LDB.insertLocalData(s);
-            Log.i("save was private","insert into local DB");
+        if (locName == null || locName.equals("")) {
+            Log.e("SaveLocationFragment","Refusing to save location without name");
         }
-        else{
-            //TODO save to public DB
-           // CDB.insertCloudData(s);
-            CDB.ExecurQuery(s);
+        else {
+            locDesc = descInputTextView.getText().toString();
+            priv = privateSwitch.isChecked();
 
-            Log.d("save was public","insert into cloud");
+            saveObj s = new saveObj(userID, locName, locDesc, locLatitude, locLongitude, locElevation, priv);
+            if (dbBM != null) s.setBLOB(dbBM);
+
+
+            //if its private save to localDB, otherwise save to public DB
+
+            if (priv) {
+                LDB.insertLocalData(s);
+                Log.i("save was private", "insert into local DB");
+            } else {
+                //TODO save to public DB
+                // CDB.insertCloudData(s);
+                CDB.ExecurQuery(s);
+
+                Log.d("save was public", "insert into cloud");
+            }
         }
 
         switchFrag();
