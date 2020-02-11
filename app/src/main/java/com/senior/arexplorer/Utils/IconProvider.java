@@ -33,8 +33,8 @@ public class IconProvider {
 
     public static IconProvider getInstance() {
         if (applicationContext == null) {
-            Log.e("IconProvider", "attempted to instantiate Settings without initializing");
-            throw new Error("attempted to instantiate Settings without initializing");
+            Log.e("IconProvider", "attempted to instantiate IconProvider without initializing");
+            throw new Error("attempted to instantiate IconProvioder without initializing");
         }
         if (IconProvider.instance == null) IconProvider.getInstanceSynced();
         return IconProvider.instance;
@@ -72,7 +72,7 @@ public class IconProvider {
             loadBitmapFromURL(url);
         }
 
-        retBitmap = roundMap.get("default");
+        retBitmap = pointyMap.get("default");
 
         return retBitmap;
     }
