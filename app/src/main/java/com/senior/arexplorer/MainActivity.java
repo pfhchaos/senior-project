@@ -239,5 +239,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         IconProvider.init(this);
         this.iconProvider = IconProvider.getInstance();
+
     }
 }
