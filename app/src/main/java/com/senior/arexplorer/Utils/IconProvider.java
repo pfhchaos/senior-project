@@ -23,7 +23,7 @@ public class IconProvider {
     private HashMap<String, Bitmap> pointyIconMap = new HashMap<>();
     private HashMap<String, Bitmap> roundIconMap = new HashMap<>();
     private HashMap<String, Bitmap> mapIconMap = new HashMap<>();
-    private float mapIconRatio = 1f/ 7f;
+    private float mapIconRatio = 1f/ 4f;
 
     private IconProvider(){
 
