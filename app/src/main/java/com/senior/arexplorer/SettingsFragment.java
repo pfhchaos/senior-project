@@ -76,6 +76,17 @@ public class SettingsFragment extends Fragment implements IFragSettings {
             }
         } );
 
+        aSwitch = v.findViewById(R.id.start_in_ar_view_settings_switch);
+        aSwitch.setChecked(Settings.getInstance().getStartInARView());
+        aSwitch.setOnClickListener(i -> {
+            if(Settings.getInstance().getStartInARView()) {
+                Settings.getInstance().setStartInARView(false);
+            }
+            else {
+                Settings.getInstance().setStartInARView(true);
+            }
+        } );
+
         return v;
     }
 

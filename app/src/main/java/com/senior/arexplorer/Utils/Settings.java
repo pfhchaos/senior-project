@@ -207,7 +207,7 @@ public class Settings {
     }
 
     public boolean getStartInARView() {
-        return this.useCloudBackend;
+        return this.startInARView;
     }
 
     public void setStartInARView(boolean startInARView) {

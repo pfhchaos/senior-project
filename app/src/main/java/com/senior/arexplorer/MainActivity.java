@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AWSAppSyncClient mAWSAppSyncClient;
     private Settings settings;
 
+    private String fragmentName;
+
     //lifecycle methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +60,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navView.setNavigationItemSelectedListener(this);
 
         if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
-            navView.setCheckedItem(R.id.nav_home);
+
+            Settings.init(this);
+            if (Settings.getInstance().getStartInARView()) {
+                this.fragmentName = "ARFragment";
+            }
+            else {
+                this.fragmentName = "MapFragment";
+            }
         }
 
         checkPermissions();
@@ -86,6 +94,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("ActivityLifecycle","onStart");
         initSingletons();
         CompassAssistant.getInstance().onStart();
+
+        NavigationView navView = findViewById(R.id.nav_view);
+        switch (this.fragmentName) {
+            case "ARFragment":
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ARFragment()).commit();
+                navView.setCheckedItem(R.id.nav_ar);
+                break;
+            case "MapFragment":
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
+                navView.setCheckedItem(R.id.nav_map);
+                break;
+        }
     }
 
     @Override

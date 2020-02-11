@@ -169,6 +169,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, IFragSe
         MarkerOptions newMarkerOptions = new MarkerOptions();
         newMarkerOptions.position(poi.getLatLng());
         newMarkerOptions.title(poi.getName());
+
+        Log.d("MapFragment", newMarkerOptions.toString());
         Marker newMarker = this.googleMap.addMarker(newMarkerOptions);
         newMarker.setTag(poi);
         newMarker.setDraggable(true);

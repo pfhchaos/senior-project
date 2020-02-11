@@ -21,6 +21,8 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
     private static Context applicationContext;
     private Location lastFetched = null;
 
+    private boolean isReady;
+
     private Collection<PoIFetcher> sources;
 
     public static synchronized void init(Context context) {
@@ -100,6 +102,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
             Log.d("Backend","OneBusAway backend is disabled, skipping");
         }
 
+        this.isReady = true;
     }
 
     public Collection<PoI> getPoIs() {
@@ -128,6 +131,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         //TODO: do something
         Log.d("Backend", "cleanUp");
         this.sources = null;
+        this.isReady = false;
         Backend.instance = null;
         Settings.getInstance().removeUseGoogleBackendListener(this);
         Settings.getInstance().removeUseLocalBackendListener(this);
@@ -137,8 +141,10 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     public boolean isReady() {
         boolean ret = false;
-        for (PoIFetcher source : sources) {
-            ret |= source.isReady();
+        if (this.isReady) {
+            for (PoIFetcher source : sources) {
+                ret |= source.isReady();
+            }
         }
         return ret;
     }
