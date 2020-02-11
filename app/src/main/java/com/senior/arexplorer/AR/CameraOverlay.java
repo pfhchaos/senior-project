@@ -118,7 +118,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             for (PoI poi : nearby.descendingSet()) {
                 calcNearbyRect(poi);
                 if(poi.compassRender)
-                    canvas.drawBitmap(IconProvider.getInstance().getPointy(poi.getIconURL()), null, poi.getCompassRect(), p);
+                    canvas.drawBitmap(poi.getPointyIcon(), null, poi.getCompassRect(), p);
             }
         }
     }
