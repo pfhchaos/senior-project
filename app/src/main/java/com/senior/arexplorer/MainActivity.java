@@ -21,10 +21,12 @@ import androidx.fragment.app.Fragment;
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
+import com.senior.arexplorer.Utils.Backend.Backend;
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.Utils.Backend.Backend;
-import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -45,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private WebRequester webRequester;
     private AWSAppSyncClient mAWSAppSyncClient;
     private Settings settings;
+    private LocalDB localDB;
+    private CloudDB cloudDB;
 
     private String fragmentName;
 
@@ -228,6 +232,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initSingletons() {
+
+        LocalDB.init(this);
+        this.localDB = LocalDB.getInstance();
+        CloudDB.init(this);
+        this.cloudDB=CloudDB.getInstance();
 
         Settings.init(this);
         this.settings = Settings.getInstance();

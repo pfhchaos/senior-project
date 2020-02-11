@@ -14,13 +14,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.senior.arexplorer.R;
-import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.IFragSettings;
-import com.senior.arexplorer.SeekBarWithText;
-import com.senior.arexplorer.Utils.Backend.Here.Here;
-import com.senior.arexplorer.Utils.Settings;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.arch.core.util.Function;
@@ -30,6 +23,13 @@ import androidx.camera.core.PreviewConfig;
 import androidx.core.util.Supplier;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+
+import com.senior.arexplorer.R;
+import com.senior.arexplorer.SeekBarWithText;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.CompassAssistant;
+import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.Settings;
 
 public class ARFragment extends Fragment implements IFragSettings {
 

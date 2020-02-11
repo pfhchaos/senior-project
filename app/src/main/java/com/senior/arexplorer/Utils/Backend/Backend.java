@@ -87,6 +87,15 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
             PoIFetcher localPoIFetcher = LocalPoIFetcher.getInstance();
             this.sources.add(localPoIFetcher);
             localPoIFetcher.addHandler(this);
+
+            // for cloud
+
+          /*  CloudDB.init(this.applicationContext);
+            PoIFetcher cloudPoIFetcher = CloudPoIFetcher.getInstance();
+            this.sources.add(cloudPoIFetcher);
+            cloudPoIFetcher.addHandler(this);
+            
+           */
         }
         else {
             Log.d("Backend","LocalDB backend is disabled, skipping");
