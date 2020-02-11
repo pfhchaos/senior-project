@@ -13,22 +13,28 @@ import com.android.volley.toolbox.ImageLoader;
 import com.senior.arexplorer.R;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
 public class IconProvider {
     private static IconProvider instance;
     private static Context applicationContext;
-    private HashMap<String, Bitmap> pointyMap = new HashMap<>();
-    private HashMap<String, Bitmap> roundMap = new HashMap<>();
+    private HashMap<String, Bitmap> pointyIconMap = new HashMap<>();
+    private HashMap<String, Bitmap> roundIconMap = new HashMap<>();
+    private HashMap<String, Bitmap> mapIconMap = new HashMap<>();
 
     private IconProvider(){
 
         Drawable d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.compassmapmarkerbackground);
-        pointyMap.put("default", CommonMethods.getBitmapFromDrawable(d));
+        Bitmap temp = CommonMethods.getBitmapFromDrawable(d);
+        pointyIconMap.put("default", temp);
+
+        temp = Bitmap.createScaledBitmap(temp, temp.getWidth() / 7, temp.getHeight() / 7, true);
+        mapIconMap.put("default", temp);
 
         d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
-        roundMap.put("default", CommonMethods.getBitmapFromDrawable(d));
+        roundIconMap.put("default", CommonMethods.getBitmapFromDrawable(d));
     }
 
     public static IconProvider getInstance() {
@@ -60,43 +66,38 @@ public class IconProvider {
         }
     }
 
-    public Bitmap getPointy(String url){
-        Bitmap retBitmap;
-
-        boolean containsPointyMap = pointyMap.containsKey(url);
-        if(containsPointyMap && pointyMap.get(url) != null) {
-            return pointyMap.get(url);
-        }
-
-        if(!containsPointyMap) {
-            loadBitmapFromURL(url);
-        }
-
-        retBitmap = pointyMap.get("default");
-
-        return retBitmap;
+    public Bitmap getPointyIcon(String url){
+        return getIcon(url, pointyIconMap);
     }
 
-    public Bitmap getRound(String url){
+    public Bitmap getMapIcon(String url){
+        return getIcon(url, mapIconMap);
+    }
+
+    public Bitmap getRoundIcon(String url){
+        return getIcon(url, roundIconMap);
+    }
+
+    private Bitmap getIcon(String url, Map<String, Bitmap> map){
         Bitmap retBitmap;
 
-        boolean containsRoundMap = roundMap.containsKey(url);
-        if(containsRoundMap && roundMap.get(url) != null) {
-            return roundMap.get(url);
+        boolean mapContains = map.containsKey(url);
+        if(mapContains && map.get(url) != null) {
+            return map.get(url);
         }
 
-        if(!containsRoundMap) {
+        if(!mapContains) {
             loadBitmapFromURL(url);
         }
 
-        retBitmap = roundMap.get("default");
+        retBitmap = map.get("default");
 
         return retBitmap;
     }
 
     private void loadBitmapFromURL(String url){
-        pointyMap.put(url, null);
-        roundMap.put(url, null);
+        pointyIconMap.put(url, null);
+        roundIconMap.put(url, null);
 
 
         Log.d("IconProvider", "Retrieving icon for URL " + url);
@@ -113,7 +114,7 @@ public class IconProvider {
                 p.setFilterBitmap(true);
                 int offset;
 
-                //pointyMap calculations
+                //pointyIconMap calculations
                 d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.compassmapmarkerbackground);
                 bitmap = CommonMethods.getBitmapFromDrawable(d);
                 canvas = new Canvas(bitmap);
@@ -124,10 +125,13 @@ public class IconProvider {
                 if(response.getBitmap() != null)
                     canvas.drawBitmap(response.getBitmap(), null, iconLocation, p);
 
-                pointyMap.put(url, bitmap);
+                pointyIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
+
+                Bitmap temp = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 7, bitmap.getHeight() / 7, true);
+                mapIconMap.put(url, temp);
 
 
-                //roundMap Calculations
+                //roundIconMap Calculations
                 d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
                 bitmap = CommonMethods.getBitmapFromDrawable(d);
                 canvas = new Canvas(bitmap);
@@ -138,7 +142,7 @@ public class IconProvider {
                 if(response.getBitmap() != null)
                     canvas.drawBitmap(response.getBitmap(), null, iconLocation, p);
 
-                roundMap.put(url, bitmap);
+                roundIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
             }
 
             @Override

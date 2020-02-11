@@ -111,11 +111,15 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     public Rect getCompassRect(){ return compassRect; }
 
     public Bitmap getPointyIcon(){
-        return IconProvider.getInstance().getPointy(getIconURL());
+        return IconProvider.getInstance().getPointyIcon(getIconURL());
     }
 
     public Bitmap getRoundIcon(){
-        return IconProvider.getInstance().getRound(getIconURL());
+        return IconProvider.getInstance().getRoundIcon(getIconURL());
+    }
+
+    public Bitmap getMapIcon(){
+        return IconProvider.getInstance().getMapIcon(getIconURL());
     }
 
     public String toShortString() {
