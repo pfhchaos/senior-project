@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Settings settings;
     private IconProvider iconProvider;
 
+    private String fragmentName;
+
     //lifecycle methods
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +56,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navView.setNavigationItemSelectedListener(this);
 
         if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
-            navView.setCheckedItem(R.id.nav_home);
+
+            Settings.init(this);
+            if (Settings.getInstance().getStartInARView()) {
+                this.fragmentName = "ARFragment";
+            }
+            else {
+                this.fragmentName = "MapFragment";
+            }
         }
 
         checkPermissions();
@@ -228,8 +236,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         this.compassAssistant = CompassAssistant.getInstance(this);
         compassAssistant.onStart();
-
-        IconProvider.init(this);
-        this.iconProvider = IconProvider.getInstance();
     }
 }

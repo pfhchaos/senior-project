@@ -24,10 +24,10 @@ import androidx.core.util.Supplier;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.senior.arexplorer.R;
-import com.senior.arexplorer.SeekBarWithText;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.FragmentWithSettings;
+import com.senior.arexplorer.Utils.SeekBarWithText;
 import com.senior.arexplorer.Utils.Settings;
 
 public class ARFragment extends FragmentWithSettings {
