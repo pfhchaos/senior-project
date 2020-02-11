@@ -2,6 +2,7 @@ package com.senior.arexplorer.Utils.Backend.CloudPoI;
 
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.RetriveData;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
@@ -13,11 +14,6 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
 
     private static CloudPoIFetcher CPF;
     private boolean isReady = false;
-
-    private static final String url = "jdbc:mysql://database-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/ar_schema";
-    private static final String user = "masteruser";
-    private static final String pass = "Bangladesh88";
-
     public static CloudPoIFetcher getInstance(){
         if(CPF == null) CPF = new CloudPoIFetcher();
         return CPF;
@@ -42,14 +38,15 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
     }
 
     private synchronized void fetchDataAsync(){
-        ArrayList<PoI> newPoIs = new ArrayList<PoI>();
+       // ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
 
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
             handler.placeFetchComplete();
         }
         synchronized (this.poIs) {
-            this.poIs = newPoIs;
+            RetriveData db = new RetriveData();
+            this.poIs = db.getLocalData();
         }
         isReady = true;
     }
