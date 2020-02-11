@@ -72,7 +72,7 @@ public class IconProvider {
             loadBitmapFromURL(url);
         }
 
-        retBitmap = roundMap.get("default");
+        retBitmap = pointyMap.get("default");
 
         return retBitmap;
     }
