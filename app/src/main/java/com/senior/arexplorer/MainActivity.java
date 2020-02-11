@@ -236,5 +236,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         this.compassAssistant = CompassAssistant.getInstance(this);
         compassAssistant.onStart();
+
+        IconProvider.init(this);
+        this.iconProvider = IconProvider.getInstance();
+
     }
 }
