@@ -38,9 +38,9 @@ public class DataBaseFragment extends Fragment {
         }
        //CloudDB.getInstance().ExecurQuery("INSERT INTO TYPE ( type) VALUES ( 'tt5' )");   //INSERT INTO TYPE ( type) VALUES ( 'type4' );
      // ArrayList<PoI> arr= CloudDB.getInstance().getLocalData();
-     //  int s = CloudDB.getInstance().getLocalData().size();
-     //   System.out.println("************************ ::: "+s);
-      // Log.d("datafrag : ", arr.get(0).getName());
+       //int s = arr.size();
+       // System.out.println("************************ ::: "+s);
+       //Log.d("datafrag : ", arr.get(0).getName());
 
        // CloudDB.getInstance().ExecurQuery( " INSERT INTO LOCAL_DATA (name, description, latitude, longitude, elevation ) VALUES ('nn', 'des', '123', '120', '25')");
 

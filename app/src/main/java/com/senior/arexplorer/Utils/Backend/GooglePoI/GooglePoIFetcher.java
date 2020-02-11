@@ -10,8 +10,6 @@ import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
-import com.senior.arexplorer.Utils.SettingListener;
-import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -21,7 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String>, SettingListener {
+public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
     public final String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     public final int radius = 1000;
 
@@ -33,22 +31,13 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
 
     public static PoIFetcher getInstance() {
         if (instance == null) {
-            GooglePoIFetcher.getInstanceSynced();
+            instance = new GooglePoIFetcher();
         }
         return instance;
     }
 
-    private static synchronized void getInstanceSynced() {
-        if (instance == null) {
-            instance = new GooglePoIFetcher();
-        }
-        return;
-    }
-
     private GooglePoIFetcher() {
         this.poIFetcherHandlers = new ArrayList<>();
-
-        Settings.getInstance().addUseGoogleBackendListener(this);
 
         poIs = new ArrayList<>();
         this.isReady = false;
@@ -129,16 +118,10 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
 
     public void cleanUp() {
         GooglePoIFetcher.instance = null;
-        Settings.getInstance().removeUseGoogleBackendListener(this);
     }
 
     @Override
     public boolean isReady() {
         return this.isReady;
-    }
-
-    @Override
-    public void onSettingChange() {
-        if (!Settings.getInstance().getUseGoogleBackend()) cleanUp();
     }
 }

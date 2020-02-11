@@ -4,11 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,18 +25,18 @@ import com.senior.arexplorer.Utils.Backend.Backend;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.TreeSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
-import androidx.arch.core.util.Function;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
     private Paint p = new Paint();
     private Rect rect = new Rect(), curCompass = new Rect();
-    private Bitmap compass, compassMarker;
+    private Bitmap compass;
     private float heading = 0;
     private float scale;
     private float sx = (float) getWidth() / 10000;
@@ -53,11 +55,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
 
+        p.setAntiAlias(true);
+        p.setFilterBitmap(true);
+
         Drawable drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
         compass = getBitmap(drawable);
-
-        drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassmarker);
-        compassMarker = getBitmap(drawable);
 
         scale = (float) compass.getWidth() / 720;
 
@@ -116,7 +118,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             for (PoI poi : nearby.descendingSet()) {
                 calcNearbyRect(poi);
                 if(poi.compassRender)
-                    canvas.drawBitmap(compassMarker, null, poi.getCompassRect(), p);
+                    canvas.drawBitmap(IconProvider.getInstance().getPointy(poi.getIconURL()), null, poi.getCompassRect(), p);
             }
         }
     }
@@ -134,23 +136,19 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     private void calcNearbyRect(PoI poi){
+        int markerHeight = 700;
+        float markerRatio = 1f; //this is unused as of now but left in in case we need it
+        float markerWidth = (float)(markerHeight) * markerRatio;
+        int halfMarkerWidth = Math.round(markerWidth / 2f);
+        int offsetFromTop = 50;
+
         int fov = Settings.getInstance().getCompassFOV();
         int drawDistance = Settings.getInstance().getDrawDistance();
-        //brings us from [-180,180] to [0,360], its easier to deal with
-        Function<Float, Float> mod360 = i -> {
-            float result = i % 360;
-            return result < 0 ? result + 360 : result;};
+
         Location destLoc = poi.getLocation();
         float relativeHeading = curLoc.bearingTo(destLoc) - heading;
         //this next bit just takes us from [0,360] to [-180,180]
         relativeHeading = CommonMethods.xMody((relativeHeading + 180), 360) - 180;
-
-//        Log.d("CamOver",
-//                poi.getName() +
-//                        "\nBearing : " + curLoc.bearingTo(destLoc) +
-//                        "\nHeading : " + heading +
-//                        "\nRelativeHeading : " + relativeHeading);
-
 
         double dist = poi.getDistanceTo();
 
@@ -160,7 +158,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             int newScale = 9000 / fov; //I think 9000 equates to 90% of the screen, AKA 5% margin on either side
             int center = (int)(5000 + relativeHeading * newScale); //which would make this at the 50% point on the screen + our offset
 
-            poi.getCompassRect().set(center - 250, 250 , center + 250, 750);
+            poi.getCompassRect().set(center - halfMarkerWidth, offsetFromTop, center + halfMarkerWidth, markerHeight + offsetFromTop);
+
+
+            //Log.d("CompassMarker", poi.getCompassRect().toString());
 
             int alpha =(int)( (1 - dist / drawDistance) * 255) + 50;
             if(alpha > 255) alpha = 255;

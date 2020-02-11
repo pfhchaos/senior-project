@@ -4,43 +4,9 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Backends" />
-
-    <Switch
-        android:id="@+id/google_settings_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Use Google Places" />
-
-    <Switch
-        android:id="@+id/one_bus_away_settings_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Use One Bus Away" />
-
-    <Switch
-        android:id="@+id/local_db_settings_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Use Local DB" />
-
-    <Switch
-        android:id="@+id/cloud_db_settings_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Use Cloud DB" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Misc. Settings" />
-
-    <Switch
-        android:id="@+id/start_in_ar_view_settings_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Start in AR view" />
+        android:text="This is where I would put my settings. IF I HAD ANY!" />
 
 </LinearLayout>

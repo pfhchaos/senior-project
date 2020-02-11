@@ -19,14 +19,12 @@ import androidx.fragment.app.Fragment;
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
-import com.senior.arexplorer.Utils.Backend.Backend;
-import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
-import com.senior.arexplorer.Utils.Backend.Here.Here;
-import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.FragmentWithSettings;
+import com.senior.arexplorer.Utils.Backend.Backend;
+import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
+import com.senior.arexplorer.Utils.IconProvider;
 
 //import com.amazonaws.mobile.config.AWSConfiguration;
 //import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
@@ -42,10 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private WebRequester webRequester;
     private AWSAppSyncClient mAWSAppSyncClient;
     private Settings settings;
-    private LocalDB localDB;
-    private CloudDB cloudDB;
-
-    private String fragmentName;
+    private IconProvider iconProvider;
 
     //lifecycle methods
     @Override
@@ -59,14 +54,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navView.setNavigationItemSelectedListener(this);
 
         if(savedInstanceState == null){
-
-            Settings.init(this);
-            if (Settings.getInstance().getStartInARView()) {
-                this.fragmentName = "ARFragment";
-            }
-            else {
-                this.fragmentName = "MapFragment";
-            }
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            navView.setCheckedItem(R.id.nav_home);
         }
 
         checkPermissions();
@@ -228,11 +217,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initSingletons() {
 
-        LocalDB.init(this);
-        this.localDB = LocalDB.getInstance();
-        CloudDB.init(this);
-        this.cloudDB=CloudDB.getInstance();
-
         Settings.init(this);
         this.settings = Settings.getInstance();
 
@@ -244,5 +228,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         this.compassAssistant = CompassAssistant.getInstance(this);
         compassAssistant.onStart();
+
+        IconProvider.init(this);
+        this.iconProvider = IconProvider.getInstance();
     }
 }

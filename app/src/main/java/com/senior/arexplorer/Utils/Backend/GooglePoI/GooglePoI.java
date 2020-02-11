@@ -52,6 +52,10 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
             }
 
             super.setName(poi.getString("name"));
+
+            //if(poi.getString("icon").isEmpty())
+            iconURL = poi.getString("icon");
+            Log.d("IconURL", iconURL);
         }
         catch (JSONException ex) {
             Log.e("GooglePoI",ex.toString());

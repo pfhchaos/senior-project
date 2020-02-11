@@ -31,7 +31,6 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
 
     public OneBusAwayPoi(JSONObject poi) {
         super();
-
         String direction = " ",name,toTrim,description="";
         Double lat,lon;
 
