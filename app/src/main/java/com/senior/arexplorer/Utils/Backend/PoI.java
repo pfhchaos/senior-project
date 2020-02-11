@@ -26,6 +26,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private Rect compassRect;
     public boolean compassRender = false;
     public boolean focused = false;
+    public String iconURL = "default";
 
     private Collection<String> types;
 
@@ -97,6 +98,8 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     public double getElevation() {
         return loc.getAltitude();
     }
+
+    public String getIconURL(){ return iconURL;}
 
     public Collection<String> getTypes() {
         //TODO: clone types before returning it
