@@ -7,6 +7,8 @@ import android.location.Location;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.IconProvider;
@@ -118,8 +120,8 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return IconProvider.getInstance().getRoundIcon(getIconURL());
     }
 
-    public Bitmap getMapIcon(){
-        return IconProvider.getInstance().getMapIcon(getIconURL());
+    public BitmapDescriptor getMapIcon(){
+        return BitmapDescriptorFactory.fromBitmap(IconProvider.getInstance().getMapIcon(getIconURL()));
     }
 
     public String toShortString() {

@@ -23,6 +23,7 @@ public class IconProvider {
     private HashMap<String, Bitmap> pointyIconMap = new HashMap<>();
     private HashMap<String, Bitmap> roundIconMap = new HashMap<>();
     private HashMap<String, Bitmap> mapIconMap = new HashMap<>();
+    private float mapIconRatio = 1f/ 7f;
 
     private IconProvider(){
 
@@ -30,7 +31,7 @@ public class IconProvider {
         Bitmap temp = CommonMethods.getBitmapFromDrawable(d);
         pointyIconMap.put("default", temp);
 
-        temp = Bitmap.createScaledBitmap(temp, temp.getWidth() / 7, temp.getHeight() / 7, true);
+        temp = Bitmap.createScaledBitmap(temp, (int)(temp.getWidth() * mapIconRatio), (int)(temp.getHeight() * mapIconRatio), true);
         mapIconMap.put("default", temp);
 
         d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
@@ -127,7 +128,7 @@ public class IconProvider {
 
                 pointyIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
 
-                Bitmap temp = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 7, bitmap.getHeight() / 7, true);
+                Bitmap temp = Bitmap.createScaledBitmap(bitmap, (int)(bitmap.getWidth()  * mapIconRatio), (int)(bitmap.getHeight()  * mapIconRatio), true);
                 mapIconMap.put(url, temp);
 
 
