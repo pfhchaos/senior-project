@@ -2,8 +2,6 @@ package com.senior.arexplorer;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,7 +24,7 @@ import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.FragmentWithSettings;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -38,9 +36,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final int PERMISSION_REQUEST_CAMERA = 10;
 
     DrawerLayout drawer;
-    public SQLiteDatabase db;
-    private Cursor favoritesCursor;
-    public Cursor cursor;
 
     private Backend backend;
     private CompassAssistant compassAssistant;
@@ -100,15 +95,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CompassAssistant.getInstance().onStart();
 
         NavigationView navView = findViewById(R.id.nav_view);
-        switch (this.fragmentName) {
-            case "ARFragment":
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ARFragment()).commit();
-                navView.setCheckedItem(R.id.nav_ar);
-                break;
-            case "MapFragment":
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
-                navView.setCheckedItem(R.id.nav_map);
-                break;
+        if (this.fragmentName != null) {
+            switch (this.fragmentName) {
+                case "ARFragment":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ARFragment()).commit();
+                    navView.setCheckedItem(R.id.nav_ar);
+                    //onNavigationItemSelected(navView.findViewById(R.id.nav_ar));
+                    break;
+                case "MapFragment":
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment()).commit();
+                    navView.setCheckedItem(R.id.nav_map);
+                    //onNavigationItemSelected(navView.findViewById(R.id.nav_map));
+                    break;
+            }
         }
     }
 
@@ -189,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        IFragSettings tempFrag = null;
+        Fragment tempFrag = null;
         Menu menu = ((NavigationView) findViewById(R.id.nav_view)).getMenu();
 
         switch(menuItem.getItemId()){
@@ -220,15 +219,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         if(tempFrag != null){
-            tempFrag.loadSettingsUI(menu, drawer, this);
+            //tempFrag.loadSettingsUI(menu, drawer, this);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, (Fragment)tempFrag).commit();
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    public String getName(){
-        return "From Activity";
     }
 
     private void initSingletons() {

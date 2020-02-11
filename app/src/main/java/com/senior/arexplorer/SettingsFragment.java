@@ -9,9 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Switch;
-import android.widget.ToggleButton;
 
-import com.senior.arexplorer.Utils.IFragSettings;
 import com.senior.arexplorer.Utils.Settings;
 
 import androidx.annotation.NonNull;
@@ -20,7 +18,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-public class SettingsFragment extends Fragment implements IFragSettings {
+public class SettingsFragment extends Fragment {
 
 
     @Nullable

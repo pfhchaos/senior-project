@@ -22,16 +22,15 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 import androidx.core.util.Supplier;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.SeekBarWithText;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.CompassAssistant;
-import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.FragmentWithSettings;
 import com.senior.arexplorer.Utils.Settings;
 
-public class ARFragment extends Fragment implements IFragSettings {
+public class ARFragment extends FragmentWithSettings {
 
     private CameraOverlay mOverlay;
     private TextureView camView;
@@ -130,6 +129,7 @@ public class ARFragment extends Fragment implements IFragSettings {
     }
 
     public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context){
+
         menu.removeGroup(R.id.settings);
         Function<String, TextView> getTitle = (i) -> {
           TextView title = new TextView(drawer.getContext());

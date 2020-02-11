@@ -33,7 +33,7 @@ import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.saveObj;
-import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.FragmentWithSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveLocationFragment extends Fragment implements IFragSettings {
+public class SaveLocationFragment extends FragmentWithSettings {
 
     private TextView nameInputTextView;
     private TextView descInputTextView;
@@ -281,8 +281,6 @@ public class SaveLocationFragment extends Fragment implements IFragSettings {
         //save stuff here
         super.onPause();
     }
-
-
 
     @Override
     public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
