@@ -10,12 +10,13 @@ import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalPoIFetcher;
 import com.senior.arexplorer.Utils.Backend.OneBusAwayPoI.OneBusAwayPoIFetcher;
+import com.senior.arexplorer.Utils.SettingListener;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandler{
+public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandler, SettingListener {
     private static Backend instance = null;
     private static Context applicationContext;
     private Location lastFetched = null;
@@ -51,10 +52,22 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
     private Backend() {
         super();
 
-        this.sources = new ArrayList<PoIFetcher>();
 
         Here.init(this.applicationContext);
         Here.getInstance().addListener(this);
+
+        Settings.getInstance().addUseGoogleBackendListener(this);
+        Settings.getInstance().addUseLocalBackendListener(this);
+        Settings.getInstance().addUseOneBusAwayBackendListener(this);
+        Settings.getInstance().addUseCloudBackendListener(this);
+
+        buildSources();
+
+        fetchData();
+    }
+
+    private void buildSources() {
+        this.sources = new ArrayList<PoIFetcher>();
 
         if (Settings.getInstance().getUseGoogleBackend()) {
             Log.d("Backend","Google Places backend is enabled, starting");
@@ -72,6 +85,15 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
             PoIFetcher localPoIFetcher = LocalPoIFetcher.getInstance();
             this.sources.add(localPoIFetcher);
             localPoIFetcher.addHandler(this);
+
+            // for cloud
+
+          /*  CloudDB.init(this.applicationContext);
+            PoIFetcher cloudPoIFetcher = CloudPoIFetcher.getInstance();
+            this.sources.add(cloudPoIFetcher);
+            cloudPoIFetcher.addHandler(this);
+
+           */
         }
         else {
             Log.d("Backend","LocalDB backend is disabled, skipping");
@@ -87,7 +109,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
             Log.d("Backend","OneBusAway backend is disabled, skipping");
         }
 
-        fetchData();
+        this.isReady = true;
     }
 
     public Collection<PoI> getPoIs() {
@@ -114,15 +136,22 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     public void cleanUp() {
         //TODO: do something
-        for (PoIFetcher source: sources) {
-            source.cleanUp();
-        }
+        Log.d("Backend", "cleanUp");
+        this.sources = null;
+        this.isReady = false;
+        Backend.instance = null;
+        Settings.getInstance().removeUseGoogleBackendListener(this);
+        Settings.getInstance().removeUseLocalBackendListener(this);
+        Settings.getInstance().removeUseOneBusAwayBackendListener(this);
+        Settings.getInstance().removeUseCloudBackendListener(this);
     }
 
     public boolean isReady() {
         boolean ret = false;
-        for (PoIFetcher source : sources) {
-            ret |= source.isReady();
+        if (this.isReady) {
+            for (PoIFetcher source : sources) {
+                ret |= source.isReady();
+            }
         }
         return ret;
     }
@@ -148,5 +177,12 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         else {
             Log.v("Backend","sources not ready");
         }
+    }
+
+    @Override
+    public void onSettingChange() {
+        Log.d("Backend", "onSettingChanged");
+        buildSources();
+        fetchData();
     }
 }

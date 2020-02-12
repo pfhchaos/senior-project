@@ -19,11 +19,11 @@ import android.widget.TextView;
 
 import com.senior.arexplorer.R;
 
+import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
-import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
@@ -118,7 +118,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             for (PoI poi : nearby.descendingSet()) {
                 calcNearbyRect(poi);
                 if(poi.compassRender)
-                    canvas.drawBitmap(IconProvider.getInstance().getPointy(poi.getIconURL()), null, poi.getCompassRect(), p);
+                    canvas.drawBitmap(poi.getPointyIcon(), null, poi.getCompassRect(), p);
             }
         }
     }

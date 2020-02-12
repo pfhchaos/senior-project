@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Settings {
     private static Settings instance;
@@ -21,6 +23,18 @@ public class Settings {
     private Boolean useCloudBackend;
 
     private Boolean startInARView;
+
+    private Collection<SettingListener> drawDistanceListeners;
+    private Collection<SettingListener> compassFOVListeners;
+
+    private Collection<SettingListener> showBuildingsListeners;
+
+    private Collection<SettingListener> useGoogleBackendListeners;
+    private Collection<SettingListener> useLocalBackendListeners;
+    private Collection<SettingListener> useOneBusAwayBackendListeners;
+    private Collection<SettingListener> useCloudBackendListeners;
+
+    private Collection<SettingListener> startInARViewListeners;
 
     public static synchronized void init(Context context) {
         Log.d("location manager", "here is initialized.");
@@ -66,6 +80,18 @@ public class Settings {
         this.useCloudBackend  = Boolean.valueOf(sharedPreferences.getString("Pref_Backend_Use_Cloud","true"));
 
         this.startInARView  = Boolean.valueOf(sharedPreferences.getString("Pref_Start_In_AR_View","true"));
+
+        this.compassFOVListeners = new ArrayList<SettingListener>();
+        this.drawDistanceListeners = new ArrayList<SettingListener>();
+
+        this.showBuildingsListeners = new ArrayList<SettingListener>();
+
+        this.useGoogleBackendListeners = new ArrayList<SettingListener>();
+        this.useLocalBackendListeners = new ArrayList<SettingListener>();
+        this.useOneBusAwayBackendListeners = new ArrayList<SettingListener>();
+        this.useCloudBackendListeners = new ArrayList<SettingListener>();
+
+        this.startInARViewListeners = new ArrayList<SettingListener>();
     }
 
     public int getDrawDistance() {
@@ -76,12 +102,28 @@ public class Settings {
         set("drawDistance", new Integer(drawDistance),"Pref_AR_Compass_DrawDistance");
     }
 
+    public void addDrawDistanceListener(SettingListener listener) {
+        addListener("drawDistanceListeners",listener);
+    }
+
+    public void removeDrawDistanceListener(SettingListener listener) {
+        removeListener("drawDistanceListeners", listener);
+    }
+
     public int getCompassFOV() {
         return this.compassFOV;
     }
 
     public void setCompassFOV(int compassFOV) {
         this.set("compassFOV", new Integer(compassFOV), "Pref_AR_Compass_FOV");
+    }
+
+    public void addCompassFOVListener(SettingListener listener) {
+        addListener("compassFOVListeners",listener);
+    }
+
+    public void removeCompassFOVListener(SettingListener listener) {
+        removeListener("compassFOVListeners", listener);
     }
 
     public boolean getShowBuildings() {
@@ -92,12 +134,28 @@ public class Settings {
         this.set("showBuildings", new Boolean(showBuildings), "Pref_Map_Show_Building");
     }
 
+    public void addShowBuildingsListener(SettingListener listener) {
+        addListener("showBuildingsListeners",listener);
+    }
+
+    public void removeShowBuildingsListener(SettingListener listener) {
+        removeListener("showBuildingsListeners", listener);
+    }
+
     public boolean getUseGoogleBackend() {
         return this.useGoogleBackend;
     }
 
     public void setUseGoogleBackend(boolean useGoogleBackend) {
         this.set("useGoogleBackend", new Boolean(useGoogleBackend), "Pref_Backend_Use_Google");
+    }
+
+    public void addUseGoogleBackendListener(SettingListener listener) {
+        addListener("useGoogleBackendListeners",listener);
+    }
+
+    public void removeUseGoogleBackendListener(SettingListener listener) {
+        removeListener("useGoogleBackendListeners", listener);
     }
 
     public boolean getUseLocalBackend() {
@@ -108,6 +166,14 @@ public class Settings {
         this.set("useLocalBackend", new Boolean(useLocalBackend), "Pref_Backend_Use_Local");
     }
 
+    public void addUseLocalBackendListener(SettingListener listener) {
+        addListener("useLocalBackendListeners",listener);
+    }
+
+    public void removeUseLocalBackendListener(SettingListener listener) {
+        removeListener("useLocalBackendListeners", listener);
+    }
+
     public boolean getUseOneBusAwayBackend() {
         return this.useOneBusAwayBackend;
     }
@@ -116,28 +182,59 @@ public class Settings {
         this.set("useOneBusAwayBackend", new Boolean(useOneBusAwayBackend), "Pref_Backend_Use_One_Bus_Away");
     }
 
+    public void addUseOneBusAwayBackendListener(SettingListener listener) {
+        addListener("useOneBusAwayBackendListeners",listener);
+    }
+
+    public void removeUseOneBusAwayBackendListener(SettingListener listener) {
+        removeListener("useOneBusAwayBackendListeners", listener);
+    }
+
     public boolean getUseCloudBackend() {
         return this.useCloudBackend;
     }
 
-    public void setCloudBackend(boolean useCloudBackend) {
+    public void setUseCloudBackend(boolean useCloudBackend) {
         this.set("useCloudBackend", new Boolean(useCloudBackend), "Pref_Backend_Cloud");
     }
 
+    public void addUseCloudBackendListener(SettingListener listener) {
+        addListener("useCloudBackendListeners",listener);
+    }
+
+    public void removeUseCloudBackendListener(SettingListener listener) {
+        removeListener("useCloudBackendListeners", listener);
+    }
+
     public boolean getStartInARView() {
-        return this.useCloudBackend;
+        return this.startInARView;
     }
 
     public void setStartInARView(boolean startInARView) {
         this.set("startInARView", new Boolean(startInARView), "Pref_Start_In_AR_View");
     }
 
+    public void addStartInARViewListener(SettingListener listener) {
+        addListener("startInARViewListeners",listener);
+    }
+
+    public void removeStartInARViewListener(SettingListener listener) {
+        removeListener("startInARViewListeners", listener);
+    }
+
     //NEVER DO THIS
     private void set(String local, Object toSave, String key) {
-        synchronized (local) {
-            try {
-                Class aClass = this.getClass();
-                Field field = aClass.getDeclaredField(local);
+        Class aClass = this.getClass();
+        Field field;
+        Object syncOn;
+
+        try {
+            field = aClass.getDeclaredField(local);
+            syncOn = field.get(this);
+            Log.d("Settings", "local: " + local);
+            Log.d("Settings", "syncOn: " + syncOn.toString());
+
+            synchronized (syncOn) {
                 field.set(this, toSave);
 
                 SharedPreferences sharedPreferences = applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE);
@@ -145,10 +242,63 @@ public class Settings {
                 editor.putString(key, "" + toSave);
                 editor.commit();
             }
-            catch (Exception ex) {
-                Log.e("Settings","THIS IS WHY YOU SHOULD NEVER DO THIS!!!");
-                ex.printStackTrace();
+
+            Collection<SettingListener> listeners = (Collection<SettingListener>) aClass.getDeclaredField(local + "Listeners").get(this);
+            for (SettingListener listener : listeners) listener.onSettingChange();
+        }
+        catch (Exception ex) {
+            Log.e("Settings","THIS IS WHY YOU SHOULD NEVER DO THIS!!!");
+            Log.e("Settings",ex.toString());
+            Log.e("Settings",ex.getStackTrace().toString());
+            ex.printStackTrace();
+        }
+    }
+
+    private void addListener(String local, SettingListener listener) {
+        Class aClass = this.getClass();
+        Field field;
+        Object syncOn;
+
+        try {
+            field = aClass.getDeclaredField(local);
+            syncOn = field.get(this);
+            Log.d("Settings", "syncOn: " + syncOn.toString());
+
+            synchronized (syncOn) {
+                Log.d("Settings", "addListener: " + listener.toString() + " from " + local);
+                Collection<SettingListener> addTo = (Collection<SettingListener>) syncOn;
+                addTo.add(listener);
             }
+        }
+        catch (Exception ex) {
+            Log.e("Settings","THIS IS WHY YOU SHOULD NEVER DO THIS!!!");
+            Log.e("Settings",ex.toString());
+            Log.e("Settings",ex.getStackTrace().toString());
+            ex.printStackTrace();
+        }
+    }
+
+    private void removeListener(String local, SettingListener listener) {
+        Class aClass = this.getClass();
+        Field field;
+        Object syncOn;
+
+        try {
+            field = aClass.getDeclaredField(local);
+            syncOn = field.get(this);
+            Log.d("Settings", "syncOn: " + syncOn.toString());
+
+            synchronized (syncOn) {
+                Log.d("Settings", "removeListener: " + listener.toString() + " from " + local);
+                Collection<SettingListener> removeFrom = (Collection<SettingListener>) syncOn;
+                removeFrom.remove(listener);
+            }
+        }
+        catch (Exception ex) {
+            Log.e("Settings","THIS IS WHY YOU SHOULD NEVER DO THIS!!!");
+            Log.e("Settings",ex.toString());
+            Log.e("Settings",ex.getStackTrace().toString());
+            ex.printStackTrace();
         }
     }
 }

@@ -15,11 +15,11 @@ import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.senior.arexplorer.Utils.IFragSettings;
+import com.senior.arexplorer.Utils.FragmentWithSettings;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 
 
-public class DataBaseFragment extends Fragment implements IFragSettings {
+public class DataBaseFragment extends Fragment {
 
     @Nullable
     @Override
@@ -45,11 +45,6 @@ public class DataBaseFragment extends Fragment implements IFragSettings {
        // CloudDB.getInstance().ExecurQuery( " INSERT INTO LOCAL_DATA (name, description, latitude, longitude, elevation ) VALUES ('nn', 'des', '123', '120', '25')");
 
         return view;
-
-    }
-
-    @Override
-    public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
 
     }
 

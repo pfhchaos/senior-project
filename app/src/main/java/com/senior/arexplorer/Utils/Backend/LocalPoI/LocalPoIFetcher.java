@@ -11,11 +11,13 @@ import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 import com.senior.arexplorer.Utils.Backend.saveObj;
+import com.senior.arexplorer.Utils.SettingListener;
+import com.senior.arexplorer.Utils.Settings;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
+public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, SettingListener {
 
     private Here here;
     private LocalDB LDB;
@@ -23,8 +25,13 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     private boolean isReady = false;
 
     public static LocalPoIFetcher getInstance(){
-        if(LPF == null) LPF = new LocalPoIFetcher();
+        if(LPF == null) getInstanceSynced();
         return LPF;
+    }
+
+    private static synchronized void getInstanceSynced() {
+        if(LPF == null) LPF = new LocalPoIFetcher();
+        return;
     }
 
     private LocalPoIFetcher(){
@@ -34,6 +41,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
         this.poIFetcherHandlers = new ArrayList<>();
         this.poIs = new ArrayList<>();
 
+        Settings.getInstance().addUseLocalBackendListener(this);
         LocalDB.getInstance().addListener(this);
     }
 
@@ -99,6 +107,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
 
     public void cleanUp(){
         Log.d("LocalPoIFetcher", "LocalPoIFetcher is cleaned up");
+        Settings.getInstance().removeUseLocalBackendListener(this);
         LocalPoIFetcher.LPF = null;
     }
 
@@ -110,5 +119,11 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener {
     @Override
     public void onUpdate() {
         this.fetchData();
+    }
+
+    @Override
+    public void onSettingChange() {
+        Log.d("LocalPoIFetcher", "onSettingChanged");
+        if (!Settings.getInstance().getUseLocalBackend()) cleanUp();
     }
 }
