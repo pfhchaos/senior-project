@@ -39,7 +39,6 @@ public class LocalPoI extends PoI {
 
     @Override
     public boolean onLongTouch(Context context) {
-
         PopupBox popup = new PopupBox(context, getName());
         popup.setView(getDetailsView(context));
         popup.show();
@@ -52,7 +51,13 @@ public class LocalPoI extends PoI {
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);
         retView.setText(toShortString());
-        retView.setCompoundDrawablesWithIntrinsicBounds(null,img,null,null);
+
+        int h,w;
+        h=img.getIntrinsicHeight()*5;
+        w=img.getIntrinsicWidth()*5;
+
+        img.setBounds(0,0,w,h);
+        retView.setCompoundDrawables(null,null,null,img);
         retView.setTextSize(18);
         return retView;
     }
