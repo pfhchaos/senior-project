@@ -79,7 +79,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
             PoIFetcher cloudPoIFetcher = CloudPoIFetcher.getInstance();
             this.sources.add(cloudPoIFetcher);
             cloudPoIFetcher.addHandler(this);
-            
+
            */
         }
         else {

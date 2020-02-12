@@ -13,11 +13,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class RetriveData {
     private static final String url = "jdbc:mysql://database-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/ar_schema";
     private static final String user = "masteruser";
     private static final String pass = "Bangladesh88";
+    private Collection<CloudDBListener> callbacks;
 
     ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
@@ -25,6 +27,7 @@ public class RetriveData {
 
      ForLocalDataTable localData = new ForLocalDataTable();
      localData.execute("");
+     this.callbacks = new ArrayList<CloudDBListener>();
  }
 
 
@@ -79,6 +82,7 @@ public class RetriveData {
 
                 res = result;
                 con.close();
+                notifyListeners();
             } catch (Exception e) {
                 e.printStackTrace();
                 res = e.toString();
@@ -91,6 +95,19 @@ public class RetriveData {
             //txtData.setText(result);
             Log.d("Result : ", result);
         }
+    }
+
+    private void notifyListeners() {
+        for (CloudDBListener listener : this.callbacks) {
+            listener.onUpdate();
+        }
+    }
+    public void addListener(CloudDBListener listener) {
+        this.callbacks.add(listener);
+    }
+
+    public void removeListener(CloudDBListener listener) {
+        this.callbacks.remove(listener);
     }
 
 
