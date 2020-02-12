@@ -1,13 +1,17 @@
 package com.senior.arexplorer.Utils.Backend;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.location.Location;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
 
 import java.io.Serializable;
@@ -26,6 +30,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private Rect compassRect;
     public boolean compassRender = false;
     public boolean focused = false;
+    public String iconURL = "default";
 
     private Collection<String> types;
 
@@ -98,12 +103,26 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return loc.getAltitude();
     }
 
+    public String getIconURL(){ return iconURL;}
+
     public Collection<String> getTypes() {
         //TODO: clone types before returning it
         return this.types;
     }
 
     public Rect getCompassRect(){ return compassRect; }
+
+    public Bitmap getPointyIcon(){
+        return IconProvider.getInstance().getPointyIcon(getIconURL());
+    }
+
+    public Bitmap getRoundIcon(){
+        return IconProvider.getInstance().getRoundIcon(getIconURL());
+    }
+
+    public BitmapDescriptor getMapIcon(){
+        return BitmapDescriptorFactory.fromBitmap(IconProvider.getInstance().getMapIcon(getIconURL()));
+    }
 
     public String toShortString() {
         if(Here.getInstance().isReady()){

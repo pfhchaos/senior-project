@@ -1,13 +1,16 @@
 package com.senior.arexplorer.Utils;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
+import android.util.LruCache;
 //import android.graphics.Bitmap;
 //import android.util.LruCache;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 //import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
 public class WebRequester {
@@ -15,15 +18,15 @@ public class WebRequester {
     private static Context applicationContext;
 
     private RequestQueue requestQueue = null;
-    //private ImageLoader mImageLoader;
+    private ImageLoader mImageLoader;
 
 
     private WebRequester() {
         Log.d("WebRequester", "WebRequester is instantiated.");
         this.requestQueue = getRequestQueue();
 
-        /*
-        mImageLoader = new ImageLoader(mRequestQueue,
+
+        mImageLoader = new ImageLoader(requestQueue,
                 new ImageLoader.ImageCache() {
                     private final LruCache<String, Bitmap>
                             cache = new LruCache<String, Bitmap>(20);
@@ -38,7 +41,7 @@ public class WebRequester {
                         cache.put(url, bitmap);
                     }
                 });
-         */
+
     }
 
     public static void init(Context context) {
@@ -85,11 +88,11 @@ public class WebRequester {
         getRequestQueue().add(req);
     }
 
-    /*
+
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }
-    */
+
 
     public void cancelPendingRequests(Object tag) {
         if (requestQueue != null) {

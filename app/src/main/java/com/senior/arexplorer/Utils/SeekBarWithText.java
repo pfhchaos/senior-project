@@ -1,4 +1,4 @@
-package com.senior.arexplorer;
+package com.senior.arexplorer.Utils;
 
 import android.content.Context;
 import android.widget.LinearLayout;

@@ -10,6 +10,8 @@ import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.SettingListener;
+import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -19,7 +21,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String> {
+public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorListener, Response.Listener<String>, SettingListener {
 
     private final String stopsUrl = "http://52.88.188.196:8080/api/api/where/stops-for-location.json?key=TEST";
     private final int radius = 500;
@@ -34,6 +36,11 @@ public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorLi
         return instance;
     }
 
+    public OneBusAwayPoIFetcher() {
+        super();
+
+        Settings.getInstance().addUseOneBusAwayBackendListener(this);
+    }
     @Override
     public void onErrorResponse(VolleyError error) {
         Log.e("OneBusAwayPoIFetcher","No response from OneBusAway. onErrorResponse");
@@ -102,10 +109,17 @@ public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorLi
     @Override
     public void cleanUp() {
         OneBusAwayPoIFetcher.instance = null;
+        Settings.getInstance().removeUseOneBusAwayBackendListener(this);
     }
 
     @Override
     public boolean isReady() {
         return this.isReady;
+    }
+
+    @Override
+    public void onSettingChange() {
+        Log.d("OneBusAwayFetcher", "onSettingChanged");
+        if (!Settings.getInstance().getUseOneBusAwayBackend()) cleanUp();
     }
 }
