@@ -129,7 +129,7 @@ public class IconProvider {
                 pointyIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
 
                 Bitmap temp = Bitmap.createScaledBitmap(bitmap, (int)(bitmap.getWidth()  * mapIconRatio), (int)(bitmap.getHeight()  * mapIconRatio), true);
-                mapIconMap.put(url, temp);
+                mapIconMap.put(url, temp.copy(temp.getConfig(), false));
 
 
                 //roundIconMap Calculations
