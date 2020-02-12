@@ -52,7 +52,7 @@ public class IconProvider {
     }
 
     public static synchronized void init(Context context) {
-        Log.d("location manager", "here is initialized.");
+        Log.d("IconProvider", "here is initialized.");
         if (IconProvider.applicationContext == null) {
             IconProvider.applicationContext = context.getApplicationContext();
         }
@@ -148,7 +148,7 @@ public class IconProvider {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("getImage", "No response from ImageLoader!\n" + error);
+                Log.e("IconProvider", "No response from ImageLoader!\n" + error);
             }
         });
     }
