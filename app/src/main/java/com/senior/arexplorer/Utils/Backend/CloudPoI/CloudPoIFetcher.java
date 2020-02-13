@@ -41,12 +41,14 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
        // ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
 
-        for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
-            handler.placeFetchComplete();
-        }
+
         synchronized (this.poIs) {
             RetriveData db = new RetriveData();
             this.poIs = db.getLocalData();
+        }
+
+        for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
+            handler.placeFetchComplete();
         }
         isReady = true;
     }

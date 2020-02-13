@@ -4,6 +4,7 @@ package com.senior.arexplorer.Utils.Backend.LocalPoI;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.RetriveData;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDBListener;
@@ -95,7 +96,9 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, Sett
         c.close();
 
         synchronized (this.poIs) {
-            this.poIs = newPoIs;
+            //this.poIs = newPoIs;
+            RetriveData db = new RetriveData();
+            this.poIs = db.getLocalData();
         }
 
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
