@@ -51,8 +51,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     public CameraOverlay(Context context){
         super(context);
 
-
-        CompassAssistant.getInstance(context).addPitchListener(this);
+        Here.getInstance().addListener(this);
+        CompassAssistant.getInstance().addCompassListener(this);
+        CompassAssistant.getInstance().addPitchListener(this);
 
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);

@@ -312,7 +312,7 @@ public class CompassAssistant implements SensorEventListener {
 
     public void cleanUp(){
         if(instance != null)
-        instance.onStop();
+            instance.onStop();
         instance = null;
     }
 
