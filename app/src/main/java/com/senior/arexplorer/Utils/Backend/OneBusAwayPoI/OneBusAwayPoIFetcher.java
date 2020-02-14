@@ -3,6 +3,7 @@ package com.senior.arexplorer.Utils.Backend.OneBusAwayPoI;
 import android.location.Location;
 import android.util.Log;
 
+import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -41,9 +42,15 @@ public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorLi
 
         Settings.getInstance().addUseOneBusAwayBackendListener(this);
     }
+
     @Override
     public void onErrorResponse(VolleyError error) {
         Log.e("OneBusAwayPoIFetcher","No response from OneBusAway. onErrorResponse");
+        Log.e("OneBusAwayPoIFetcher",error.toString());
+        NetworkResponse networkResponse = error.networkResponse;
+        if (networkResponse != null) {
+            Log.e("Status code", String.valueOf(networkResponse.statusCode));
+        }
     }
 
     @Override
@@ -99,7 +106,7 @@ public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorLi
             return;
         }
         String request = String.format("%s&lat=%s&lon=%s&radius=%s",stopsUrl,hereNow.getLatitude(),hereNow.getLongitude(),radius);
-        Log.v("OneBusAway","Request: "+request);
+        Log.v("OneBusAwayPoIFetcher","Request: "+request);
         StringRequest stringRequest = new StringRequest(request, this, this);
         this.lastRequest = request;
         WebRequester.getInstance().getRequestQueue().add(stringRequest);
