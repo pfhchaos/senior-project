@@ -98,6 +98,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             }
             else {
                 Log.e("Here", "Attempted to initialize Here twice!");
+                Log.e("Here", new Exception("Stack trace").getStackTrace().toString());
                 throw new Error("Shit and die!");
             }
         }

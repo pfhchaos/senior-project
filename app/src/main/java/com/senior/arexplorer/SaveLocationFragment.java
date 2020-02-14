@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
@@ -41,7 +42,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveLocationFragment extends FragmentWithSettings {
+public class SaveLocationFragment extends DialogFragment {
 
     private TextView nameInputTextView;
     private TextView descInputTextView;
@@ -283,6 +284,7 @@ public class SaveLocationFragment extends FragmentWithSettings {
 
 
 
+    /*
     @Override
     public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
@@ -312,5 +314,6 @@ public class SaveLocationFragment extends FragmentWithSettings {
             return false;
         });
     }
+    */
 
 }

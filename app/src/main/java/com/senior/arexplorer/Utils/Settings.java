@@ -37,7 +37,7 @@ public class Settings {
     private Collection<SettingListener> startInARViewListeners;
 
     public static synchronized void init(Context context) {
-        Log.d("location manager", "here is initialized.");
+        Log.d("Settings", "Settings is initialized.");
         if (Settings.applicationContext == null) {
             Settings.applicationContext = context.getApplicationContext();
         }

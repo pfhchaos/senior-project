@@ -51,14 +51,19 @@ public class WebRequester {
             WebRequester.applicationContext = context.getApplicationContext();
         }
         else {
-            Log.e("Here","Attempted to initialize Here twice!");
+            if (context.getApplicationContext() == WebRequester.applicationContext) {
+                Log.d("WebRequester","Attempted to initialize WebRequester twice! Same context proceeding.");
+            }
+            else {
+                Log.e("WebRequester", "Attempted to initialize WebRequester twice!");
+                Log.e("WebRequester", new Exception("Stack trace").getStackTrace().toString());
+            }
         }
-
     }
 
     public static WebRequester getInstance() {
         if (WebRequester.applicationContext == null) {
-            Log.e("Here", "Attempted to instantionate without initalizing!");
+            Log.e("WebRequester", "Attempted to instantionate WebRequester without initalizing!");
             return null;
         }
         if (WebRequester.instance == null) WebRequester.getInstanceSynced();
@@ -67,7 +72,7 @@ public class WebRequester {
 
     private static synchronized WebRequester getInstanceSynced() {
         if (WebRequester.applicationContext == null) {
-            Log.e("Here", "Attempted to instantionate without initalizing!");
+            Log.e("WebRequester", "Attempted to instantionate without initalizing!");
             return null;
         }
         if (WebRequester.instance == null) {

@@ -144,13 +144,18 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     }
 
     private void placeMarkers() {
-        Collection<PoI> pois = Backend.getInstance().getPoIs();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Collection<PoI> pois = Backend.getInstance().getPoIs();
 
-        Log.d("mapFragment","entered callback from place fetcher");
+                Log.d("mapFragment","entered callback from place fetcher");
 
-        for (PoI poi: pois) {
-            createMarker(poi);
-        }
+                for (PoI poi: pois) {
+                    createMarker(poi);
+                }
+            }
+        });
     }
 
     private void changeLocation(Location location) {
@@ -187,31 +192,6 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     @Override
     public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
-
-        menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Save Location")
-                .setOnMenuItemClickListener((i) ->{
-                    AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
-
-                    View view = new SaveView(getContext(), null);
-                            //((LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                            //.inflate(R.layout.fragment_save, null);
-
-                    //From here we can grab the views with view.getViewByID and assign on clicks to the popup
-
-                    popDialog.setView(view);
-
-                    popDialog.setPositiveButton("OK", (dialog, which) -> {
-                        dialog.dismiss();
-                    });
-
-                    popDialog.create();
-
-                    int width = (int) (Resources.getSystem().getDisplayMetrics().widthPixels * .97);
-                    int height = (int) (Resources.getSystem().getDisplayMetrics().heightPixels * .97);
-
-                    popDialog.show().getWindow().setLayout(width,height);
-                    return false;
-                });
     }
 
     @Override

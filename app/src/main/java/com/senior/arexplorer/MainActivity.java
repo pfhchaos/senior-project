@@ -127,11 +127,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onStop() {
         Log.d("ActivityLifecycle","onStop");
-        Here.getInstance().cleanUp();
-        Backend.getInstance().cleanUp();
-        //TODO: this seems wrong
-        CompassAssistant.getInstance().onStop();
-        CompassAssistant.getInstance().cleanUp();
         super.onStop();
     }
 
@@ -209,7 +204,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.nav_save :
-                tempFrag = new SaveLocationFragment();
+                tempFrag = null;
+                SaveLocationFragment saveLocationFragment = new SaveLocationFragment();
+                saveLocationFragment.show(getSupportFragmentManager(),"Save Fragment");
+                //tempFrag = new SaveLocationFragment();
                 break;
 
             default :
