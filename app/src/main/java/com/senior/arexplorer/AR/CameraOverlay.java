@@ -51,6 +51,9 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     public CameraOverlay(Context context){
         super(context);
 
+
+        CompassAssistant.getInstance(context).addPitchListener(this);
+
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
@@ -187,6 +190,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public void onCompassAccuracyChange(int compassStatus) {}
+
+    @Override
+    public void onPitchChanged(float pitch){
+        //Log.d("PitchTest", "Pitch : " + userPitch);
+
+    }
 
     @Override
     public void onLocationChanged(Location location) {
