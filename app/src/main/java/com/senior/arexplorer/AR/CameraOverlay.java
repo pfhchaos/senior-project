@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -25,7 +24,6 @@ import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.PoI;
-import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 
@@ -123,6 +121,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 calcNearbyRect(poi);
                 if(poi.compassRender)
                     canvas.drawBitmap(poi.getPointyIcon(), null, poi.getCompassRect(), p);
+                if(poi.arMarkerRender)
+                    canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
             }
         }
     }
@@ -219,12 +219,14 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         boolean handled = false;
         PoI closest = null;
         TreeSet<PoI> touched = new TreeSet<>();
+
         for (PoI poi : nearby) {
-            if (poi.getCompassRect().contains((int) event.getX(), (int) event.getY()) && poi.compassRender) {
+            if (poi.wasTouched(event)) {
                 touched.add(poi);
                 if(touched.first() == poi)
                     closest = poi;
             }
+
         }
 
         switch(event.getAction()) {
