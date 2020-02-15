@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.location.Location;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -29,6 +30,8 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private double elevation;
     private Rect compassRect;
     public boolean compassRender = false;
+    private Rect arRect;
+    public boolean arMarkerRender = false;
     public boolean focused = false;
     public String iconURL = "default";
 
@@ -41,6 +44,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         this.description = "";
         this.types = new ArrayList<String>();
         this.compassRect = new Rect();
+        this.arRect = new Rect();
     }
 
     public void setName(String name) {
@@ -112,12 +116,23 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
 
     public Rect getCompassRect(){ return compassRect; }
 
+    public Rect getARRect () { return arRect; }
+
     public Bitmap getPointyIcon(){
         return IconProvider.getInstance().getPointyIcon(getIconURL());
     }
 
     public Bitmap getRoundIcon(){
         return IconProvider.getInstance().getRoundIcon(getIconURL());
+    }
+
+    public boolean wasTouched(MotionEvent touchEvent){
+        int touchX = (int)touchEvent.getX(), touchY = (int)touchEvent.getY();
+        Rect touchedPoint = new Rect(touchX, touchY, touchX, touchY);
+        boolean retBool = getCompassRect().contains(touchedPoint) && compassRender;
+        retBool |= getARRect().contains(touchedPoint) && arMarkerRender;
+
+        return retBool;
     }
 
     public BitmapDescriptor getMapIcon(){
