@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
+import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
@@ -166,6 +167,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     }
 
     private void changeHeading(float userHeading) {
+        userHeading = CommonMethods.xMody(userHeading, 360);
         CameraPosition currentPosition = googleMap.getCameraPosition();
         CameraPosition newPosition = new CameraPosition(currentPosition.target, currentPosition.zoom, currentPosition.tilt, userHeading);
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
