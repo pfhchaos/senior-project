@@ -49,9 +49,6 @@ public class ARFragment extends FragmentWithSettings {
         FrameLayout overlay = view.findViewById(R.id.overlay_view);
         overlay.addView(mOverlay);
 
-        Here.getInstance().addListener(mOverlay);
-        CompassAssistant.getInstance(view.getContext()).addCompassListener(mOverlay);
-
         return view;
     }
 

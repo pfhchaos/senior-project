@@ -220,6 +220,11 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     }
 
     @Override
+    public void onPitchChanged(float pitch) {
+
+    }
+
+    @Override
     public void onCompassAccuracyChange(int compassStatus) {
         Log.v("MapFragment", "onCompassAccuracyChanged");
     }
