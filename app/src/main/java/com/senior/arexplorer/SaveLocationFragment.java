@@ -1,8 +1,5 @@
 package com.senior.arexplorer;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +11,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,7 +21,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -33,7 +28,6 @@ import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.saveObj;
-import com.senior.arexplorer.Utils.FragmentWithSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -231,6 +225,7 @@ public class SaveLocationFragment extends DialogFragment {
 
 
     private void saveData() {
+
         LocalDB LDB = LocalDB.getInstance();
         CloudDB CDB = CloudDB.getInstance();
 

@@ -1,22 +1,23 @@
 package com.senior.arexplorer;
 
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.senior.arexplorer.Utils.FragmentWithSettings;
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
+
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
+import com.senior.arexplorer.Utils.Backend.PoI;
+
+import java.util.ArrayList;
 
 
 public class DataBaseFragment extends Fragment {
@@ -43,6 +44,10 @@ public class DataBaseFragment extends Fragment {
        //Log.d("datafrag : ", arr.get(0).getName());
 
        // CloudDB.getInstance().ExecurQuery( " INSERT INTO LOCAL_DATA (name, description, latitude, longitude, elevation ) VALUES ('nn', 'des', '123', '120', '25')");
+       // ArrayList<PoI> newPoIs = new ArrayList<PoI>();
+
+
+      //  System.out.println("log in size "+ db.getLocalData().size());
 
         return view;
 
