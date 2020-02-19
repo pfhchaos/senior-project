@@ -188,10 +188,20 @@ public class SaveLocationFragment extends DialogFragment implements SettingListe
         }
     }
 
+    @Override
+    public void onResume() {
+        Log.v("Lifecycle onResume","onResume in SaveLocationFragment");
+        super.onResume();
+
+
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v("Lifecycle onCreateView","onCreateView in SaveLocationFragment");
+
         View inflate = inflater.inflate(R.layout.fragment_save, container, false);
         here = Here.getInstance();
         nameInputTextView = inflate.findViewById(R.id.nameInput);
@@ -261,6 +271,7 @@ public class SaveLocationFragment extends DialogFragment implements SettingListe
         }
 
         switchFrag();
+        this.dismiss();
     }
 
     private void switchFrag() {
