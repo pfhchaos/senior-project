@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
-import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.RetriveData;
+//import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.RetriveData;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
@@ -52,8 +52,8 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, Sett
 
 
         synchronized (this.poIs) {
-            RetriveData db = new RetriveData();
-            this.poIs = db.getLocalData();
+//            RetriveData db = new RetriveData();
+//            this.poIs = db.getLocalData();
         }
 
         for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
@@ -71,12 +71,6 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, Sett
     }
 
     @Override
-    public void onSettingChange() {
-        Log.d("LocalPoIFetcher", "onSettingChanged");
-        if (!Settings.getInstance().getUseCloudBackend()) cleanUp();
-    }
-
-    @Override
     public void cleanUp() {
         CloudPoIFetcher.CPF = null;
     }
@@ -89,5 +83,11 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, Sett
     @Override
     public void onUpdate() {
         this.fetchData();
+    }
+
+    @Override
+    public void onSettingChange() {
+        Log.d("CloudPoIFetcher", "onSettingChanged");
+        if (!Settings.getInstance().getUseCloudBackend()) cleanUp();
     }
 }

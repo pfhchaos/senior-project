@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.senior.arexplorer.AR.SaveView;
+import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
@@ -34,6 +37,7 @@ import com.senior.arexplorer.Utils.FragmentWithSettings;
 import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.Settings;
 
 import java.util.Collection;
 
@@ -67,6 +71,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Here.getInstance().addListener(this);
         Backend.getInstance().addHandler(this);
         CompassAssistant.getInstance(getContext()).addCompassListener(this);
+        CompassAssistant.getInstance(getContext()).addPitchListener(this);
 
         return v;
     }
@@ -171,6 +176,12 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
     }
 
+    private void changePitch(float pitch) {
+        CameraPosition currentPosition = googleMap.getCameraPosition();
+        CameraPosition newPosition = new CameraPosition(currentPosition.target, currentPosition.zoom, pitch, currentPosition.bearing);
+        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(newPosition));
+    }
+
     private void createMarker(PoI poi) {
         MarkerOptions newMarkerOptions = new MarkerOptions();
         newMarkerOptions.position(poi.getLatLng());
@@ -192,6 +203,31 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     @Override
     public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
+
+        MenuItem showBuildingsMenuItem = menu.add("Show Buildings");
+
+        showBuildingsMenuItem.setCheckable(true);
+        showBuildingsMenuItem.setChecked(Settings.getInstance().getShowBuildings());
+
+        showBuildingsMenuItem.setOnMenuItemClickListener((menuItem) -> {
+            if(Settings.getInstance().getShowBuildings()) {
+                Settings.getInstance().setShowBuildings(false);
+                menuItem.setChecked(false);
+            }
+            else {
+                Settings.getInstance().setShowBuildings(true);
+                menuItem.setChecked(true);
+            }
+            return true;
+        });
+
+        String filter = Settings.getInstance().getFilter();
+        MenuItem filterMenuItem = menu.add("Filter: " + filter);
+
+        filterMenuItem.setOnMenuItemClickListener((menuItem) -> {
+            //TODO: create popup with text entry for filter string
+            return true;
+        });
     }
 
     @Override
@@ -214,6 +250,16 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         //Log.v("MapFragment", "onCompassChanged");
         if(googleMap != null) {
             changeHeading(userHeading);
+        }
+    }
+
+    @Override
+    public void onPitchChanged(float pitch) {
+        Log.v("MapFragment", "onPitchChanged");
+        if(googleMap != null) {
+            if (pitch < 0) pitch = 0;
+            pitch = 90 - pitch;
+            changePitch(pitch);
         }
     }
 

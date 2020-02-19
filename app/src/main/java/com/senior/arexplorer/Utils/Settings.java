@@ -24,6 +24,8 @@ public class Settings {
 
     private Boolean startInARView;
 
+    private String filter;
+
     private Collection<SettingListener> drawDistanceListeners;
     private Collection<SettingListener> compassFOVListeners;
 
@@ -35,6 +37,8 @@ public class Settings {
     private Collection<SettingListener> useCloudBackendListeners;
 
     private Collection<SettingListener> startInARViewListeners;
+
+    private Collection<SettingListener> filterListener;
 
     public static synchronized void init(Context context) {
         Log.d("Settings", "Settings is initialized.");
@@ -81,6 +85,8 @@ public class Settings {
 
         this.startInARView  = Boolean.valueOf(sharedPreferences.getString("Pref_Start_In_AR_View","true"));
 
+        this.filter = sharedPreferences.getString("Pref_Filter", "");
+
         this.compassFOVListeners = new ArrayList<SettingListener>();
         this.drawDistanceListeners = new ArrayList<SettingListener>();
 
@@ -92,6 +98,8 @@ public class Settings {
         this.useCloudBackendListeners = new ArrayList<SettingListener>();
 
         this.startInARViewListeners = new ArrayList<SettingListener>();
+
+        this.filterListener = new ArrayList<SettingListener>();
     }
 
     public int getDrawDistance() {
@@ -222,6 +230,22 @@ public class Settings {
         removeListener("startInARViewListeners", listener);
     }
 
+    public String getFilter() {
+        return this.filter;
+    }
+
+    public void setFilter(String filter) {
+        this.set("filter", filter, "Pref_Filter");
+    }
+
+    public void addFilterListener(SettingListener listener) {
+        addListener("filterListeners",listener);
+    }
+
+    public void removeFilterListener(SettingListener listener) {
+        removeListener("filterListeners", listener);
+    }
+
     //NEVER DO THIS
     private void set(String local, Object toSave, String key) {
         Class aClass = this.getClass();
@@ -301,4 +325,5 @@ public class Settings {
             ex.printStackTrace();
         }
     }
+
 }

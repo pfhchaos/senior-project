@@ -31,6 +31,8 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
 
     private static PoIFetcher instance;
 
+    private Integer outstandingRequests = 0;
+
     public static PoIFetcher getInstance() {
         if (instance == null) {
             GooglePoIFetcher.getInstanceSynced();
@@ -56,18 +58,25 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
 
     @Override
     public void fetchData() {
+        WebRequester.getInstance().cancelPendingRequests(this);
         Location here = Here.getInstance().getLocation();
         if (here == null) {
             Log.e("GooglePoIFetcher","here is null. this should not happen");
             return; //will try again, don't make null references
         }
+
         String request = String.format("%s?key=%s&location=%s,%s&radius=%s", url, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", here.getLatitude(),here.getLongitude(), radius);
         StringRequest stringRequest = new StringRequest(request, this, this);
+        stringRequest.setTag(this);
+
         this.lastRequest = request;
 
         this.newPoIs = new ArrayList<PoI>();
 
         WebRequester.getInstance().getRequestQueue().add(stringRequest);
+        synchronized (this.outstandingRequests) {
+            outstandingRequests = 1;
+        }
     }
 
 
@@ -79,6 +88,9 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        synchronized (this.outstandingRequests) {
+            this.outstandingRequests--;
+        }
         Log.e("GooglePoiFetcher","No response from google. Fuck you Google!");
     }
 
@@ -89,11 +101,19 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
         JSONArray results = null;
 
         Log.d("GooglePoIFetcher", "Response recieved from Google Places API");
-        Log.d("GooglePoIFetcher", response);
         try {
             googleResp = new JSONObject(response);
             try {
                 next_page_token = googleResp.getString("next_page_token");
+                Log.d("GooglePoIFetcher", "next_page_token recieved. proceeding to new request.");
+
+                StringRequest stringRequest = new StringRequest(lastRequest + "&pagetoken=" + next_page_token, this, this);
+                stringRequest.setTag(this);
+                WebRequester.getInstance().getRequestQueue().add(stringRequest);
+
+                synchronized (this.outstandingRequests) {
+                    this.outstandingRequests++;
+                }
             }
             catch (JSONException ex) {
                 Log.d("GooglePoIFetcher", "No next_page_token recieved. request finished.");
@@ -106,25 +126,28 @@ public class GooglePoIFetcher extends PoIFetcher implements Response.ErrorListen
                 newPoIs.add(new GooglePoI(poi));
             }
 
-            if (next_page_token != null) {
-                StringRequest stringRequest = new StringRequest(lastRequest + "&pagetoken=" + next_page_token, this, this);
-                WebRequester.getInstance().getRequestQueue().add(stringRequest);
+            synchronized (this.outstandingRequests) {
+                this.outstandingRequests--;
             }
-            else {
+            if (next_page_token == null) {
+                while (this.outstandingRequests > 0) {
+                    Thread.sleep(10);
+                }
+                Log.d("GooglePoIFetcher", "No next_page_token recieved. request finished.");
                 synchronized (this.poIs) {
                     this.poIs = newPoIs;
                 }
                 for (PoIFetcherHandler handler: this.poIFetcherHandlers) {
                     handler.placeFetchComplete();
                 }
+                this.isReady = true;
             }
         }
         catch (Exception ex) {
-            ex.printStackTrace();
+            Log.e("GooglePoIFetcher", "Failed to process response from Google!");
+            Log.e("GooglePoIFetcher", ex.getStackTrace().toString());
             return;
         }
-        this.isReady = true;
-        Log.d("GooglePoIFetcher", results.toString());
     }
 
     public void cleanUp() {

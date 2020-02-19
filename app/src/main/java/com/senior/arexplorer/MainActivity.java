@@ -19,12 +19,13 @@ import androidx.fragment.app.Fragment;
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.google.android.material.navigation.NavigationView;
 import com.senior.arexplorer.AR.ARFragment;
-import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
-import com.senior.arexplorer.Utils.Backend.Here.Here;
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
+
+import com.senior.arexplorer.Utils.CompassAssistant;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
-import com.senior.arexplorer.Utils.IconProvider;
 
 //import com.amazonaws.mobile.config.AWSConfiguration;
 //import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
@@ -222,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initSingletons() {
+        CloudDB.init(this);
 
         Settings.init(this);
         this.settings = Settings.getInstance();

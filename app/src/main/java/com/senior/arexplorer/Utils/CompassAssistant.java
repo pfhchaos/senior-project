@@ -37,6 +37,7 @@ public class CompassAssistant implements SensorEventListener {
     private final WindowManager windowManager;
     private final SensorManager sensorManager;
     private final List<CompassAssistantListener> compassAssistantListeners = new ArrayList<>();
+    private final List<CompassAssistantListener> compassPitchListeners = new ArrayList<>();
 
     // Not all devices have a compassSensor
     @Nullable
@@ -51,6 +52,8 @@ public class CompassAssistant implements SensorEventListener {
     private float[] rotationVectorValue;
     private float lastHeading;
     private int lastAccuracySensorStatus;
+    private float lastPitch;
+    private float disabledCompassAtAngle = 80; //this is 10 degrees from screen up flat
 
     private long compassUpdateNextTimestamp;
     private float[] gravityValues = new float[3];
@@ -79,15 +82,30 @@ public class CompassAssistant implements SensorEventListener {
     }
 
     public void addCompassListener(@NonNull CompassAssistantListener compassAssistantListener) {
-        if (compassAssistantListeners.isEmpty()) {
+        if (compassAssistantListeners.isEmpty() && compassPitchListeners.isEmpty()) {
             onStart();
         }
         compassAssistantListeners.add(compassAssistantListener);
     }
 
+    public void addPitchListener(@NonNull CompassAssistantListener compassPitchListener) {
+        if (compassPitchListeners.isEmpty() && compassAssistantListeners.isEmpty()) {
+            onStart();
+        }
+        //Log.d("PitchTest", "Adding Pitch Listener " + compassPitchListener.getClass());
+        compassPitchListeners.add(compassPitchListener);
+    }
+
     public void removeCompassListener(@NonNull CompassAssistantListener compassAssistantListener) {
         compassAssistantListeners.remove(compassAssistantListener);
-        if (compassAssistantListeners.isEmpty()) {
+        if (compassAssistantListeners.isEmpty() && compassPitchListeners.isEmpty()) {
+            onStop();
+        }
+    }
+
+    public void removePitchListener(@NonNull CompassAssistantListener compassPitchListener) {
+        compassPitchListeners.remove(compassPitchListener);
+        if (compassPitchListeners.isEmpty() && compassAssistantListeners.isEmpty()) {
             onStop();
         }
     }
@@ -194,13 +212,26 @@ public class CompassAssistant implements SensorEventListener {
 
         // The x-axis is all we care about here.
         notifyCompassChangeListeners((float) Math.toDegrees(orientation[0]));
+
+        // Now we care about pitch!
+        notifyPitchChangeListeners((float) Math.toDegrees(orientation[1]));
     }
 
     private void notifyCompassChangeListeners(float heading) {
-        for (CompassAssistantListener compassAssistantListener : compassAssistantListeners) {
-            compassAssistantListener.onCompassChanged(heading);
+        if(lastPitch < disabledCompassAtAngle) {
+            for (CompassAssistantListener compassAssistantListener : compassAssistantListeners) {
+                compassAssistantListener.onCompassChanged(heading);
+            }
+            lastHeading = heading;
         }
-        lastHeading = heading;
+    }
+
+    private void notifyPitchChangeListeners(float pitch) {
+        for (CompassAssistantListener compassPitchListener : compassPitchListeners) {
+            compassPitchListener.onPitchChanged(pitch);
+        }
+        //Log.d("PitchTest", "Notifying pitch listeners, new pitch is " + pitch);
+        lastPitch = pitch;
     }
 
     private void registerSensorListeners() {
@@ -281,7 +312,7 @@ public class CompassAssistant implements SensorEventListener {
 
     public void cleanUp(){
         if(instance != null)
-        instance.onStop();
+            instance.onStop();
         instance = null;
     }
 
@@ -308,6 +339,15 @@ public class CompassAssistant implements SensorEventListener {
          * @param userHeading the new compassVector heading
          */
         void onCompassChanged(float userHeading);
+
+        /**
+         * Callback's invoked when a new compassVector update occurs. You can listen into the compassVector updates
+         * using (CompassAssistantListener)} and implementing these callbacks.
+         * callbacks. Note that this interface is also used internally to to update the UI chevron/arrow.
+         *
+         * @param userPitch the new compassVector heading on a range of -90 to 90. NOTE: -90 indicates back of the phone is facing zenith
+         */
+        void onPitchChanged(float userPitch);
 
         /**
          * This gets invoked when the compassVector accuracy status changes from one value to another. It
