@@ -4,6 +4,8 @@ package com.senior.arexplorer.Utils.Backend.LocalPoI;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDBListener;
@@ -22,7 +24,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, SettingListener {
+public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, SettingListener, CloudDBListener {
 
     private static final String url2 = "jdbc:mysql://database-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/ar_schema";
     private static final String user2 = "masteruser";
@@ -85,7 +87,13 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, Sett
         db.execute("");
 
 
+
     }// fetchdataAsync end
+
+    @Override
+    public void onUpdateCloud() {
+        this.fetchData();
+    }
 
     // private class start
     // for local data
