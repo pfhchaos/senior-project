@@ -1,22 +1,31 @@
 package com.senior.arexplorer.Utils.Backend.CloudPoI;
 
+import android.util.Log;
+
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.RetriveData;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.SettingListener;
+import com.senior.arexplorer.Utils.Settings;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
+public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, SettingListener {
 
     private static CloudPoIFetcher CPF;
     private boolean isReady = false;
+
     public static CloudPoIFetcher getInstance(){
-        if(CPF == null) CPF = new CloudPoIFetcher();
+        if(CPF == null) getInstanceSynced();
         return CPF;
+    }
+    private static synchronized void getInstanceSynced() {
+        if(CPF == null) CPF = new CloudPoIFetcher();
+        return;
     }
 
     @Override
@@ -59,6 +68,12 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener {
         this.poIs = new ArrayList<>();
 
         CloudDB.getInstance().addListener(this);
+    }
+
+    @Override
+    public void onSettingChange() {
+        Log.d("LocalPoIFetcher", "onSettingChanged");
+        if (!Settings.getInstance().getUseCloudBackend()) cleanUp();
     }
 
     @Override

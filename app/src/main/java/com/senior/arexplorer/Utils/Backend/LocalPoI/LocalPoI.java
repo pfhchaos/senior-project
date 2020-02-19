@@ -40,8 +40,10 @@ public class LocalPoI extends PoI {
     @Override
     public boolean onLongTouch(Context context) {
         PopupBox popup = new PopupBox(context, getName());
+
         popup.setView(getDetailsView(context));
         popup.show();
+
         return true;
     }
 

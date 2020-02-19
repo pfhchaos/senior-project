@@ -32,7 +32,7 @@ public class CloudDB {
     ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
     public static void init(Context context) {
-        Log.d("CloudDB", "CloudDB is initialized.");
+        Log.v("CloudDB", "CloudDB is initialized.");
         CloudDB.applicationContext = context.getApplicationContext();
 
 
@@ -51,7 +51,7 @@ public class CloudDB {
     }
 
     private static synchronized CloudDB getInstanceSynced() {
-        Log.d("CloudDB", "CloudDB is instanciated.");
+        Log.v("CloudDB", "CloudDB is instanciated.");
         if (CloudDB.instance == null) CloudDB.instance = new CloudDB();
         return CloudDB.instance;
     }

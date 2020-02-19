@@ -231,8 +231,6 @@ public class SaveLocationFragment extends DialogFragment {
 
 
     private void saveData() {
-        LocalDB LDB = LocalDB.getInstance();
-        CloudDB CDB = CloudDB.getInstance();
 
         userID = "test1";       //TODO
 
@@ -254,11 +252,13 @@ public class SaveLocationFragment extends DialogFragment {
             //if its private save to localDB, otherwise save to public DB
 
             if (priv) {
+                LocalDB LDB = LocalDB.getInstance();
                 LDB.insertLocalData(s);
                 Log.i("save was private", "insert into local DB");
             } else {
                 //TODO save to public DB
                 // CDB.insertCloudData(s);
+                CloudDB CDB = CloudDB.getInstance();
                 CDB.ExecurQuery(s);
 
                 Log.d("save was public", "insert into cloud");
