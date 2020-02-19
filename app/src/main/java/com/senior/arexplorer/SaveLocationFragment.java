@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -245,6 +246,8 @@ public class SaveLocationFragment extends DialogFragment implements SettingListe
         locName = nameInputTextView.getText().toString();
         if (locName == null || locName.equals("")) {
             Log.e("SaveLocationFragment","Refusing to save location without name");
+            Toast.makeText(this.getContext(),"\nYour name is required!\n", Toast.LENGTH_LONG).show();
+            return;
         }
         else {
             locDesc = descInputTextView.getText().toString();
@@ -269,9 +272,8 @@ public class SaveLocationFragment extends DialogFragment implements SettingListe
                 Log.d("save was public", "insert into cloud");
             }
         }
-
-        switchFrag();
         this.dismiss();
+        //switchFrag();
     }
 
     private void switchFrag() {
