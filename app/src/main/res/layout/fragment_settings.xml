@@ -43,4 +43,10 @@
         android:layout_height="wrap_content"
         android:text="Start in AR view" />
 
+    <Button
+        android:id="@+id/buttonClearLocDB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Eradicate all custom locations" />
+
 </LinearLayout>

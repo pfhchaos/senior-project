@@ -28,6 +28,7 @@ import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.saveObj;
+import com.senior.arexplorer.Utils.SettingListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveLocationFragment extends DialogFragment {
+public class SaveLocationFragment extends DialogFragment implements SettingListener {
 
     private TextView nameInputTextView;
     private TextView descInputTextView;
@@ -274,6 +275,11 @@ public class SaveLocationFragment extends DialogFragment {
     public void onPause() {
         //save stuff here
         super.onPause();
+    }
+
+    @Override
+    public void onSettingChange() {
+
     }
 
 
