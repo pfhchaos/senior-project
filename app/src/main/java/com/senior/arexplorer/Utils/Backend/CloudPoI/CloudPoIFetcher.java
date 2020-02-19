@@ -81,7 +81,7 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, Sett
     }
 
     @Override
-    public void onUpdate() {
+    public void onUpdateCloud() {
         this.fetchData();
     }
 
