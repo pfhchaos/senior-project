@@ -28,7 +28,10 @@ import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 
+import java.util.NavigableSet;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
@@ -46,7 +49,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     private Location curLoc;
     private PoI lastTouchedLocation;
-    private TreeSet<PoI> nearby;
+    private NavigableSet<PoI> nearby;
     private long lastTouchTime;
 
     public CameraOverlay(Context context){
@@ -124,7 +127,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 if (poi.arMarkerRender)
                     canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
             }
-            drawCompass(canvas);
+
+            calcCompass();
+            canvas.drawBitmap(compass, curCompass, rect, null);
+
             for (PoI poi : nearby.descendingSet()) {
                 calcCompassRect(poi);
                 if(poi.compassRender)
@@ -133,7 +139,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
     }
 
-    private void drawCompass(Canvas canvas){
+    private void calcCompass(){
         int height = compass.getHeight();
         int width = compass.getWidth();
         int fov = Settings.getInstance().getCompassFOV();
@@ -142,7 +148,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         curCompass.set(mid - offset,0,mid + offset, height);
         rect.set(500,500,9500,1000);
-        canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
     private void calcCompassRect(PoI poi){
