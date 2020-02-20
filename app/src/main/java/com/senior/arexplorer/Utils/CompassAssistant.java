@@ -345,7 +345,7 @@ public class CompassAssistant implements SensorEventListener {
          * using (CompassAssistantListener)} and implementing these callbacks.
          * callbacks. Note that this interface is also used internally to to update the UI chevron/arrow.
          *
-         * @param userPitch the new compassVector heading on a range of -90 to 90. NOTE: -90 indicates back of the phone is facing zenith
+         * @param userPitch the new compassVector pitch on a range of -90 to 90. NOTE: -90 indicates back of the phone is facing zenith
          */
         void onPitchChanged(float userPitch);
 

@@ -120,7 +120,7 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
                     (error) -> Log.e("GooglePoI", "No response from Google Place Detail API!\n" + error));
             WebRequester.getInstance().getRequestQueue().add(stringRequest);
 
-            Toast.makeText(context, "Details are not yet available, fetching now...", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Details are not yet available, fetching now...", Toast.LENGTH_SHORT).show();
         }
         else{
             PopupBox popup = new PopupBox(context, getName());

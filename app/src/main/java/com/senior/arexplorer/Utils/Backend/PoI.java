@@ -33,7 +33,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private Rect arRect;
     public boolean arMarkerRender = false;
     public boolean focused = false;
-    public String iconURL = "default";
+    public String iconURL = "https://maps.gstatic.com/mapfiles/place_api/icons/generic_business-71.png";
 
     private Collection<String> types;
 
