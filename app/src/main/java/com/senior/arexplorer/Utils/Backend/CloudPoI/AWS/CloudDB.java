@@ -146,6 +146,7 @@ public class CloudDB {
                 res = e.toString();
                 Log.d("NOT : ", "Not select statement");
             }
+            notifyListeners(); // new code for test
             return data;
         }
 
