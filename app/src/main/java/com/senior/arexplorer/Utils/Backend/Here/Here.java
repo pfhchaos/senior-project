@@ -44,6 +44,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     private Location currentLocation;
     private GoogleApiClient googleApiClient;
     private boolean isReady;
+    private double lastElevation = 0;
 
     private Here() {
         Log.v("Here", "Here is instantiated.");
@@ -124,7 +125,9 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     }
 
     public double getElevation() {
-        return this.currentLocation.getAltitude();
+        double tempElevation = this.currentLocation.getAltitude();
+        if(tempElevation != 0) lastElevation = tempElevation;
+        return lastElevation;
     }
 
     public boolean isReady() {
