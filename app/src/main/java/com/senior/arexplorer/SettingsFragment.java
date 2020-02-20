@@ -2,14 +2,17 @@ package com.senior.arexplorer;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Switch;
 
+import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Settings;
 
 import androidx.annotation.NonNull;
@@ -28,6 +31,33 @@ public class SettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
         Switch aSwitch;
+        Button aButton;
+
+        aButton = v.findViewById(R.id.buttonClearLocDB);
+        aButton.setOnClickListener(i->{
+            DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //yes, clear all localDB PoI's
+                            LocalDB.getInstance().deleteAllCustomLoc();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //no, do not clear, do nothing
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("Are you sure you wish to permanently (yes, forever) delete all of your custom save locations?")
+                    .setPositiveButton("Yes",dcl)
+                    .setNegativeButton("No",dcl)
+                    .show();
+
+            return;
+        });
 
         aSwitch = v.findViewById(R.id.google_settings_switch);
         aSwitch.setChecked(Settings.getInstance().getUseGoogleBackend());

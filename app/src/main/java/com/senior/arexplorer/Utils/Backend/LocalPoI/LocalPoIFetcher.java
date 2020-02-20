@@ -4,6 +4,8 @@ package com.senior.arexplorer.Utils.Backend.LocalPoI;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDBListener;
@@ -24,9 +26,7 @@ import java.util.Collection;
 
 public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, SettingListener {
 
-    private static final String url2 = "jdbc:mysql://database-1.cmns0dweli3w.us-west-2.rds.amazonaws.com:3306/ar_schema";
-    private static final String user2 = "masteruser";
-    private static final String pass2 = "Bangladesh88";
+
 
 
     private Here here;
@@ -81,138 +81,47 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, Sett
 
         isReady = false;
         ArrayList<PoI> newPoIs = new ArrayList<PoI>();
-        ConnectMySql2 db=new ConnectMySql2(newPoIs); // cloud data retring
-        db.execute("");
 
 
-    }// fetchdataAsync end
+        Cursor c = LDB.getAllLocalData();
 
-    // private class start
-    // for local data
-    private class ConnectMySql2 extends AsyncTask<String, Void, String> {
-        String res = "";
-        String data="";
 
-        ArrayList<PoI> newPoIs2;
-        public ConnectMySql2(ArrayList<PoI> newPoIs2){
 
-            this.newPoIs2=newPoIs2;
+        while(c.moveToNext()){
+            String userName = "testUser";
+            String locName,locDesc;
+            Double locLat,locLong,locElev;
+            Boolean priv = false;
 
+            locName = c.getString(c.getColumnIndex("name"));
+            locDesc = c.getString(c.getColumnIndex("description"));
+            locLat = new Double(c.getString(c.getColumnIndex("latitude")));
+            locLong = new Double(c.getString(c.getColumnIndex("longitude")));
+            locElev = new Double(c.getString(c.getColumnIndex("elevation")));
+
+            saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
+            s.setBLOB(c.getBlob(c.getColumnIndex("image")));
+
+            Log.i("fetched saveObj",s.toString());
+            Log.d("LocalPoIFetcher", s.toString());
+            newPoIs.add(new LocalPoI(s));
         }
 
+        c.close();
 
-        // Method that returns the first word
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //  Toast.makeText(CloudDB.applicationContext , "Please wait...", Toast.LENGTH_SHORT)
-            //    .show();
-
+        synchronized (this.poIs) {
+            this.poIs = newPoIs;
+            System.out.println("local and cloud size : " + poIs.size());
         }
 
-        @Override
-        protected String doInBackground(String... params) {
-            //  newPoIs2 = new ArrayList<PoI>();
-            try {
-                Class.forName("com.mysql.jdbc.Driver");
-                Connection con = DriverManager.getConnection(url2, user2, pass2);
-                // System.out.println("Databaseection success");
-
-                String result = "Database Connection Successful\n";
-                // Statement st = con.createStatement();
-                //  PreparedStatement statement = con.prepareStatement("SELECT * FROM TYPE"); //
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-                ResultSet rs    = statement.executeQuery("SELECT * FROM LOCALDATA");
-
-                while(rs.next()){
-                    String userName = "testUser";
-                    String locName,locDesc;
-                    Double locLat,locLong,locElev;
-                    Boolean priv = false;
-                    locName= rs.getString("name");
-                    locDesc = rs.getString("description");
-                    locLat = rs.getDouble("latitude");
-                    locLong = rs.getDouble("longitude");
-                    locElev = rs.getDouble("elevation");
-                    Blob blob = rs.getBlob("image");
-                    byte[] theBytes = blob.getBytes(1L, (int)blob.length());
-
-                    saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
-                    s.setBLOB(theBytes);
-
-                    System.out.println("try :"+s.getLocationDesc());
-                    this.newPoIs2.add(new LocalPoI(s));
-                    // Log.d("check3 : ", rs.getString("type"));
-                    System.out.println("size ****: "+ this.newPoIs2.size());
-                }
-
-
-                res = result;
-                 con.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                res = e.toString();
-                Log.d("NOT : ", "Not select statement");
-            }
-
-            //  for local datastart *********
-            Cursor c = LDB.getAllLocalData();
-
-
-
-            while(c.moveToNext()){
-                String userName = "testUser";
-                String locName,locDesc;
-                Double locLat,locLong,locElev;
-                Boolean priv = false;
-
-                locName = c.getString(c.getColumnIndex("name"));
-                locDesc = c.getString(c.getColumnIndex("description"));
-                locLat = new Double(c.getString(c.getColumnIndex("latitude")));
-                locLong = new Double(c.getString(c.getColumnIndex("longitude")));
-                locElev = new Double(c.getString(c.getColumnIndex("elevation")));
-
-                saveObj s = new saveObj(userName,locName,locDesc,locLat,locLong,locElev,priv);
-                s.setBLOB(c.getBlob(c.getColumnIndex("image")));
-
-                Log.i("fetched saveObj",s.toString());
-                Log.d("LocalPoIFetcher", s.toString());
-                newPoIs2.add(new LocalPoI(s));
-            }
-
-            c.close();
-
-            synchronized (poIs) {
-                poIs = newPoIs2;
-                System.out.println("local and cloud size : " + poIs.size());
-            }
-
-            for (PoIFetcherHandler handler: poIFetcherHandlers) {
-                handler.placeFetchComplete();
-            }
-
-            isReady = true;
-
-            // local data end
-            return data;
+        for (PoIFetcherHandler handler: poIFetcherHandlers) {
+            handler.placeFetchComplete();
         }
 
-        ArrayList<PoI> getArray(){
-            return newPoIs2;
-        }
+        isReady = true;
 
-
-        @Override
-        protected void onPostExecute(String result) {
-            //txtData.setText(result);
-            Log.d("Result : ", result);
-            System.out.println("sizeOUT ****: "+ newPoIs2.size());
-        }
-
-    } // private class dove
-
+        // local data end
+    }
 
     public void cleanUp(){
         Log.d("LocalPoIFetcher", "LocalPoIFetcher is cleaned up");
@@ -222,7 +131,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, Sett
 
     @Override
     public boolean isReady() {
-        return isReady;
+        return this.isReady;
     }
 
     @Override
@@ -236,3 +145,4 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, Sett
         if (!Settings.getInstance().getUseLocalBackend()) cleanUp();
     }
 }
+    // class end

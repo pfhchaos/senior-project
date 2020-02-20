@@ -33,7 +33,7 @@ public class CloudDB {
     ArrayList<PoI> newPoIs = new ArrayList<PoI>();
 
     public static void init(Context context) {
-        Log.d("CloudDB", "CloudDB is initialized.");
+        Log.v("CloudDB", "CloudDB is initialized.");
         CloudDB.applicationContext = context.getApplicationContext();
 
 
@@ -52,7 +52,7 @@ public class CloudDB {
     }
 
     private static synchronized CloudDB getInstanceSynced() {
-        Log.d("CloudDB", "CloudDB is instanciated.");
+        Log.v("CloudDB", "CloudDB is instanciated.");
         if (CloudDB.instance == null) CloudDB.instance = new CloudDB();
         return CloudDB.instance;
     }
@@ -72,18 +72,7 @@ public class CloudDB {
 
 
 
-    private void notifyListeners() {
-        for (CloudDBListener listener : this.callbacks) {
-            listener.onUpdate();
-        }
-    }
-    public void addListener(CloudDBListener listener) {
-        this.callbacks.add(listener);
-    }
 
-    public void removeListener(CloudDBListener listener) {
-        this.callbacks.remove(listener);
-    }
 
     /*
      * the ExecurQuery(String command) function can be used to execute any mysql query
@@ -94,6 +83,7 @@ public class CloudDB {
        // this.query=command;
         ConnectMySql connectMySql = new ConnectMySql(s);
         connectMySql.execute("");
+        notifyListeners();
     }
 
 
@@ -167,6 +157,17 @@ public class CloudDB {
     }
 
 
+    private void notifyListeners() {
+        for (CloudDBListener listener : this.callbacks) {
+            listener.onUpdateCloud();
+        }
+    }
+    public void addListener(CloudDBListener listener) {
+        this.callbacks.add(listener);
+    }
 
+    public void removeListener(CloudDBListener listener) {
+        this.callbacks.remove(listener);
+    }
 
 }

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +29,7 @@ import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Backend.saveObj;
+import com.senior.arexplorer.Utils.SettingListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +38,7 @@ import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
-public class SaveLocationFragment extends DialogFragment {
+public class SaveLocationFragment extends DialogFragment implements SettingListener {
 
     private TextView nameInputTextView;
     private TextView descInputTextView;
@@ -187,10 +189,20 @@ public class SaveLocationFragment extends DialogFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        Log.v("Lifecycle onResume","onResume in SaveLocationFragment");
+        super.onResume();
+
+
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v("Lifecycle onCreateView","onCreateView in SaveLocationFragment");
+
         View inflate = inflater.inflate(R.layout.fragment_save, container, false);
         here = Here.getInstance();
         nameInputTextView = inflate.findViewById(R.id.nameInput);
@@ -226,9 +238,6 @@ public class SaveLocationFragment extends DialogFragment {
 
     private void saveData() {
 
-        LocalDB LDB = LocalDB.getInstance();
-        CloudDB CDB = CloudDB.getInstance();
-
         userID = "test1";       //TODO
 
         Log.i("save here:",here.toString());
@@ -237,6 +246,8 @@ public class SaveLocationFragment extends DialogFragment {
         locName = nameInputTextView.getText().toString();
         if (locName == null || locName.equals("")) {
             Log.e("SaveLocationFragment","Refusing to save location without name");
+            Toast.makeText(this.getContext(),"\nYour name is required!\n", Toast.LENGTH_LONG).show();
+            return;
         }
         else {
             locDesc = descInputTextView.getText().toString();
@@ -249,18 +260,20 @@ public class SaveLocationFragment extends DialogFragment {
             //if its private save to localDB, otherwise save to public DB
 
             if (priv) {
+                LocalDB LDB = LocalDB.getInstance();
                 LDB.insertLocalData(s);
                 Log.i("save was private", "insert into local DB");
             } else {
                 //TODO save to public DB
                 // CDB.insertCloudData(s);
+                CloudDB CDB = CloudDB.getInstance();
                 CDB.ExecurQuery(s);
 
                 Log.d("save was public", "insert into cloud");
             }
         }
-
-        switchFrag();
+        this.dismiss();
+        //switchFrag();
     }
 
     private void switchFrag() {
@@ -275,6 +288,11 @@ public class SaveLocationFragment extends DialogFragment {
     public void onPause() {
         //save stuff here
         super.onPause();
+    }
+
+    @Override
+    public void onSettingChange() {
+
     }
 
 
