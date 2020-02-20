@@ -38,6 +38,7 @@ import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
 import com.senior.arexplorer.Utils.IconListener;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.Collection;
@@ -73,6 +74,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Backend.getInstance().addHandler(this);
         CompassAssistant.getInstance(getContext()).addCompassListener(this);
         CompassAssistant.getInstance(getContext()).addPitchListener(this);
+        IconProvider.getInstance().addIconListener(this);
 
         return v;
     }
@@ -112,6 +114,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Here.getInstance().removeListener(this);
         Backend.getInstance().removeHandler(this);
         CompassAssistant.getInstance(getContext()).removeCompassListener(this);
+        IconProvider.getInstance().removeIconListener(this);
         mapView.onDestroy();
     }
 

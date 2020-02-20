@@ -177,16 +177,14 @@ public class IconProvider {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                    /*
-                    Log.d("IconProvider", "onErrorResponse");
-                    synchronized (IconProvider.this.outstandingRequests) {
-                        IconProvider.this.outstandingRequests--;
-                    }
-                    Log.d("IconProvider", "outstandingRequests is " + IconProvider.this.outstandingRequests);
-                    if (IconProvider.this.outstandingRequests == 0) {
-                        notifyListeners();
-                    }
-                    */
+                Log.d("IconProvider", "onErrorResponse");
+                synchronized (IconProvider.this.outstandingRequests) {
+                    IconProvider.this.outstandingRequests--;
+                }
+                Log.d("IconProvider", "outstandingRequests is " + IconProvider.this.outstandingRequests);
+                if (IconProvider.this.outstandingRequests == 0) {
+                    notifyListeners();
+                }
                 Log.e("IconProvider", "No response from ImageLoader!\n" + error);
             }
         });
