@@ -224,8 +224,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             }
             else
                 p.setAlpha(255);
-            int scaledMarkerLength = (int) (baseMarkerLength * scalingFactor);
-
+            int scaledMarkerLength = (int) (baseMarkerLength * scalingFactor / 2);
 
             poi.getARRect().set(centerHoriz - scaledMarkerLength, centerVert - scaledMarkerLength,
                     centerHoriz + scaledMarkerLength, centerVert + scaledMarkerLength);

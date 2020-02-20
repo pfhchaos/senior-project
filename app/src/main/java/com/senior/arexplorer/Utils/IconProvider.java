@@ -96,6 +96,52 @@ public class IconProvider {
         return retBitmap;
     }
 
+    public void generateIcon(String url, Bitmap bitmapIn){
+        Canvas canvas;
+        Bitmap tempBitmap;
+        Drawable d;
+        Rect iconLocation;
+        Paint p = new Paint();
+        p.setAntiAlias(true);
+        p.setFilterBitmap(true);
+        int offset;
+
+        //pointyIconMap calculations
+        d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.compassmapmarkerbackground);
+        tempBitmap = CommonMethods.getBitmapFromDrawable(d);
+        canvas = new Canvas(tempBitmap);
+
+        offset = canvas.getWidth() / 5;
+        iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, (int) (canvas.getHeight() * (2f/3f) - offset));
+
+        if(bitmapIn != null)
+            canvas.drawBitmap(bitmapIn, null, iconLocation, p);
+
+        pointyIconMap.put(url, tempBitmap.copy(tempBitmap.getConfig(), false));
+
+        Bitmap temp = Bitmap.createScaledBitmap(tempBitmap, (int)(tempBitmap.getWidth()  * mapIconRatio), (int)(tempBitmap.getHeight()  * mapIconRatio), true);
+        mapIconMap.put(url, temp.copy(temp.getConfig(), false));
+
+
+        //roundIconMap Calculations
+        d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
+        tempBitmap = CommonMethods.getBitmapFromDrawable(d);
+        //Log.d("IconProvider", String.format("Circle Bitmap Dimensions : %d x %d", bitmap.getWidth(), bitmap.getHeight()));
+        canvas = new Canvas(tempBitmap);
+
+        offset = canvas.getWidth() / 5; //offset 20% in both directions
+        iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, canvas.getHeight() - offset);
+
+        if(bitmapIn != null)
+            canvas.drawBitmap(bitmapIn, null, iconLocation, p);
+
+        roundIconMap.put(url, tempBitmap.copy(tempBitmap.getConfig(), false));
+    }
+
+    public void generateIcon(String url, Drawable drawable){
+        generateIcon(url, CommonMethods.getBitmapFromDrawable(drawable));
+    }
+
     private void loadBitmapFromURL(String url){
         pointyIconMap.put(url, null);
         roundIconMap.put(url, null);
@@ -106,47 +152,7 @@ public class IconProvider {
         WebRequester.getInstance().getImageLoader().get(url, new ImageLoader.ImageListener() {
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                Canvas canvas;
-                Bitmap bitmap;
-                Drawable d;
-                Rect iconLocation;
-                Paint p = new Paint();
-                p.setAntiAlias(true);
-                p.setFilterBitmap(true);
-                int offset;
-
-                //pointyIconMap calculations
-                d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.compassmapmarkerbackground);
-                bitmap = CommonMethods.getBitmapFromDrawable(d);
-                canvas = new Canvas(bitmap);
-
-                offset = canvas.getWidth() / 5;
-                iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, (int) (canvas.getHeight() * (2f/3f) - offset));
-
-                if(response.getBitmap() != null)
-                    canvas.drawBitmap(response.getBitmap(), null, iconLocation, p);
-
-                pointyIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
-
-                Bitmap temp = Bitmap.createScaledBitmap(bitmap, (int)(bitmap.getWidth()  * mapIconRatio), (int)(bitmap.getHeight()  * mapIconRatio), true);
-                mapIconMap.put(url, temp.copy(temp.getConfig(), false));
-
-
-                //roundIconMap Calculations
-                d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
-                bitmap = CommonMethods.getBitmapFromDrawable(d);
-                //Log.d("IconProvider", String.format("Circle Bitmap Dimensions : %d x %d", bitmap.getWidth(), bitmap.getHeight()));
-                canvas = new Canvas(bitmap);
-
-                Log.d("IconProvider", String.format("Circle Canvas Dimensions : %d x %d", canvas.getWidth(), canvas.getHeight()));
-
-                offset = canvas.getWidth() / 5; //offset 20% in both directions
-                iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, canvas.getHeight() - offset);
-
-                if(response.getBitmap() != null)
-                    canvas.drawBitmap(response.getBitmap(), null, iconLocation, p);
-
-                roundIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
+                generateIcon(url, response.getBitmap());
             }
 
             @Override
