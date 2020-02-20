@@ -166,10 +166,12 @@ public class IconProvider {
 
                 roundIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
 
-                IconProvider.this.outstandingRequests--;
-                Log.d("IconProvider", "After decrement outstandingRequests is " + IconProvider.this.outstandingRequests);
-                if (IconProvider.this.outstandingRequests == 0) {
-                    notifyListeners();
+                if (isImmediate) {
+                    IconProvider.this.outstandingRequests--;
+                    Log.d("IconProvider", "After decrement outstandingRequests is " + IconProvider.this.outstandingRequests);
+                    if (IconProvider.this.outstandingRequests == 0) {
+                        notifyListeners();
+                    }
                 }
             }
 
