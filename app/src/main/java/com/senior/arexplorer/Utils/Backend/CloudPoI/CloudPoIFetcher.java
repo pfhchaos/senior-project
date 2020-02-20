@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDBListener;
-//import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.RetriveData;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalPoI;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcher;
@@ -77,6 +76,7 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, Sett
         this.poIFetcherHandlers = new ArrayList<>();
         this.poIs = new ArrayList<>();
 
+        Settings.getInstance().addUseCloudBackendListener(this);
         CloudDB.getInstance().addListener(this);
     }
 

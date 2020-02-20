@@ -111,7 +111,7 @@ public class LocalPoIFetcher extends PoIFetcher implements LocalDBListener, Sett
 
         synchronized (this.poIs) {
             this.poIs = newPoIs;
-            System.out.println("local and cloud size : " + poIs.size());
+            System.out.println("local DB size : " + poIs.size());
         }
 
         for (PoIFetcherHandler handler: poIFetcherHandlers) {
