@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.hardware.Camera;
 import android.location.Location;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,6 +41,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private float sx = (float) getWidth() / 10000;
     private float sy = (float) getHeight() / 10000;
     private float previousCompassBearing = -1f;
+    private float camHorizViewingAngle, camVertViewingAngle;
+    private float pitch;
 
     private Location curLoc;
     private PoI lastTouchedLocation;
@@ -56,6 +59,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setWillNotDraw(false);
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
+        setViewingAngles();
+        //Log.d("CameraVA", String.format("Horizontal : %f\nVertical : %f", camHorizViewingAngle, camVertViewingAngle));
 
         p.setAntiAlias(true);
         p.setFilterBitmap(true);
@@ -98,9 +103,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         sy = (float) getHeight() / 10000;
         canvas.scale(sx,sy);
 
-        rect.set(500,500,9500,1000);
-        drawCompass(canvas);
-
         if(curLoc.getProvider().equalsIgnoreCase("dummyProvider") || curLoc == null){
             p.setTextAlign(Paint.Align.CENTER);
             p.setTextSize(300);
@@ -118,11 +120,15 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
         else {
             for (PoI poi : nearby.descendingSet()) {
-                calcNearbyRect(poi);
+                calcARRect(poi);
+                if (poi.arMarkerRender)
+                    canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
+            }
+            drawCompass(canvas);
+            for (PoI poi : nearby.descendingSet()) {
+                calcCompassRect(poi);
                 if(poi.compassRender)
                     canvas.drawBitmap(poi.getPointyIcon(), null, poi.getCompassRect(), p);
-                if(poi.arMarkerRender)
-                    canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
             }
         }
     }
@@ -135,11 +141,11 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         int mid = width / 2 +  (int) (heading * scale);
 
         curCompass.set(mid - offset,0,mid + offset, height);
-
+        rect.set(500,500,9500,1000);
         canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
-    private void calcNearbyRect(PoI poi){
+    private void calcCompassRect(PoI poi){
         int markerHeight = 700;
         float markerRatio = 1f; //this is unused as of now but left in in case we need it
         float markerWidth = (float)(markerHeight) * markerRatio;
@@ -156,8 +162,12 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         double dist = poi.getDistanceTo();
 
+        boolean shouldRender;
+        shouldRender = dist <= drawDistance && dist >= 5;
+        shouldRender &= relativeHeading >= -(double) fov / 2;
+        shouldRender &= relativeHeading <= (double) fov / 2;
         //if our heading is within our FoV
-        if(relativeHeading >= -(double)fov/2 && relativeHeading <= (double)fov/2 && dist <= drawDistance && dist >= 10){
+        if(shouldRender){
             //Why is this magic number here? Why 9000? Was I drunk when I did this?
             int newScale = 9000 / fov; //I think 9000 equates to 90% of the screen, AKA 5% margin on either side
             int center = (int)(5000 + relativeHeading * newScale); //which would make this at the 50% point on the screen + our offset
@@ -177,6 +187,65 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             poi.compassRender = false;
     }
 
+    public void calcARRect(PoI poi){
+        int baseMarkerLength = 1500; // 2500 is 25% of the screen, so at MIN_DIST the marker will take up a quarter of your screen
+        int minRenderDistance = 5, maxRenderDistance = 100; //in meters, a city block is ABOUT 100m.
+
+
+        double dist = poi.getDistanceTo();
+
+        float relativeHorizHeading = curLoc.bearingTo(poi.getLocation()) - heading;
+        relativeHorizHeading = CommonMethods.xMody((relativeHorizHeading + 180), 360) - 180;
+
+        int relativeElevation = (int)(curLoc.getAltitude() - poi.getElevation());
+        float relativeVertHeading = (float) Math.toDegrees(Math.atan(relativeElevation / dist)) + pitch;
+
+        int offScreen = 10; //variable for number of degrees offscreen to continue rendering (for smooth disappearance)
+        boolean shouldRender;
+        shouldRender = dist <= maxRenderDistance && dist >= minRenderDistance;
+        shouldRender &= relativeHorizHeading >= -(double) camHorizViewingAngle / 2 - offScreen;
+        shouldRender &= relativeHorizHeading <= (double) camHorizViewingAngle / 2 + offScreen;
+        shouldRender &= relativeVertHeading >= -(double) camVertViewingAngle / 2 - offScreen;
+        shouldRender &= relativeVertHeading <= (double) camVertViewingAngle / 2 + offScreen;
+
+        if(shouldRender) {
+            float newHorizScale = 10000 / camHorizViewingAngle;
+            float newVertScale = 10000 / camVertViewingAngle;
+            int centerHoriz = (int) (5000 + relativeHorizHeading * newHorizScale);
+            int centerVert = (int) (5000 + relativeVertHeading * newVertScale);
+
+            float scalingFactor = 1 - ((float)(dist - minRenderDistance) / (float)(maxRenderDistance - minRenderDistance));
+            if(scalingFactor < .1) {
+                float remainingDist = (float) (dist - maxRenderDistance * .9);
+                scalingFactor = (float) (maxRenderDistance - minRenderDistance) / 10;
+                float scaledRemainingDist = remainingDist / scalingFactor;
+                p.setAlpha((int)(scaledRemainingDist * 255));
+                scalingFactor = .1f;
+            }
+            else
+                p.setAlpha(255);
+            int scaledMarkerLength = (int) (baseMarkerLength * scalingFactor);
+
+
+            poi.getARRect().set(centerHoriz - scaledMarkerLength, centerVert - scaledMarkerLength,
+                    centerHoriz + scaledMarkerLength, centerVert + scaledMarkerLength);
+
+            poi.arMarkerRender = true;
+
+        }
+        else
+            poi.arMarkerRender = false;
+    }
+
+    public void setViewingAngles(){
+        Camera c = Camera.open();
+        if(c != null) {
+            Camera.Parameters params = c.getParameters();
+            camHorizViewingAngle = params.getHorizontalViewAngle();
+            camVertViewingAngle = params.getVerticalViewAngle();
+        }
+    }
+
     @Override
     public void onCompassChanged(float userHeading) {
         if (previousCompassBearing < 0) {
@@ -194,8 +263,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
     @Override
     public void onPitchChanged(float pitch){
+        this.pitch = pitch * -1;
         //Log.d("PitchTest", "Pitch : " + userPitch);
-
     }
 
     @Override
@@ -270,6 +339,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 lastTouchTime = 0;
                 lastTouchedLocation = null;
                 break;
+
         }
 
         return handled;

@@ -110,17 +110,17 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         else {
             Log.d("Backend","OneBusAway backend is disabled, skipping");
         }
-// i sure wish this would work like it's supposed to...
-//        if(Settings.getInstance().getUseCloudBackend()){
-//            Log.d("Backend","CloudDB backend is enabled, starting");
-//            CloudDB.init(this.applicationContext);
-//            PoIFetcher cloudPoIFetcher = CloudPoIFetcher.getInstance();
-//            this.sources.add(cloudPoIFetcher);
-//            cloudPoIFetcher.addHandler(this);
-//        }
-//        else{
-//            Log.d("Backend","CloudDB backend is disabled, skipping");
-//        }
+
+        if(Settings.getInstance().getUseCloudBackend()){
+            Log.d("Backend","CloudDB backend is enabled, starting");
+            CloudDB.init(this.applicationContext);
+            PoIFetcher cloudPoIFetcher = CloudPoIFetcher.getInstance();
+            this.sources.add(cloudPoIFetcher);
+            cloudPoIFetcher.addHandler(this);
+        }
+        else{
+            Log.d("Backend","CloudDB backend is disabled, skipping");
+        }
 
         this.isReady = true;
     }

@@ -153,7 +153,10 @@ public class IconProvider {
                 //roundIconMap Calculations
                 d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
                 bitmap = CommonMethods.getBitmapFromDrawable(d);
+                //Log.d("IconProvider", String.format("Circle Bitmap Dimensions : %d x %d", bitmap.getWidth(), bitmap.getHeight()));
                 canvas = new Canvas(bitmap);
+
+                Log.d("IconProvider", String.format("Circle Canvas Dimensions : %d x %d", canvas.getWidth(), canvas.getHeight()));
 
                 offset = canvas.getWidth() / 5; //offset 20% in both directions
                 iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, canvas.getHeight() - offset);
