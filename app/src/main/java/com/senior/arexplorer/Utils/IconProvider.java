@@ -12,6 +12,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.senior.arexplorer.R;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,8 +26,12 @@ public class IconProvider {
     private HashMap<String, Bitmap> roundIconMap = new HashMap<>();
     private HashMap<String, Bitmap> mapIconMap = new HashMap<>();
     private float mapIconRatio = 1f/ 4f;
+    private Integer outstandingRequests;
+    private Collection<IconListener> iconListeners;
 
     private IconProvider(){
+        this.outstandingRequests = 0;
+        this.iconListeners = new ArrayList<IconListener>();
 
         Drawable d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.compassmapmarkerbackground);
         Bitmap temp = CommonMethods.getBitmapFromDrawable(d);
@@ -67,6 +73,14 @@ public class IconProvider {
         }
     }
 
+    public void addIconListener(IconListener listener) {
+        this.iconListeners.add(listener);
+    }
+
+    public void removeIconListener(IconListener listener) {
+        this.iconListeners.remove(listener);
+    }
+
     public Bitmap getPointyIcon(String url){
         return getIcon(url, pointyIconMap);
     }
@@ -88,7 +102,12 @@ public class IconProvider {
         }
 
         if(!mapContains) {
-            loadBitmapFromURL(url);
+            synchronized (this.outstandingRequests) {
+                this.outstandingRequests++;
+                Log.d("IconProvider", "Retrieving icon for URL " + url);
+                Log.d("IconProvider","After increment outstandingRequests is " + this.outstandingRequests);
+                loadBitmapFromURL(url);
+            }
         }
 
         retBitmap = map.get("default");
@@ -100,12 +119,11 @@ public class IconProvider {
         pointyIconMap.put(url, null);
         roundIconMap.put(url, null);
 
-
-        Log.d("IconProvider", "Retrieving icon for URL " + url);
-
         WebRequester.getInstance().getImageLoader().get(url, new ImageLoader.ImageListener() {
+
             @Override
             public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+                Log.d("IconProvider", "onResponse");
                 Canvas canvas;
                 Bitmap bitmap;
                 Drawable d;
@@ -121,14 +139,14 @@ public class IconProvider {
                 canvas = new Canvas(bitmap);
 
                 offset = canvas.getWidth() / 5;
-                iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, (int) (canvas.getHeight() * (2f/3f) - offset));
+                iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, (int) (canvas.getHeight() * (2f / 3f) - offset));
 
-                if(response.getBitmap() != null)
+                if (response.getBitmap() != null)
                     canvas.drawBitmap(response.getBitmap(), null, iconLocation, p);
 
                 pointyIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
 
-                Bitmap temp = Bitmap.createScaledBitmap(bitmap, (int)(bitmap.getWidth()  * mapIconRatio), (int)(bitmap.getHeight()  * mapIconRatio), true);
+                Bitmap temp = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() * mapIconRatio), (int) (bitmap.getHeight() * mapIconRatio), true);
                 mapIconMap.put(url, temp.copy(temp.getConfig(), false));
 
 
@@ -140,17 +158,39 @@ public class IconProvider {
                 offset = canvas.getWidth() / 5; //offset 20% in both directions
                 iconLocation = new Rect(offset, offset, canvas.getWidth() - offset, canvas.getHeight() - offset);
 
-                if(response.getBitmap() != null)
+                if (response.getBitmap() != null)
                     canvas.drawBitmap(response.getBitmap(), null, iconLocation, p);
 
                 roundIconMap.put(url, bitmap.copy(bitmap.getConfig(), false));
+
+                IconProvider.this.outstandingRequests--;
+                Log.d("IconProvider", "After decrement outstandingRequests is " + IconProvider.this.outstandingRequests);
+                if (IconProvider.this.outstandingRequests == 0) {
+                    notifyListeners();
+                }
             }
 
             @Override
             public void onErrorResponse(VolleyError error) {
+                    /*
+                    Log.d("IconProvider", "onErrorResponse");
+                    synchronized (IconProvider.this.outstandingRequests) {
+                        IconProvider.this.outstandingRequests--;
+                    }
+                    Log.d("IconProvider", "outstandingRequests is " + IconProvider.this.outstandingRequests);
+                    if (IconProvider.this.outstandingRequests == 0) {
+                        notifyListeners();
+                    }
+                    */
                 Log.e("IconProvider", "No response from ImageLoader!\n" + error);
             }
         });
+    }
+
+    private void notifyListeners() {
+        for (IconListener listener : this.iconListeners) {
+            listener.onIconsFetched();
+        }
     }
 
 }
