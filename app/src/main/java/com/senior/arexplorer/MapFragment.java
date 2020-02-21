@@ -13,6 +13,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,11 +39,13 @@ import com.senior.arexplorer.Utils.FragmentWithSettings;
 import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.IconListener;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.Collection;
 
-public class MapFragment extends FragmentWithSettings implements OnMapReadyCallback, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
+public class MapFragment extends FragmentWithSettings implements OnMapReadyCallback, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, IconListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
@@ -72,6 +76,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Backend.getInstance().addHandler(this);
         CompassAssistant.getInstance(getContext()).addCompassListener(this);
         CompassAssistant.getInstance(getContext()).addPitchListener(this);
+        IconProvider.getInstance().addIconListener(this);
 
         return v;
     }
@@ -111,6 +116,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Here.getInstance().removeListener(this);
         Backend.getInstance().removeHandler(this);
         CompassAssistant.getInstance(getContext()).removeCompassListener(this);
+        IconProvider.getInstance().removeIconListener(this);
         mapView.onDestroy();
     }
 
@@ -255,7 +261,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
 
     @Override
     public void onPitchChanged(float pitch) {
-        Log.v("MapFragment", "onPitchChanged");
+        //Log.v("MapFragment", "onPitchChanged");
         if(googleMap != null) {
             if (pitch < 0) pitch = 0;
             pitch = 90 - pitch;
@@ -295,5 +301,11 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     @Override
     public void onMarkerDragEnd(Marker marker) {
 
+    }
+
+    @Override
+    public void onIconsFetched() {
+        Log.v("MapFragment", "onIconsFetched");
+        this.placeFetchComplete();
     }
 }

@@ -185,9 +185,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Menu menu = ((NavigationView) findViewById(R.id.nav_view)).getMenu();
 
         switch(menuItem.getItemId()){
-            case R.id.nav_home :
-                tempFrag = new HomeFragment();
-                break;
 
             case R.id.nav_map :
                 tempFrag =   new MapFragment();
