@@ -193,9 +193,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_ar :
                 tempFrag = new ARFragment();
                 break;
-            case R.id.nav_login :
-                tempFrag =  new DataBaseFragment();
-                break;
 
             case R.id.nav_settings :
                 tempFrag =  new SettingsFragment();
@@ -206,6 +203,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 SaveLocationFragment saveLocationFragment = new SaveLocationFragment();
                 saveLocationFragment.show(getSupportFragmentManager(),"Save Fragment");
                 //tempFrag = new SaveLocationFragment();
+                break;
+
+            case R.id.nav_filter :
+                tempFrag = null;
+                FilterFragment filterFragment = new FilterFragment();
+                filterFragment.show(getSupportFragmentManager(),"Filter Fragment");
                 break;
 
             default :
