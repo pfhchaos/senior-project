@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Switch;
 
+import com.senior.arexplorer.Utils.Backend.CloudPoI.AWS.CloudDB;
 import com.senior.arexplorer.Utils.Backend.LocalPoI.LocalDB.LocalDB;
 import com.senior.arexplorer.Utils.Settings;
 
@@ -21,7 +22,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-public class SettingsFragment extends Fragment {
+public class
+SettingsFragment extends Fragment {
 
 
     @Nullable
@@ -32,6 +34,10 @@ public class SettingsFragment extends Fragment {
 
         Switch aSwitch;
         Button aButton;
+        Button cButton;
+
+        cButton =v.findViewById(R.id.buttonClearCloudDB);
+        //cButton.setVisibility(View.INVISIBLE);
 
         aButton = v.findViewById(R.id.buttonClearLocDB);
         aButton.setOnClickListener(i->{
@@ -58,6 +64,34 @@ public class SettingsFragment extends Fragment {
 
             return;
         });
+
+        cButton.setOnClickListener(i->{
+            DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //yes, clear all localDB PoI's
+                           // LocalDB.getInstance().deleteAllCustomLoc();
+                            CloudDB.getInstance().deleteCloudData();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //no, do not clear, do nothing
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("Are you sure you wish to permanently (yes, forever) delete all of your custom save locations?")
+                    .setPositiveButton("Yes",dcl)
+                    .setNegativeButton("No",dcl)
+                    .show();
+
+            return;
+        });
+
+
 
         aSwitch = v.findViewById(R.id.google_settings_switch);
         aSwitch.setChecked(Settings.getInstance().getUseGoogleBackend());

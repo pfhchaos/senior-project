@@ -146,7 +146,7 @@ public class CloudDB {
                 res = e.toString();
                 Log.d("NOT : ", "Not select statement");
             }
-            notifyListeners(); // new code for test
+           // notifyListeners(); // new code for test
             return data;
         }
 
@@ -155,8 +155,57 @@ public class CloudDB {
             //txtData.setText(result);
             Log.d("Result : ", result);
         }
+    }// inner class end
+
+    public void deleteCloudData(){
+        DeleteData dl = new DeleteData();
+        dl.execute("");
+        notifyListeners();
+
     }
 
+
+    private class DeleteData extends AsyncTask<String, Void, String> {
+        String res = "";
+        String data="";
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(CloudDB.applicationContext , "Deleting cloud data .....", Toast.LENGTH_SHORT)
+                    .show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection con = DriverManager.getConnection(url, user, pass);
+                // System.out.println("Databaseection success");
+
+                String result = "Database Connection Successful\n";
+                // Statement st = con.createStatement();
+                PreparedStatement statement = con.prepareStatement("DELETE FROM LOCALDATA WHERE _id > 0");
+
+                statement.execute();
+
+                res = result;
+                con.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                res = e.toString();
+                Log.d("NOT : ", "Not select statement");
+            }
+            return data;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            //txtData.setText(result);
+            Log.d("Result : ", result);
+        }
+    } // ***** deteledata class end
 
     private void notifyListeners() {
         for (CloudDBListener listener : this.callbacks) {
