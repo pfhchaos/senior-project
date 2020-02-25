@@ -22,8 +22,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-public class
-SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment {
 
 
     @Nullable
@@ -33,14 +32,13 @@ SettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
         Switch aSwitch;
-        Button aButton;
+        Button clearLocButton;
         Button cButton;
-
         cButton =v.findViewById(R.id.buttonClearCloudDB);
-        //cButton.setVisibility(View.INVISIBLE);
 
-        aButton = v.findViewById(R.id.buttonClearLocDB);
-        aButton.setOnClickListener(i->{
+
+        clearLocButton = v.findViewById(R.id.buttonClearLocDB);
+        clearLocButton.setOnClickListener(i->{
             DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
