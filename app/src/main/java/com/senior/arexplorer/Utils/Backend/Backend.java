@@ -138,7 +138,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
     }
 
     private void buildPoIs() {
-        Log.d("MapFragment","Building PoI list");
+        Log.d("Backend","Building PoI list");
         if (this.isReady()) {
             Collection<PoI> newPoIs = new ArrayList<PoI>();
             for (PoIFetcher source : sources) {
@@ -205,7 +205,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.v("Backend", "location changed");
+        //Log.v("Backend", "location changed");
         if (this.lastFetched == null || location.distanceTo(this.lastFetched) > 100) {
             this.fetchData();
         }

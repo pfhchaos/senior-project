@@ -161,6 +161,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
             @Override
             public void run() {
                 Collection<PoI> pois = Backend.getInstance().getPoIs();
+                googleMap.clear();
 
                 for (PoI poi: pois) {
                     createMarker(poi);
@@ -249,7 +250,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.v("MapFragment", "onLocationChanged");
+        //Log.v("MapFragment", "onLocationChanged");
         if (googleMap != null) {
             changeLocation(location);
         }
