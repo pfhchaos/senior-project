@@ -31,10 +31,10 @@ public class SettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
 
         Switch aSwitch;
-        Button aButton;
+        Button clearLocButton;
 
-        aButton = v.findViewById(R.id.buttonClearLocDB);
-        aButton.setOnClickListener(i->{
+        clearLocButton = v.findViewById(R.id.buttonClearLocDB);
+        clearLocButton.setOnClickListener(i->{
             DialogInterface.OnClickListener dcl = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

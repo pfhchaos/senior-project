@@ -135,7 +135,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
         TextView retView = new TextView(context);
         retView.setPadding(10,5,10,5);
         retView.setGravity(Gravity.CENTER);
-        retView.setText(toShortString()+"\n"+longDescription);
+        retView.setText(longDescription);
         retView.setTextSize(18);
         return retView;
     }
@@ -157,9 +157,9 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
                 JSONObject jsonObject = new JSONObject(response).getJSONObject("data").getJSONObject("entry");
                 jsonArray = jsonObject.getJSONArray("arrivalsAndDepartures");
                 String results="";
-                long arv,dep;
+                long dep;
 
-                Log.v("OneBus arv/dep","array size: "+jsonArray.length());
+                Log.v("OneBus dep","array size: "+jsonArray.length());
 
                 for(int i = 0; i < jsonArray.length(); i++){
                     results += jsonArray.getJSONObject(i).getString("routeId")+" "+jsonArray.getJSONObject(i).getString("tripHeadsign");

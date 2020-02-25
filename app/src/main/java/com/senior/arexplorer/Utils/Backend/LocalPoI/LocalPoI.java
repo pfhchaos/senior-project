@@ -54,12 +54,14 @@ public class LocalPoI extends PoI {
         retView.setGravity(Gravity.CENTER);
         retView.setText(toShortString());
 
-        int h,w;
-        h=img.getIntrinsicHeight()*5;
-        w=img.getIntrinsicWidth()*5;
+        if (img!=null) {
+            int h,w;
+            h=img.getIntrinsicHeight()*10;
+            w=img.getIntrinsicWidth()*10;
 
-        img.setBounds(0,0,w,h);
-        retView.setCompoundDrawables(null,null,null,img);
+            img.setBounds(0,0,w,h);
+            retView.setCompoundDrawables(null,null,null,img);
+        }
         retView.setTextSize(18);
         return retView;
     }
