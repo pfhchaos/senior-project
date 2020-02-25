@@ -125,9 +125,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     }
 
     public double getElevation() {
-        double tempElevation = this.currentLocation.getAltitude();
-        if(tempElevation != 0) lastElevation = tempElevation;
-        return lastElevation;
+        return this.currentLocation.getAltitude();
     }
 
     public boolean isReady() {
@@ -198,7 +196,10 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             elevationResp = new JSONObject(response);
 
             results = elevationResp.getJSONArray("results");
-            this.setElevation(results.getJSONObject(0).getDouble("elevation"));
+            double newElevation = results.getJSONObject(0).getDouble("elevation");
+            if (newElevation != 0) {
+                this.setElevation(newElevation);
+            }
         }
         catch (Exception ex) {
             Log.e("Here", "elevation request failed");
