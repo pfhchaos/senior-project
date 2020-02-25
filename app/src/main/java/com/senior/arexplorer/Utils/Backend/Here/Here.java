@@ -201,7 +201,8 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             this.setElevation(results.getJSONObject(0).getDouble("elevation"));
         }
         catch (Exception ex) {
-            ex.printStackTrace();
+            Log.e("Here", "elevation request failed");
+            Log.e("Here", ex.getStackTrace().toString());
             return;
         }
     }

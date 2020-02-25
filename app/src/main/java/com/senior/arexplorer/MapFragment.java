@@ -162,8 +162,6 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
             public void run() {
                 Collection<PoI> pois = Backend.getInstance().getPoIs();
 
-                Log.d("mapFragment","entered callback from place fetcher");
-
                 for (PoI poi: pois) {
                     createMarker(poi);
                 }
@@ -240,8 +238,12 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
 
     @Override
     public void placeFetchComplete() {
+        Log.d("MapFragment", "placeFetchComplete");
         if (googleMap != null) {
             placeMarkers();
+        }
+        else {
+            Log.d("MapFragment", "placeFetchComplete update failed googleMap is null");
         }
     }
 

@@ -25,6 +25,8 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     private Collection<PoIFetcher> sources;
 
+    private SettingListener filterListener;
+
     public static synchronized void init(Context context) {
         Log.d("Backend", "Backend is initialized.");
         if (Backend.applicationContext == null) {
@@ -32,7 +34,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         }
         else {
             if (Backend.applicationContext == context.getApplicationContext()) {
-                Log.d("Backend", "Backend initalized twice, same context proceding");
+                Log.d("Backend", "Backend initialized twice, same context proceeding");
             }
             else {
                 Log.e("Backend", "Attempted to initialize Backend twice! from different contexts");
@@ -62,6 +64,16 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         Settings.getInstance().addUseLocalBackendListener(this);
         Settings.getInstance().addUseOneBusAwayBackendListener(this);
         Settings.getInstance().addUseCloudBackendListener(this);
+
+        this.filterListener = new SettingListener() {
+            @Override
+            public void onSettingChange() {
+                Log.d("Backend", "Filter changed");
+                buildPoIs();
+                notifyHandlers();
+            }
+        };
+        Settings.getInstance().addFilterListener(filterListener);
 
         buildSources();
 
@@ -125,18 +137,39 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         this.isReady = true;
     }
 
-    public Collection<PoI> getPoIs() {
+    private void buildPoIs() {
+        Log.d("MapFragment","Building PoI list");
         if (this.isReady()) {
-            Collection<PoI> ret = new ArrayList<PoI>();
+            Collection<PoI> newPoIs = new ArrayList<PoI>();
             for (PoIFetcher source : sources) {
-                ret.addAll(source.getPoIs());
+                for (PoI poi : source.getPoIs()) {
+                    if (matchesFilter(poi)) {
+                        newPoIs.add(poi);
+                    }
+                }
             }
-            return ret;
+            this.poIs = newPoIs;
         }
         else {
-            Log.d("Backend", "attempted to retrieve poi's before sources are ready");
-            return null;
+            Log.d("Backend", "attempted to build poi's before sources are ready");
         }
+    }
+
+    private boolean matchesFilter(PoI poi) {
+        String filter = Settings.getInstance().getFilter();
+        if (filter == null || filter.equals("")) return true;
+        return false;
+    }
+
+    private void notifyHandlers() {
+        for (PoIFetcherHandler handler : this.poIFetcherHandlers) {
+            handler.placeFetchComplete();
+        }
+    }
+
+    public Collection<PoI> getPoIs() {
+        //TODO: clone pois
+        return this.poIs;
     }
 
     public void fetchData() {
@@ -157,6 +190,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         Settings.getInstance().removeUseLocalBackendListener(this);
         Settings.getInstance().removeUseOneBusAwayBackendListener(this);
         Settings.getInstance().removeUseCloudBackendListener(this);
+        Settings.getInstance().removeFilterListener(this.filterListener);
     }
 
     public boolean isReady() {
@@ -183,9 +217,8 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
         if (isReady()) {
             Log.v("Backend","all sources ready");
-            for (PoIFetcherHandler handler : this.poIFetcherHandlers) {
-                handler.placeFetchComplete();
-            }
+            buildPoIs();
+            notifyHandlers();
         }
         else {
             Log.v("Backend","sources not ready");
