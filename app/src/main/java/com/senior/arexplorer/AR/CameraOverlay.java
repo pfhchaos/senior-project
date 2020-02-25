@@ -1,6 +1,7 @@
 package com.senior.arexplorer.AR;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -46,7 +47,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private float previousCompassBearing = -1f;
     private float camHorizViewingAngle, camVertViewingAngle;
     private float pitch;
-
+    private boolean useElevation = false;
     private Location curLoc;
     private PoI lastTouchedLocation;
     private NavigableSet<PoI> nearby;
@@ -202,7 +203,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         float relativeHorizHeading = curLoc.bearingTo(poi.getLocation()) - heading;
         relativeHorizHeading = CommonMethods.xMody((relativeHorizHeading + 180), 360) - 180;
 
-        int relativeElevation = (int)(curLoc.getAltitude() - poi.getElevation());
+        int relativeElevation = (useElevation) ? (int)(curLoc.getAltitude() - poi.getElevation()) : 0;
         float relativeVertHeading = (float) Math.toDegrees(Math.atan(relativeElevation / dist)) + pitch;
 
         int offScreen = 10; //variable for number of degrees offscreen to continue rendering (for smooth disappearance)
@@ -242,12 +243,26 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void setViewingAngles(){
-        Camera c = Camera.open();
-        if(c != null) {
-            Camera.Parameters params = c.getParameters();
-            camHorizViewingAngle = params.getHorizontalViewAngle();
-            camVertViewingAngle = params.getVerticalViewAngle();
+        float tempHoriz, tempVert;
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("cameraFoV", Context.MODE_PRIVATE);
+        tempHoriz = sharedPreferences.getFloat("horiz", 0);
+        tempVert = sharedPreferences.getFloat("vert", 0);
+        if(tempHoriz == 0 || tempVert == 0){
+            Log.d("CamOverlay", "Camera Viewing angles unknown, loading now!");
+
+            Camera c = Camera.open();
+            if(c != null) {
+                Camera.Parameters params = c.getParameters();
+                tempHoriz = params.getHorizontalViewAngle();
+                tempVert = params.getVerticalViewAngle();
+            }
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putFloat("horiz", tempHoriz);
+            editor.putFloat("vert", tempVert);
+            editor.apply();
         }
+        camVertViewingAngle = tempVert;
+        camHorizViewingAngle = tempHoriz;
     }
 
     @Override
