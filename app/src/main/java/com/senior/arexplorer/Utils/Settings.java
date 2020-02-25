@@ -38,7 +38,7 @@ public class Settings {
 
     private Collection<SettingListener> startInARViewListeners;
 
-    private Collection<SettingListener> filterListener;
+    private Collection<SettingListener> filterListeners;
 
     public static synchronized void init(Context context) {
         Log.d("Settings", "Settings is initialized.");
@@ -99,7 +99,7 @@ public class Settings {
 
         this.startInARViewListeners = new ArrayList<SettingListener>();
 
-        this.filterListener = new ArrayList<SettingListener>();
+        this.filterListeners = new ArrayList<SettingListener>();
     }
 
     public int getDrawDistance() {

@@ -1,18 +1,16 @@
 package com.senior.arexplorer;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,13 +21,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.senior.arexplorer.AR.SaveView;
-import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.CompassAssistant;
 import com.senior.arexplorer.Utils.Backend.Backend;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
@@ -37,11 +32,14 @@ import com.senior.arexplorer.Utils.FragmentWithSettings;
 import com.senior.arexplorer.Utils.Backend.Here.HereListener;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.PoIFetcherHandler;
+import com.senior.arexplorer.Utils.IconListener;
+import com.senior.arexplorer.Utils.IconProvider;
+import com.senior.arexplorer.Utils.SettingListener;
 import com.senior.arexplorer.Utils.Settings;
 
 import java.util.Collection;
 
-public class MapFragment extends FragmentWithSettings implements OnMapReadyCallback, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener {
+public class MapFragment extends FragmentWithSettings implements OnMapReadyCallback, PoIFetcherHandler, HereListener, CompassAssistant.CompassAssistantListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMarkerDragListener, IconListener, SettingListener {
 
     private GoogleMap googleMap;
     private MapView mapView;
@@ -72,6 +70,8 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Backend.getInstance().addHandler(this);
         CompassAssistant.getInstance(getContext()).addCompassListener(this);
         CompassAssistant.getInstance(getContext()).addPitchListener(this);
+        Settings.getInstance().addShowBuildingsListener(this);
+        IconProvider.getInstance().addIconListener(this);
 
         return v;
     }
@@ -111,6 +111,8 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Here.getInstance().removeListener(this);
         Backend.getInstance().removeHandler(this);
         CompassAssistant.getInstance(getContext()).removeCompassListener(this);
+        IconProvider.getInstance().removeIconListener(this);
+        Settings.getInstance().removeShowBuildingsListener(this);
         mapView.onDestroy();
     }
 
@@ -125,7 +127,13 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     public void onMapReady(GoogleMap gMap) {
         Log.d("MapFragment", "onMapReady");
         googleMap = gMap;
-        googleMap.setBuildingsEnabled(true);
+
+        if (Settings.getInstance().getShowBuildings()) {
+            googleMap.setBuildingsEnabled(true);
+        }
+        else {
+            googleMap.setBuildingsEnabled(false);
+        }
 
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setCompassEnabled(true);
@@ -153,8 +161,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
             @Override
             public void run() {
                 Collection<PoI> pois = Backend.getInstance().getPoIs();
-
-                Log.d("mapFragment","entered callback from place fetcher");
+                googleMap.clear();
 
                 for (PoI poi: pois) {
                     createMarker(poi);
@@ -204,25 +211,25 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     public void loadSettingsUI(Menu menu, DrawerLayout drawer, Context context) {
         menu.removeGroup(R.id.settings);
 
-        MenuItem showBuildingsMenuItem = menu.add("Show Buildings");
+        MenuItem showBuildingsMenuItem = menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Show Buildings");
+        Switch showBuildingsSwitch = new Switch(getContext());
+        showBuildingsSwitch.setChecked(Settings.getInstance().getShowBuildings());
 
-        showBuildingsMenuItem.setCheckable(true);
-        showBuildingsMenuItem.setChecked(Settings.getInstance().getShowBuildings());
+        //showBuildingsMenuItem.setCheckable(true);
+        //showBuildingsMenuItem.setChecked(Settings.getInstance().getShowBuildings());
+        showBuildingsMenuItem.setActionView(showBuildingsSwitch);
 
-        showBuildingsMenuItem.setOnMenuItemClickListener((menuItem) -> {
-            if(Settings.getInstance().getShowBuildings()) {
-                Settings.getInstance().setShowBuildings(false);
-                menuItem.setChecked(false);
+        showBuildingsSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
+            if(isChecked) {
+                Settings.getInstance().setShowBuildings(true);
             }
             else {
-                Settings.getInstance().setShowBuildings(true);
-                menuItem.setChecked(true);
+                Settings.getInstance().setShowBuildings(false);
             }
-            return true;
         });
 
         String filter = Settings.getInstance().getFilter();
-        MenuItem filterMenuItem = menu.add("Filter: " + filter);
+        MenuItem filterMenuItem = menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Filter: " + filter);
 
         filterMenuItem.setOnMenuItemClickListener((menuItem) -> {
             //TODO: create popup with text entry for filter string
@@ -232,14 +239,18 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
 
     @Override
     public void placeFetchComplete() {
+        Log.d("MapFragment", "placeFetchComplete");
         if (googleMap != null) {
             placeMarkers();
+        }
+        else {
+            Log.d("MapFragment", "placeFetchComplete update failed googleMap is null");
         }
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.v("MapFragment", "onLocationChanged");
+        //Log.v("MapFragment", "onLocationChanged");
         if (googleMap != null) {
             changeLocation(location);
         }
@@ -255,7 +266,7 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
 
     @Override
     public void onPitchChanged(float pitch) {
-        Log.v("MapFragment", "onPitchChanged");
+        //Log.v("MapFragment", "onPitchChanged");
         if(googleMap != null) {
             if (pitch < 0) pitch = 0;
             pitch = 90 - pitch;
@@ -295,5 +306,23 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
     @Override
     public void onMarkerDragEnd(Marker marker) {
 
+    }
+
+    @Override
+    public void onIconsFetched() {
+        Log.v("MapFragment", "onIconsFetched");
+        this.placeFetchComplete();
+    }
+
+    @Override
+    public void onSettingChange() {
+        if(googleMap != null) {
+            if (Settings.getInstance().getShowBuildings()) {
+                googleMap.setBuildingsEnabled(true);
+            }
+            else {
+                googleMap.setBuildingsEnabled(false);
+            }
+        }
     }
 }

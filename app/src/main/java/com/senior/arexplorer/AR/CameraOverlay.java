@@ -1,6 +1,7 @@
 package com.senior.arexplorer.AR;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,7 +29,10 @@ import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 
+import java.util.NavigableSet;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
@@ -43,10 +47,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private float previousCompassBearing = -1f;
     private float camHorizViewingAngle, camVertViewingAngle;
     private float pitch;
-
+    private boolean useElevation = false;
     private Location curLoc;
     private PoI lastTouchedLocation;
-    private TreeSet<PoI> nearby;
+    private NavigableSet<PoI> nearby;
     private long lastTouchTime;
 
     public CameraOverlay(Context context){
@@ -124,7 +128,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 if (poi.arMarkerRender)
                     canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
             }
-            drawCompass(canvas);
+
+            calcCompass();
+            canvas.drawBitmap(compass, curCompass, rect, null);
+
             for (PoI poi : nearby.descendingSet()) {
                 calcCompassRect(poi);
                 if(poi.compassRender)
@@ -133,7 +140,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
     }
 
-    private void drawCompass(Canvas canvas){
+    private void calcCompass(){
         int height = compass.getHeight();
         int width = compass.getWidth();
         int fov = Settings.getInstance().getCompassFOV();
@@ -142,7 +149,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         curCompass.set(mid - offset,0,mid + offset, height);
         rect.set(500,500,9500,1000);
-        canvas.drawBitmap(compass, curCompass, rect, null);
     }
 
     private void calcCompassRect(PoI poi){
@@ -197,7 +203,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         float relativeHorizHeading = curLoc.bearingTo(poi.getLocation()) - heading;
         relativeHorizHeading = CommonMethods.xMody((relativeHorizHeading + 180), 360) - 180;
 
-        int relativeElevation = (int)(curLoc.getAltitude() - poi.getElevation());
+        int relativeElevation = (useElevation) ? (int)(curLoc.getAltitude() - poi.getElevation()) : 0;
         float relativeVertHeading = (float) Math.toDegrees(Math.atan(relativeElevation / dist)) + pitch;
 
         int offScreen = 10; //variable for number of degrees offscreen to continue rendering (for smooth disappearance)
@@ -224,8 +230,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             }
             else
                 p.setAlpha(255);
-            int scaledMarkerLength = (int) (baseMarkerLength * scalingFactor);
-
+            int scaledMarkerLength = (int) (baseMarkerLength * scalingFactor / 2);
 
             poi.getARRect().set(centerHoriz - scaledMarkerLength, centerVert - scaledMarkerLength,
                     centerHoriz + scaledMarkerLength, centerVert + scaledMarkerLength);
@@ -238,12 +243,26 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     }
 
     public void setViewingAngles(){
-        Camera c = Camera.open();
-        if(c != null) {
-            Camera.Parameters params = c.getParameters();
-            camHorizViewingAngle = params.getHorizontalViewAngle();
-            camVertViewingAngle = params.getVerticalViewAngle();
+        float tempHoriz, tempVert;
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("cameraFoV", Context.MODE_PRIVATE);
+        tempHoriz = sharedPreferences.getFloat("horiz", 0);
+        tempVert = sharedPreferences.getFloat("vert", 0);
+        if(tempHoriz == 0 || tempVert == 0){
+            Log.d("CamOverlay", "Camera Viewing angles unknown, loading now!");
+
+            Camera c = Camera.open();
+            if(c != null) {
+                Camera.Parameters params = c.getParameters();
+                tempHoriz = params.getHorizontalViewAngle();
+                tempVert = params.getVerticalViewAngle();
+            }
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putFloat("horiz", tempHoriz);
+            editor.putFloat("vert", tempVert);
+            editor.apply();
         }
+        camVertViewingAngle = tempVert;
+        camHorizViewingAngle = tempHoriz;
     }
 
     @Override

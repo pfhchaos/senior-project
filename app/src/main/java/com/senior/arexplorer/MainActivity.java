@@ -185,9 +185,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Menu menu = ((NavigationView) findViewById(R.id.nav_view)).getMenu();
 
         switch(menuItem.getItemId()){
-            case R.id.nav_home :
-                tempFrag = new HomeFragment();
-                break;
 
             case R.id.nav_map :
                 tempFrag =   new MapFragment();
@@ -195,9 +192,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             case R.id.nav_ar :
                 tempFrag = new ARFragment();
-                break;
-            case R.id.nav_login :
-                tempFrag =  new DataBaseFragment();
                 break;
 
             case R.id.nav_settings :
@@ -209,6 +203,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 SaveLocationFragment saveLocationFragment = new SaveLocationFragment();
                 saveLocationFragment.show(getSupportFragmentManager(),"Save Fragment");
                 //tempFrag = new SaveLocationFragment();
+                break;
+
+            case R.id.nav_filter :
+                tempFrag = null;
+                FilterFragment filterFragment = new FilterFragment();
+                filterFragment.show(getSupportFragmentManager(),"Filter Fragment");
                 break;
 
             default :

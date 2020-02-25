@@ -30,8 +30,8 @@ import java.util.Queue;
 
 public class Here implements LocationListener, Response.ErrorListener, Response.Listener<String>, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
 
-    public final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
-    public final int smoothNumLocations = 5;
+    private final String elevationAPIurl = "https://maps.googleapis.com/maps/api/elevation/json";
+    private final int smoothNumLocations = 5;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final long LOCATION_UPDATE_INTERVAL = 5000;
     private static final long LOCATION_FASTEST_INTERVAL = 5000;
@@ -125,9 +125,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     }
 
     public double getElevation() {
-        double tempElevation = this.currentLocation.getAltitude();
-        if(tempElevation != 0) lastElevation = tempElevation;
-        return lastElevation;
+        return this.currentLocation.getAltitude();
     }
 
     public boolean isReady() {
@@ -154,8 +152,8 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             }
 
             Location newLocation = new Location("dummy");
-            Double lat = 0.0;
-            Double lon = 0.0;
+            double lat = 0.0;
+            double lon = 0.0;
             for (Location loc : prevLocations) {
                 lat += loc.getLatitude();
                 lon += loc.getLongitude();
@@ -166,7 +164,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             newLocation.setLatitude(lat);
             newLocation.setLongitude(lon);
 
-            synchronized (this.currentLocation) {
+            synchronized (this) {
                 this.currentLocation = newLocation;
             }
 
@@ -198,11 +196,14 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
             elevationResp = new JSONObject(response);
 
             results = elevationResp.getJSONArray("results");
-            this.setElevation(results.getJSONObject(0).getDouble("elevation"));
+            double newElevation = results.getJSONObject(0).getDouble("elevation");
+            if (newElevation != 0) {
+                this.setElevation(newElevation);
+            }
         }
         catch (Exception ex) {
-            ex.printStackTrace();
-            return;
+            Log.e("Here", "elevation request failed");
+            Log.e("Here", ex.getStackTrace().toString());
         }
     }
 
@@ -242,7 +243,7 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
     //google location services
     private boolean checkPlayServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this.applicationContext);
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(Here.applicationContext);
 
         if (resultCode != ConnectionResult.SUCCESS) {
             if (apiAvailability.isUserResolvableError(resultCode)) {

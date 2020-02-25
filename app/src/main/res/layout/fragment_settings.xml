@@ -48,5 +48,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Eradicate all custom locations" />
+    <Button
+        android:id="@+id/buttonClearCloudDB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete custom locations from Cloud" />
 
 </LinearLayout>
