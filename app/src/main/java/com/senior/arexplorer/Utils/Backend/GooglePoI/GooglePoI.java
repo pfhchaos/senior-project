@@ -17,6 +17,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.CommonMethods;
 import com.senior.arexplorer.Utils.PopupBox;
+import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -62,7 +63,9 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         }
 
         Log.d("GooglePoI", "created GooglePoI " + this.toString());
-        this.fetchElevation();
+        if (Settings.getInstance().getUseElevation()) {
+            this.fetchElevation();
+        }
     }
 
     private void fetchElevation() {

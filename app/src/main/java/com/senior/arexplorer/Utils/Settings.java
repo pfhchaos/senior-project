@@ -24,6 +24,8 @@ public class Settings {
 
     private Boolean startInARView;
 
+    private Boolean useElevation;
+
     private String filter;
 
     private Collection<SettingListener> drawDistanceListeners;
@@ -37,6 +39,8 @@ public class Settings {
     private Collection<SettingListener> useCloudBackendListeners;
 
     private Collection<SettingListener> startInARViewListeners;
+
+    private Collection<SettingListener> useElevationListeners;
 
     private Collection<SettingListener> filterListeners;
 
@@ -85,6 +89,8 @@ public class Settings {
 
         this.startInARView  = Boolean.valueOf(sharedPreferences.getString("Pref_Start_In_AR_View","true"));
 
+        this.useElevation  = Boolean.valueOf(sharedPreferences.getString("Pref_Use_Elevation","false"));
+
         this.filter = sharedPreferences.getString("Pref_Filter", "");
 
         this.compassFOVListeners = new ArrayList<SettingListener>();
@@ -98,6 +104,8 @@ public class Settings {
         this.useCloudBackendListeners = new ArrayList<SettingListener>();
 
         this.startInARViewListeners = new ArrayList<SettingListener>();
+
+        this.useElevationListeners = new ArrayList<SettingListener>();
 
         this.filterListeners = new ArrayList<SettingListener>();
     }
@@ -228,6 +236,22 @@ public class Settings {
 
     public void removeStartInARViewListener(SettingListener listener) {
         removeListener("startInARViewListeners", listener);
+    }
+
+    public boolean getUseElevation() {
+        return this.useElevation;
+    }
+
+    public void setUseElevation(boolean useElevation) {
+        this.set("useElevation", new Boolean(useElevation), "Pref_Use_Elevation");
+    }
+
+    public void addUseElevationListener(SettingListener listener) {
+        addListener("useElevationListeners",listener);
+    }
+
+    public void removeUseElevationListener(SettingListener listener) {
+        removeListener("useElevationListeners", listener);
     }
 
     public String getFilter() {
