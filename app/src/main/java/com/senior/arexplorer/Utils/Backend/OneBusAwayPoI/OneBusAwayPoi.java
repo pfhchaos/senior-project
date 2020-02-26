@@ -34,7 +34,8 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
         String direction = " ",name,toTrim,description="";
         Double lat,lon;
 
-        iconURL = "https://mayorguthrie.files.wordpress.com/2015/11/img_4464.png";
+        iconURL = "https://library.kissclipart.com/20181218/alq/kissclipart-bus-road-sign-clipart-bus-traffic-sign-stop-sign-cc3b144b7647d74b.png";
+        
 
         try {
             direction += poi.getString("direction");
