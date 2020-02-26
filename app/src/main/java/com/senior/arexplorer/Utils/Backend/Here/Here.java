@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
 
 import org.json.JSONArray;
@@ -172,9 +173,12 @@ public class Here implements LocationListener, Response.ErrorListener, Response.
                 listener.onLocationChanged(this.currentLocation);
             }
 
-            String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
-            StringRequest stringRequest = new StringRequest(request, this, this);
-            WebRequester.getInstance().getRequestQueue().add(stringRequest);
+            if (Settings.getInstance().getUseElevation()) {
+                String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", location.getLatitude(), location.getLongitude());
+                StringRequest stringRequest = new StringRequest(request, this, this);
+                WebRequester.getInstance().getRequestQueue().add(stringRequest);
+            }
+
             this.isReady = true;
         }
     }
