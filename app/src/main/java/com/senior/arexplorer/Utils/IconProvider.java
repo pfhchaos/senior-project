@@ -116,6 +116,7 @@ public class IconProvider {
     }
 
     public void generateIcon(String key, Bitmap bitmapIn){
+        if(roundIconMap.containsKey(key)) return;
         Canvas canvas;
         Bitmap tempBitmap;
         Drawable d;
@@ -159,6 +160,7 @@ public class IconProvider {
     }
 
     public void generateIcon(String key, Drawable d){
+        if(roundIconMap.containsKey(key)) return;
         generateIcon(key, CommonMethods.getBitmapFromDrawable(d));
     }
 
