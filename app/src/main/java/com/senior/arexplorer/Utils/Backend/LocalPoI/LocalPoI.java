@@ -25,6 +25,7 @@ public class LocalPoI extends PoI {
         setElevation(s.getLocationElevation());
         setLatitude(s.getLocationLatitude());
         setLongitude(s.getLocationLongitude());
+        this.iconURL = "";
         if(s.getBlob() != null) {
             this.img = new BitmapDrawable(blobToBitmap(s.getBlob()));
             Log.v("LocalPoI","getBlob was not null");

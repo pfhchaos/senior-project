@@ -10,8 +10,11 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -34,8 +37,8 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
         String direction = " ",name,toTrim,description="";
         Double lat,lon;
 
-        iconURL = "https://library.kissclipart.com/20181218/alq/kissclipart-bus-road-sign-clipart-bus-traffic-sign-stop-sign-cc3b144b7647d74b.png";
-        
+        this.iconURL = "busIcon";
+
 
         try {
             direction += poi.getString("direction");
@@ -68,14 +71,18 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
             Log.e("JSONexception",""+e.toString());
             e.printStackTrace();
         }
+
+
+       IconProvider.getInstance().generateIcon("busIcon", R.drawable.bus_stop_icon);
+
     }
 
 
     private void fetchElevation() {
-        //TODO: google elevation API call
-        String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", this.getLatitude(),this.getLongitude());
-        StringRequest stringRequest = new StringRequest(request, this, this);
-        WebRequester.getInstance().getRequestQueue().add(stringRequest);
+        //TODO: google elevation API call setting
+//        String request = String.format("%s?key=%s&locations=%s,%s", elevationAPIurl, "AIzaSyCh8fjtEu9nC2j9Khxv6CDbAtlll2Dd-w4", this.getLatitude(),this.getLongitude());
+//        StringRequest stringRequest = new StringRequest(request, this, this);
+//        WebRequester.getInstance().getRequestQueue().add(stringRequest);
     }
 
     private void fetchToFrom(){

@@ -162,7 +162,7 @@ public class CloudPoIFetcher extends PoIFetcher implements CloudDBListener, Sett
                     s.setBLOB(theBytes);
 
                     System.out.println("try :"+s.getLocationDesc());
-                    this.newPoIs2.add(new LocalPoI(s));
+                    this.newPoIs2.add(new CloudPoI(s));
                     // Log.d("check3 : ", rs.getString("type"));
                     System.out.println("size ****: "+ this.newPoIs2.size());
                 }
