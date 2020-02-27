@@ -35,7 +35,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
         String direction = " ",name,toTrim,description="";
         Double lat,lon;
 
-        this.iconURL = "busIcon";
+        this.iconKey = "busIcon";
 
 
         try {
