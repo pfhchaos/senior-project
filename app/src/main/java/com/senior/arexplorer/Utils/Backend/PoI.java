@@ -45,6 +45,9 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         this.types = new ArrayList<String>();
         this.compassRect = new Rect();
         this.arRect = new Rect();
+
+        //Todo: SCOTT FIXIT This causes a crash cause IconProvider's instance doesn't exist yet
+        //IconProvider.getInstance().generateIcon(iconURL);
     }
 
     public void setName(String name) {

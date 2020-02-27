@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.PoI;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.WebRequester;
 
@@ -67,6 +68,8 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
             Log.e("JSONexception",""+e.toString());
             e.printStackTrace();
         }
+
+        IconProvider.getInstance().generateIcon(iconURL);
     }
 
 

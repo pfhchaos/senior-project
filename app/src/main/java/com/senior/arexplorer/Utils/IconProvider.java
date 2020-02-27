@@ -94,29 +94,14 @@ public class IconProvider {
     }
 
     private Bitmap getIcon(String key, Map<String, Bitmap> map){
-        Bitmap retBitmap;
-
-        boolean mapContains = map.containsKey(key);
-        if(mapContains && map.get(key) != null) {
+        if(map.containsKey(key) && map.get(key) != null) {
             return map.get(key);
         }
-
-        if(!mapContains) {
-            synchronized (this.outstandingRequests) {
-                this.outstandingRequests++;
-                Log.d("IconProvider", "Retrieving icon for URL " + key);
-                Log.d("IconProvider","After increment outstandingRequests is " + this.outstandingRequests);
-                loadBitmapFromURL(key);
-            }
-        }
-
-        retBitmap = map.get("default");
-
-        return retBitmap;
+        return map.get("default");
     }
 
     public void generateIcon(String key, Bitmap bitmapIn){
-        if(roundIconMap.containsKey(key)) return;
+
         Canvas canvas;
         Bitmap tempBitmap;
         Drawable d;
@@ -162,6 +147,23 @@ public class IconProvider {
     public void generateIcon(String key, Drawable d){
         if(roundIconMap.containsKey(key)) return;
         generateIcon(key, CommonMethods.getBitmapFromDrawable(d));
+    }
+
+    /**
+     * Generates an Icon by making a web request for the image located at the url passed in.
+     * If url is invalid a blank icon is returned
+     * @param url to be processed
+     */
+    public void generateIcon(String url){
+        if(!roundIconMap.containsKey(url)) {
+            synchronized (this.outstandingRequests) {
+                this.outstandingRequests++;
+                Log.d("IconProvider", "Retrieving icon for URL " + url);
+                Log.d("IconProvider","After increment outstandingRequests is " + this.outstandingRequests);
+                loadBitmapFromURL(url);
+            }
+        }
+
     }
 
     private void loadBitmapFromURL(String url){

@@ -16,6 +16,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.CommonMethods;
+import com.senior.arexplorer.Utils.IconProvider;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 import com.senior.arexplorer.Utils.WebRequester;
@@ -66,6 +67,8 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         if (Settings.getInstance().getUseElevation()) {
             this.fetchElevation();
         }
+
+        IconProvider.getInstance().generateIcon(iconURL);
     }
 
     private void fetchElevation() {
