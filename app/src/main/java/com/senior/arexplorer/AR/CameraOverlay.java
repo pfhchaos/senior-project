@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.location.Location;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 
+import java.util.Arrays;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -52,6 +54,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private PoI lastTouchedLocation;
     private NavigableSet<PoI> nearby;
     private long lastTouchTime;
+    final GestureDetector gestureDetector;
 
     public CameraOverlay(Context context){
         super(context);
@@ -85,9 +88,17 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
 
         nearby = new TreeSet<>();
 
-        Backend.getInstance().addHandler(() -> nearby.addAll(Backend.getInstance().getPoIs()));
+
+        Backend.getInstance().addHandler(() -> {
+            CommonMethods.getActivity(getContext()).runOnUiThread(() -> {
+                nearby.clear();
+                nearby.addAll(Backend.getInstance().getPoIs());
+                });
+            });
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
+
+        gestureDetector = new GestureDetector(getContext(), new CameraOverlayGestureListener());
     }
 
     private static Bitmap getBitmap(Drawable drawable) {
@@ -304,64 +315,73 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         matrix.mapPoints(mClickCoords);
         event.setLocation(mClickCoords[0], mClickCoords[1]);
 
-        boolean handled = false;
-        PoI closest = null;
-        TreeSet<PoI> touched = new TreeSet<>();
+        gestureDetector.onTouchEvent(event);
+        return true;
+    }
 
-        for (PoI poi : nearby) {
-            if (poi.wasTouched(event)) {
-                touched.add(poi);
-                if(touched.first() == poi)
-                    closest = poi;
+    private class CameraOverlayGestureListener extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public void onLongPress(MotionEvent e) {
+            Log.d("CamOver", "Long Touch detected!");
+            PoI closest = null;
+            TreeSet<PoI> touched = new TreeSet<>();
+            for (PoI poi : nearby) {
+                if (poi.wasTouched(e)) {
+                    touched.add(poi);
+                    if(touched.first() == poi)
+                        closest = poi;
+                }
+            }
+            if(closest != null) {
+                if (touched.size() == 1)
+                    closest.onLongTouch(getContext());
+                else {
+                    PopupBox popup = new PopupBox(getContext(), "Which would you like to view?");
+
+                    LinearLayout popView = new LinearLayout(getContext());
+                    popView.setOrientation(LinearLayout.VERTICAL);
+                    for (PoI poi : touched) {
+                        TextView poiView = new TextView(getContext());
+                        poiView.setPadding(10, 5, 10, 5);
+                        poiView.setGravity(Gravity.END);
+                        poiView.setText(poi.toShortString());
+                        poiView.setTextSize(18);
+                        poiView.setOnClickListener((i) -> {
+                            poi.onLongTouch(getContext());
+                            popup.dismiss();
+                        });
+                        popView.addView(poiView);
+                    }
+
+                    popup.setView(popView);
+                    popup.show();
+                }
             }
 
         }
 
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN :
-                lastTouchedLocation = closest;
-                lastTouchTime = System.currentTimeMillis();
-                handled = true;
-                break;
-            case MotionEvent.ACTION_UP :
-                if (closest != null && closest == lastTouchedLocation) {
-                    if (System.currentTimeMillis() - lastTouchTime <= 1000)
-                        handled = closest.onShortTouch(getContext());
-                    else{
-                        if(touched.size() == 1)
-                            handled = closest.onLongTouch(getContext());
-                        else{
-                            PopupBox popup = new PopupBox(getContext(), "Which would you like to view?");
-
-                            LinearLayout popView = new LinearLayout(getContext());
-                            popView.setOrientation(LinearLayout.VERTICAL);
-                            for(PoI poi : touched){
-                                TextView poiView = new TextView(getContext());
-                                poiView.setPadding(10,5,10,5);
-                                poiView.setGravity(Gravity.END);
-                                poiView.setText(poi.toShortString());
-                                poiView.setTextSize(18);
-                                poiView.setOnClickListener( (i) -> {
-                                    poi.onLongTouch(getContext());
-                                    popup.dismiss();
-                                });
-                                popView.addView(poiView);
-                            }
-
-                            popup.setView(popView);
-                            popup.show();
-                        }
-                    }
-
-                    //Log.d("CamOver", "Bearing to " + curLoc.bearingTo(lastTouchedLocation.getLocation()));
+        @Override
+        public boolean onSingleTapUp(MotionEvent e){
+            Log.d("CamOver", "Tap detected!");
+            PoI closest = null;
+            TreeSet<PoI> touched = new TreeSet<>();
+            for (PoI poi : nearby) {
+                if (poi.wasTouched(e)) {
+                    touched.add(poi);
+                    if(touched.first() == poi)
+                        closest = poi;
                 }
-                lastTouchTime = 0;
-                lastTouchedLocation = null;
-                break;
-
+            }
+            if(closest != null) {
+                return closest.onShortTouch(getContext());
+            }
+            return true;
         }
 
-        return handled;
+        @Override
+        public boolean onDown(MotionEvent e){
+            Log.d("CamOver", "Down detected!");
+            return true;
+        }
     }
-
 }
