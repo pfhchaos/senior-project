@@ -70,12 +70,8 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
             e.printStackTrace();
         }
 
-
        IconProvider.getInstance().generateIcon("busIcon", R.drawable.bus_stop_icon);
-
     }
-
-
 
     private void fetchElevation() {
         //TODO: google elevation API call setting
