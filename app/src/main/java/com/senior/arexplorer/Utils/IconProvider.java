@@ -166,6 +166,10 @@ public class IconProvider {
 
     }
 
+    public void generateIcon(String key, int resource){
+        generateIcon(key,AppCompatDrawableManager.get().getDrawable(applicationContext, resource));
+    }
+
     private void loadBitmapFromURL(String url){
         pointyIconMap.put(url, null);
         roundIconMap.put(url, null);

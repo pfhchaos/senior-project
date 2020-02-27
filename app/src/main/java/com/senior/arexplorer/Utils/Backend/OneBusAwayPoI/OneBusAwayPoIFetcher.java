@@ -51,6 +51,7 @@ public class OneBusAwayPoIFetcher extends PoIFetcher implements Response.ErrorLi
         if (networkResponse != null) {
             Log.e("Status code", String.valueOf(networkResponse.statusCode));
         }
+        this.fetchData();
     }
 
     @Override
