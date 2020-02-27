@@ -33,7 +33,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     private Rect arRect;
     public boolean arMarkerRender = false;
     public boolean focused = false;
-    public String iconURL = "https://maps.gstatic.com/mapfiles/place_api/icons/generic_business-71.png";
+    public String iconKey = "https://maps.gstatic.com/mapfiles/place_api/icons/generic_business-71.png";
 
     private Collection<String> types;
 
@@ -47,7 +47,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         this.arRect = new Rect();
 
         //Todo: SCOTT FIXIT This causes a crash cause IconProvider's instance doesn't exist yet
-        //IconProvider.getInstance().generateIcon(iconURL);
+        //IconProvider.getInstance().generateIcon(iconKey);
     }
 
     public void setName(String name) {
@@ -110,7 +110,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
         return loc.getAltitude();
     }
 
-    public String getIconURL(){ return iconURL;}
+    public String getIconKey(){ return iconKey;}
 
     public Collection<String> getTypes() {
         //TODO: clone types before returning it
@@ -122,11 +122,11 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     public Rect getARRect () { return arRect; }
 
     public Bitmap getPointyIcon(){
-        return IconProvider.getInstance().getPointyIcon(getIconURL());
+        return IconProvider.getInstance().getPointyIcon(getIconKey());
     }
 
     public Bitmap getRoundIcon(){
-        return IconProvider.getInstance().getRoundIcon(getIconURL());
+        return IconProvider.getInstance().getRoundIcon(getIconKey());
     }
 
     public boolean wasTouched(MotionEvent touchEvent){
@@ -139,7 +139,7 @@ public abstract class PoI implements Serializable, Comparable<PoI> {
     }
 
     public BitmapDescriptor getMapIcon(){
-        return BitmapDescriptorFactory.fromBitmap(IconProvider.getInstance().getMapIcon(getIconURL()));
+        return BitmapDescriptorFactory.fromBitmap(IconProvider.getInstance().getMapIcon(getIconKey()));
     }
 
     public String toShortString() {
