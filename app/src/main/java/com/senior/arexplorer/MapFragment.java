@@ -215,8 +215,6 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
         Switch showBuildingsSwitch = new Switch(getContext());
         showBuildingsSwitch.setChecked(Settings.getInstance().getShowBuildings());
 
-        //showBuildingsMenuItem.setCheckable(true);
-        //showBuildingsMenuItem.setChecked(Settings.getInstance().getShowBuildings());
         showBuildingsMenuItem.setActionView(showBuildingsSwitch);
 
         showBuildingsSwitch.setOnCheckedChangeListener((CompoundButton buttonView, boolean isChecked) -> {
@@ -226,14 +224,6 @@ public class MapFragment extends FragmentWithSettings implements OnMapReadyCallb
             else {
                 Settings.getInstance().setShowBuildings(false);
             }
-        });
-
-        String filter = Settings.getInstance().getFilter();
-        MenuItem filterMenuItem = menu.add(R.id.settings, Menu.NONE, Menu.NONE, "Filter: " + filter);
-
-        filterMenuItem.setOnMenuItemClickListener((menuItem) -> {
-            //TODO: create popup with text entry for filter string
-            return true;
         });
     }
 
