@@ -6,11 +6,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.senior.arexplorer.R;
 import com.senior.arexplorer.Utils.Backend.Here.Here;
 import com.senior.arexplorer.Utils.Backend.PoI;
@@ -76,6 +74,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
        IconProvider.getInstance().generateIcon("busIcon", R.drawable.bus_stop_icon);
 
     }
+
 
 
     private void fetchElevation() {

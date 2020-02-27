@@ -1,5 +1,6 @@
 package com.senior.arexplorer.Utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -160,6 +161,10 @@ public class IconProvider {
 
     public void generateIcon(String key, Drawable d){
         generateIcon(key, CommonMethods.getBitmapFromDrawable(d));
+    }
+
+    public void generateIcon(String key, int resource){
+        generateIcon(key,AppCompatDrawableManager.get().getDrawable(applicationContext, resource));
     }
 
     private void loadBitmapFromURL(String url){
