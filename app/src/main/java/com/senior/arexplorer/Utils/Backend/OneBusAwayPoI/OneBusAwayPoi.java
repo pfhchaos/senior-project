@@ -35,7 +35,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
         String direction = " ",name,toTrim,description="";
         Double lat,lon;
 
-        this.iconURL = "busIcon";
+        this.iconKey = "busIcon";
 
 
         try {
@@ -70,7 +70,6 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
             e.printStackTrace();
         }
 
-       IconProvider.getInstance().generateIcon("busIcon", R.drawable.bus_stop_icon);
     }
 
     private void fetchElevation() {
