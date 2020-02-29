@@ -1,5 +1,6 @@
 package com.senior.arexplorer.Utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
+@SuppressLint("RestrictedApi")
 public class IconProvider {
     private static IconProvider instance;
     private static Context applicationContext;

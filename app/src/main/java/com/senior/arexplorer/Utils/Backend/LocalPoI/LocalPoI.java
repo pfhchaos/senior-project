@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
+
 import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.Backend.saveObj;
 import com.senior.arexplorer.Utils.PopupBox;
@@ -16,8 +17,6 @@ import com.senior.arexplorer.Utils.PopupBox;
 public class LocalPoI extends PoI {
 
     Drawable img = null;
-
-
 
     public LocalPoI(saveObj s) {
         super();
@@ -31,7 +30,6 @@ public class LocalPoI extends PoI {
             this.img = new BitmapDrawable(blobToBitmap(s.getBlob()));
             Log.v("LocalPoI","getBlob was not null");
         }
-
     }
 
     private Bitmap blobToBitmap(byte[] blobToConvert){
