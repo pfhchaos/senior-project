@@ -175,6 +175,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
                 }
 
                 longDescription = results;
+                if(jsonArray.length() == 0)longDescription = "Get comfortable, there are no upcoming arrivals";
                 Log.v("OneBus arvs",longDescription);
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -8,5 +8,6 @@ public class CloudPoI extends LocalPoI {
 
     public CloudPoI(saveObj s){
         super(s);
+        this.iconKey = "cloudIcon";
     }
 }
