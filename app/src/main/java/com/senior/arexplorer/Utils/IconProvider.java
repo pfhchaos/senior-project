@@ -44,6 +44,10 @@ public class IconProvider {
 
         d = AppCompatDrawableManager.get().getDrawable(applicationContext, R.drawable.armarkerbackground);
         roundIconMap.put("default", CommonMethods.getBitmapFromDrawable(d));
+
+        generateIcon("busIcon", R.drawable.ic_bus_stop);
+        generateIcon("localIcon", R.drawable.ic_private);
+        generateIcon("cloudIcon",R.drawable.ic_cloud);
     }
 
     public static IconProvider getInstance() {

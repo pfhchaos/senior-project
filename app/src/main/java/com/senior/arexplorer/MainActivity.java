@@ -239,9 +239,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         IconProvider.init(this);
         this.iconProvider = IconProvider.getInstance();
-        this.iconProvider.generateIcon("busIcon", R.drawable.ic_bus_stop);
-        this.iconProvider.generateIcon("localIcon", R.drawable.ic_private);
-        this.iconProvider.generateIcon("cloudIcon",R.drawable.ic_cloud);
 
 
     }
