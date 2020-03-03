@@ -204,7 +204,24 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
              */
             int dayOfWeek = CommonMethods.xMody(Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2, 7);
             JSONArray hoursArray = details.getJSONObject("opening_hours").getJSONArray("weekday_text");
-            retView.addView(PopupBox.getTextView(hoursArray.getString(dayOfWeek), context));
+            tempView = PopupBox.getTextView(hoursArray.getString(dayOfWeek), context);
+            tempView.setOnClickListener(i -> {
+                PopupBox popup = new PopupBox(context, "Weekly hours for " + getName());
+                LinearLayout fullHoursView = new LinearLayout(context);
+                fullHoursView.setOrientation(LinearLayout.VERTICAL);
+                try{
+                    fullHoursView.addView(PopupBox.getTextView(hoursArray.getString(6),context));
+                for(int day = 0; day < 6; day++){
+                    fullHoursView.addView(PopupBox.getTextView(hoursArray.getString(day),context));
+
+                }
+                } catch (JSONException e) {
+                        Log.d("GooglePoI", e.toString());
+                    }
+                popup.setView(fullHoursView);
+                popup.show();
+            });
+            retView.addView(tempView);
 
             String website = details.getString("website");
             tempView = PopupBox.getTextView(website, context);
