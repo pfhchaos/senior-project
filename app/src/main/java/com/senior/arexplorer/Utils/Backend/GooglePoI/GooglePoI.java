@@ -1,5 +1,6 @@
 package com.senior.arexplorer.Utils.Backend.GooglePoI;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -107,10 +109,17 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
         if(details == null){
             String request = String.format("%s?key=%s&placeid=%s", placeDetailsAPIurl, KEY, this.placeID);
             Log.d("PlacesRequest", "Sending following getRequest : " + request);
+
+            ProgressDialog pd = new ProgressDialog(context);
+            pd.setTitle("Fetching Details");
+            pd.show();
+
             StringRequest stringRequest = new StringRequest(request,
                     (response) -> {
                         JSONObject detailsResp;
                         try {
+
+                            pd.dismiss();
                             detailsResp = new JSONObject(response);
                             details = detailsResp.getJSONObject("result");
                             Log.d("PlacesRequest", details.toString());
@@ -121,12 +130,16 @@ public class GooglePoI extends PoI implements Serializable, Response.ErrorListen
 
                         } catch (JSONException ex) {
                             Log.d("PlacesRequest", ex.toString());
+                            pd.setTitle("Error retrieving details");
                         }
                     },
-                    (error) -> Log.e("GooglePoI", "No response from Google Place Detail API!\n" + error));
+                    (error) -> {
+                        Log.e("GooglePoI", "No response from Google Place Detail API!\n" + error);
+                        pd.setTitle("Error retrieving details");
+                    });
             WebRequester.getInstance().getRequestQueue().add(stringRequest);
 
-            Toast.makeText(context, "Details are not yet available, fetching now...", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Details are not yet available, fetching now...", Toast.LENGTH_SHORT).show();
         }
         else{
             PopupBox popup = new PopupBox(context, getName());
