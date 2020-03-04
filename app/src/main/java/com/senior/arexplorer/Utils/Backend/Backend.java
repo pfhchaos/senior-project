@@ -134,7 +134,7 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         if (this.isReady()) {
             Collection<PoI> newPoIs = new ArrayList<PoI>();
             for (PoIFetcher source : sources) {
-                for (PoI poi : source.getPoIs()) { 
+                for (PoI poi : source.getPoIs()) {
                     if (matchesFilter(poi)) {
                         newPoIs.add(poi);
                     }
@@ -149,7 +149,6 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     private boolean matchesFilter(PoI poi) {
         String filter = Settings.getInstance().getFilter();
-        System.out.println("filter ****"+filter.matches(poi.getName()));
         if (filter.matches(poi.getName()) || filter.equals(poi.getDescription())|| poi.getDescription().matches(".*"+filter+".*")|| poi.getName().matches(".*"+filter+".*")){
             return true;
         }
