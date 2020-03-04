@@ -12,8 +12,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.location.Location;
+import android.os.Handler;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,6 +37,7 @@ import java.util.TreeSet;
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
 public class CameraOverlay extends View implements CompassAssistant.CompassAssistantListener, HereListener {
+    private final String TAG = "CamOver";
     private Paint p = new Paint();
     private Rect rect = new Rect(), curCompass = new Rect();
     private Bitmap compass;
@@ -50,8 +51,19 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private Location curLoc;
     private PoI lastTouchedLocation;
     private NavigableSet<PoI> nearby;
-    private long lastTouchTime;
-    final GestureDetector gestureDetector;
+
+    final Handler longPressHandler = new Handler();
+    Runnable longPressedRunnable = new Runnable() {
+        public void run() {
+            longPress();
+            isLongPressHandlerActivated = true;
+        }
+    };
+
+    private boolean isLongPressHandlerActivated = false;
+
+    private MotionEvent touchEvent;
+    private float downX,downY;
 
     public CameraOverlay(Context context){
         super(context);
@@ -64,13 +76,13 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         setBackgroundColor(Color.TRANSPARENT);
         setAlpha(1f);
         setViewingAngles();
-        //Log.d("CameraVA", String.format("Horizontal : %f\nVertical : %f", camHorizViewingAngle, camVertViewingAngle));
+        //Log.d(TAG, String.format("Horizontal : %f\nVertical : %f", camHorizViewingAngle, camVertViewingAngle));
 
         p.setAntiAlias(true);
         p.setFilterBitmap(true);
 
         @SuppressLint("RestrictedApi") Drawable drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
-        compass = getBitmap(drawable);
+        compass = CommonMethods.getBitmapFromDrawable(drawable);
 
         scale = (float) compass.getWidth() / 720;
 
@@ -95,16 +107,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         if(Backend.getInstance().isReady())
             nearby.addAll(Backend.getInstance().getPoIs());
 
-        gestureDetector = new GestureDetector(getContext(), new CameraOverlayGestureListener());
-    }
-
-    private static Bitmap getBitmap(Drawable drawable) {
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
     }
 
     @Override
@@ -135,7 +137,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
                 calcARRect(poi);
                 if (poi.arMarkerRender) {
                     canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
-                    //Log.d("CamOver", "Rendering ARMarker at " + poi.getARRect());
+                    //Log.d(TAG, "Rendering ARMarker at " + poi.getARRect());
                 }
             }
 
@@ -191,7 +193,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             poi.getCompassRect().set(center - halfMarkerWidth, offsetFromTop, center + halfMarkerWidth, markerHeight + offsetFromTop);
 
 
-            //Log.d("CompassMarker", poi.getCompassRect().toString());
+            //Log.d(TAG, poi.getCompassRect().toString());
 
             int alpha =(int)( (1 - dist / drawDistance) * 255) + 50;
             if(alpha > 255) alpha = 255;
@@ -259,7 +261,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         tempHoriz = sharedPreferences.getFloat("horiz", 0);
         tempVert = sharedPreferences.getFloat("vert", 0);
         if(tempHoriz == 0 || tempVert == 0){
-            Log.d("CamOver", "Camera Viewing angles unknown, loading now!");
+            Log.d(TAG, "Camera Viewing angles unknown, loading now!");
 
             Camera c = Camera.open();
             if(c != null) {
@@ -315,73 +317,94 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         matrix.mapPoints(mClickCoords);
         event.setLocation(mClickCoords[0], mClickCoords[1]);
 
-        gestureDetector.onTouchEvent(event);
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            longPressHandler.postDelayed(longPressedRunnable, 1000);
+            touchEvent = event;
+            downX = event.getX();
+            downY = event.getY();
+        }
+        if(event.getAction() == MotionEvent.ACTION_MOVE || event.getAction() == MotionEvent.ACTION_HOVER_MOVE) {
+                float currentX = event.getX();
+                float currentY = event.getY();
+                float firstX = downX;
+                float firstY = downY;
+                double distanceSquared = (currentY - firstY) * (currentY - firstY) + ((currentX - firstX) * (currentX - firstX));
+                Log.d(TAG, String.format(" \nOriginal Location\t: %f, %f\nNew Location\t\t: %f, %f", firstX, firstY, currentX, currentY));
+                Log.d(TAG, "Distance from down to up is " + distanceSquared);
+                if(distanceSquared > 25000) {
+                    longPressHandler.removeCallbacks(longPressedRunnable);
+                }
+
+        }
+        if(event.getAction() == MotionEvent.ACTION_UP) {
+            longPressHandler.removeCallbacks(longPressedRunnable);
+            if(isLongPressHandlerActivated) {
+                isLongPressHandlerActivated = false;
+                return false;
+            }
+
+            PoI closest;
+            TreeSet<PoI> touched = calcTouched(touchEvent);
+            closest = (touched.size() != 0) ? touched.first() : null;
+
+            if(closest != null) {
+                Log.d(TAG, "Tap detected on " + closest.getName() + "!");
+                return closest.onShortTouch(getContext());
+            }
+            else{
+                Log.d(TAG, "Tap wasnt on a marker!");
+            }
+        }
+
         return true;
     }
 
-    private class CameraOverlayGestureListener extends GestureDetector.SimpleOnGestureListener{
-        @Override
-        public void onLongPress(MotionEvent e) {
-            Log.d("CamOver", "Long Touch detected!");
-            PoI closest = null;
-            TreeSet<PoI> touched = new TreeSet<>();
-            for (PoI poi : nearby) {
-                if (poi.wasTouched(e)) {
-                    touched.add(poi);
-                    if(touched.first() == poi)
-                        closest = poi;
+    private void longPress(){
+        PoI closest;
+        TreeSet<PoI> touched = calcTouched(touchEvent);
+        closest = (touched.size() != 0) ? touched.first() : null;
+
+        if(closest != null) {
+            Log.d(TAG, "Long Press on marker detected!");
+            if (touched.size() == 1) {
+                Log.d(TAG, "Long Pressing " + closest.getName() + "!");
+                closest.onLongTouch(getContext());
+            }
+            else {
+                Log.d(TAG, "Long Pressing on multiple markers!");
+                PopupBox popup = new PopupBox(getContext(), "Which would you like to view?");
+
+                LinearLayout popView = new LinearLayout(getContext());
+                popView.setOrientation(LinearLayout.VERTICAL);
+                for (PoI poi : touched) {
+                    TextView poiView = new TextView(getContext());
+                    poiView.setPadding(10, 5, 10, 5);
+                    poiView.setGravity(Gravity.END);
+                    poiView.setText(poi.toShortString());
+                    poiView.setTextSize(18);
+                    poiView.setOnClickListener((i) -> {
+                        poi.onLongTouch(getContext());
+                        popup.dismiss();
+                    });
+                    popView.addView(poiView);
                 }
+
+                popup.setView(popView);
+                popup.show();
             }
-            if(closest != null) {
-                if (touched.size() == 1)
-                    closest.onLongTouch(getContext());
-                else {
-                    PopupBox popup = new PopupBox(getContext(), "Which would you like to view?");
-
-                    LinearLayout popView = new LinearLayout(getContext());
-                    popView.setOrientation(LinearLayout.VERTICAL);
-                    for (PoI poi : touched) {
-                        TextView poiView = new TextView(getContext());
-                        poiView.setPadding(10, 5, 10, 5);
-                        poiView.setGravity(Gravity.END);
-                        poiView.setText(poi.toShortString());
-                        poiView.setTextSize(18);
-                        poiView.setOnClickListener((i) -> {
-                            poi.onLongTouch(getContext());
-                            popup.dismiss();
-                        });
-                        popView.addView(poiView);
-                    }
-
-                    popup.setView(popView);
-                    popup.show();
-                }
-            }
-
         }
-
-        @Override
-        public boolean onSingleTapUp(MotionEvent e){
-            Log.d("CamOver", "Tap detected!");
-            PoI closest = null;
-            TreeSet<PoI> touched = new TreeSet<>();
-            for (PoI poi : nearby) {
-                if (poi.wasTouched(e)) {
-                    touched.add(poi);
-                    if(touched.first() == poi)
-                        closest = poi;
-                }
-            }
-            if(closest != null) {
-                return closest.onShortTouch(getContext());
-            }
-            return true;
+        else{
+            Log.d(TAG, "Long Press wasn't on marker!");
         }
+    }
 
-        @Override
-        public boolean onDown(MotionEvent e){
-            Log.d("CamOver", "Down detected!");
-            return true;
+    public TreeSet<PoI> calcTouched(MotionEvent event){
+        TreeSet<PoI> touched = new TreeSet<>();
+        for (PoI poi : nearby) {
+            if (poi.wasTouched(event)) {
+                touched.add(poi);
+            }
         }
+        return touched;
     }
 }
