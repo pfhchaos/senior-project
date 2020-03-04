@@ -320,21 +320,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             longPressHandler.postDelayed(longPressedRunnable, 1000);
             touchEvent = event;
+            TreeSet<PoI> touched = calcTouched(touchEvent);
+            lastTouchedLocation = (touched.size() != 0) ? touched.first() : null;
             downX = event.getX();
             downY = event.getY();
-        }
-        if(event.getAction() == MotionEvent.ACTION_MOVE || event.getAction() == MotionEvent.ACTION_HOVER_MOVE) {
-                float currentX = event.getX();
-                float currentY = event.getY();
-                float firstX = downX;
-                float firstY = downY;
-                double distanceSquared = (currentY - firstY) * (currentY - firstY) + ((currentX - firstX) * (currentX - firstX));
-                Log.d(TAG, String.format(" \nOriginal Location\t: %f, %f\nNew Location\t\t: %f, %f", firstX, firstY, currentX, currentY));
-                Log.d(TAG, "Distance from down to up is " + distanceSquared);
-                if(distanceSquared > 25000) {
-                    longPressHandler.removeCallbacks(longPressedRunnable);
-                }
-
         }
         if(event.getAction() == MotionEvent.ACTION_UP) {
             longPressHandler.removeCallbacks(longPressedRunnable);
@@ -364,7 +353,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         TreeSet<PoI> touched = calcTouched(touchEvent);
         closest = (touched.size() != 0) ? touched.first() : null;
 
-        if(closest != null) {
+        if(closest != null && closest == lastTouchedLocation) {
             Log.d(TAG, "Long Press on marker detected!");
             if (touched.size() == 1) {
                 Log.d(TAG, "Long Pressing " + closest.getName() + "!");
