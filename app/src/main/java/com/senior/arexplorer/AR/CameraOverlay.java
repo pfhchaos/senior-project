@@ -1,5 +1,6 @@
 package com.senior.arexplorer.AR;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -30,11 +31,8 @@ import com.senior.arexplorer.Utils.Backend.PoI;
 import com.senior.arexplorer.Utils.PopupBox;
 import com.senior.arexplorer.Utils.Settings;
 
-import java.util.Arrays;
 import java.util.NavigableSet;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
@@ -49,7 +47,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private float previousCompassBearing = -1f;
     private float camHorizViewingAngle, camVertViewingAngle;
     private float pitch;
-    private boolean useElevation = false;
     private Location curLoc;
     private PoI lastTouchedLocation;
     private NavigableSet<PoI> nearby;
@@ -72,7 +69,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         p.setAntiAlias(true);
         p.setFilterBitmap(true);
 
-        Drawable drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
+        @SuppressLint("RestrictedApi") Drawable drawable = AppCompatDrawableManager.get().getDrawable(getContext(), R.drawable.compassvector);
         compass = getBitmap(drawable);
 
         scale = (float) compass.getWidth() / 720;
@@ -136,8 +133,10 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         else {
             for (PoI poi : nearby.descendingSet()) {
                 calcARRect(poi);
-                if (poi.arMarkerRender)
+                if (poi.arMarkerRender) {
                     canvas.drawBitmap(poi.getRoundIcon(), null, poi.getARRect(), p);
+                    //Log.d("CamOver", "Rendering ARMarker at " + poi.getARRect());
+                }
             }
 
             calcCompass();
@@ -214,6 +213,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         float relativeHorizHeading = curLoc.bearingTo(poi.getLocation()) - heading;
         relativeHorizHeading = CommonMethods.xMody((relativeHorizHeading + 180), 360) - 180;
 
+        boolean useElevation = Settings.getInstance().getUseElevation();
         int relativeElevation = (useElevation) ? (int)(curLoc.getAltitude() - poi.getElevation()) : 0;
         float relativeVertHeading = (float) Math.toDegrees(Math.atan(relativeElevation / dist)) + pitch;
 
@@ -259,7 +259,7 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         tempHoriz = sharedPreferences.getFloat("horiz", 0);
         tempVert = sharedPreferences.getFloat("vert", 0);
         if(tempHoriz == 0 || tempVert == 0){
-            Log.d("CamOverlay", "Camera Viewing angles unknown, loading now!");
+            Log.d("CamOver", "Camera Viewing angles unknown, loading now!");
 
             Camera c = Camera.open();
             if(c != null) {
