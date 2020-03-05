@@ -153,11 +153,11 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
         so the filter needs to treat those the same. it should also ignore case and repeated whitespace.
         possibly also ignore word order though that will be harder
          */
-        String result = filter.replaceAll("\\s"," ").toLowerCase();
-        String typeString = filter.replaceAll("\\s", "_").toLowerCase();
+        String result = filter.replaceAll("\\s+"," ").toLowerCase();
+        String typeString = filter.replaceAll("\\s+", "_").toLowerCase();
         boolean matches = false;
-        matches |= result.matches(poi.getName().toLowerCase());
-        matches |= result.matches(poi.getDescription().toLowerCase());
+        matches |= poi.getName().toLowerCase().matches(".*"+result+".*");
+        matches |= poi.getDescription().toLowerCase().matches(".*"+result+".*");
         for (String type : poi.getTypes()) {
             matches |= typeString.matches(type);
         }
