@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/staticMenuItems"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_map"
@@ -12,26 +14,25 @@
             android:id="@+id/nav_ar"
             android:icon="@drawable/ic_ar"
             android:title="AR" />
+    </group>
+
+    <group android:checkableBehavior="none">
         <item
             android:id="@+id/nav_settings"
-            android:checkable="false"
             android:icon="@drawable/ic_settings"
             android:title="Settings" />
         <item
             android:id="@+id/nav_save"
-            android:checkable="false"
             android:icon="@android:drawable/ic_menu_save"
             android:title="Save" />
         <item
             android:id="@+id/nav_filter"
-            android:checkable="false"
-            android:icon="@android:drawable/ic_menu_save"
+            android:icon="@android:drawable/ic_menu_search"
             android:title="Filter" />
     </group>
 
     <group
         android:id="@+id/settings"
-        android:checkableBehavior="none">
-    </group>
+        android:checkableBehavior="none" />
 
 </menu>
