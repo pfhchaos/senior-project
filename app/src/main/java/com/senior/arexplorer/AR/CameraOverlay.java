@@ -51,6 +51,8 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
     private Location curLoc;
     private PoI lastTouchedLocation;
     private NavigableSet<PoI> nearby;
+    private boolean isLongPressHandlerActivated = false;
+    private MotionEvent touchEvent;
 
     final Handler longPressHandler = new Handler();
     Runnable longPressedRunnable = new Runnable() {
@@ -60,10 +62,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
         }
     };
 
-    private boolean isLongPressHandlerActivated = false;
-
-    private MotionEvent touchEvent;
-    private float downX,downY;
 
     public CameraOverlay(Context context){
         super(context);
@@ -322,8 +320,6 @@ public class CameraOverlay extends View implements CompassAssistant.CompassAssis
             touchEvent = event;
             TreeSet<PoI> touched = calcTouched(touchEvent);
             lastTouchedLocation = (touched.size() != 0) ? touched.first() : null;
-            downX = event.getX();
-            downY = event.getY();
         }
         if(event.getAction() == MotionEvent.ACTION_UP) {
             longPressHandler.removeCallbacks(longPressedRunnable);
