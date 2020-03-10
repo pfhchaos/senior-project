@@ -14,14 +14,17 @@
             android:title="AR" />
         <item
             android:id="@+id/nav_settings"
+            android:checkable="false"
             android:icon="@drawable/ic_settings"
             android:title="Settings" />
         <item
             android:id="@+id/nav_save"
+            android:checkable="false"
             android:icon="@android:drawable/ic_menu_save"
             android:title="Save" />
         <item
             android:id="@+id/nav_filter"
+            android:checkable="false"
             android:icon="@android:drawable/ic_menu_save"
             android:title="Filter" />
     </group>

@@ -195,7 +195,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.nav_settings :
-                tempFrag =  new SettingsFragment();
+                tempFrag = null;
+                SettingsFragment settingsFragment = new SettingsFragment();
+                settingsFragment.show(getSupportFragmentManager(), "Settings Fragment");
+                //tempFrag =  new SettingsFragment();
                 break;
 
             case R.id.nav_save :

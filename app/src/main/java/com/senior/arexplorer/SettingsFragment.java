@@ -20,9 +20,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends DialogFragment {
 
 
     @Nullable
