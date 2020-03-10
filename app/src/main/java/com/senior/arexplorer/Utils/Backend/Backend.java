@@ -149,10 +149,19 @@ public class Backend extends PoIFetcher implements HereListener, PoIFetcherHandl
 
     private boolean matchesFilter(PoI poi) {
         String filter = Settings.getInstance().getFilter();
-        if (filter.matches(poi.getName()) || filter.equals(poi.getDescription())|| poi.getDescription().matches(".*"+filter+".*")|| poi.getName().matches(".*"+filter+".*")){
-            return true;
+        /*take filter and transform into a regex. the types have underscors instead of spaces
+        so the filter needs to treat those the same. it should also ignore case and repeated whitespace.
+        possibly also ignore word order though that will be harder
+         */
+        String result = filter.replaceAll("\\s+"," ").toLowerCase();
+        String typeString = filter.replaceAll("\\s+", "_").toLowerCase();
+        boolean matches = false;
+        matches |= poi.getName().toLowerCase().matches(".*"+result+".*");
+        matches |= poi.getDescription().toLowerCase().matches(".*"+result+".*");
+        for (String type : poi.getTypes()) {
+            matches |= typeString.matches(type);
         }
-        return false;
+        return matches;
     }
 
     private void notifyHandlers() {
