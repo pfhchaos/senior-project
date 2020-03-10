@@ -185,6 +185,7 @@ class OneBusAwayPoi extends PoI implements Serializable, Response.ErrorListener,
         private String formatTime(long durationInMillis){
             long now = System.currentTimeMillis();
             durationInMillis = durationInMillis - now;
+            if(durationInMillis <= 0)return "Already departed.";
             Log.v("OneBus formatTime","durationInMillis "+durationInMillis);
             long second = (durationInMillis / 1000) % 60;
             long minute = (durationInMillis / (1000 * 60)) % 60;
